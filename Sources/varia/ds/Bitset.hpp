@@ -154,10 +154,16 @@ struct Bitset32
 		for_range_var(i, Bitset32Util::true_size(Size))
 		{
 			vds::Result<u8> bit_search = this->data[i].find_first_set();
-			if (bit_search.valid)
+			size_t found_bit = bit_search.value + (Bitset32Util::bit_width() * i);
+
+			//Note(zshoals Dec-11-2022): found_bit must compare against size
+			//even in find_first_set (despite being unable to set OOB values)
+			//because it's possible that the bitset will be inverted and 
+			//bits outside the bitset's public facing size could wind up set
+			if (bit_search.valid && found_bit < Size)
 			{
 				res.valid = vds::ResultStatus_e::Success;
-				res.value = bit_search.value + (Bitset32Util::bit_width() * i);
+				res.value = found_bit;
 
 				return res;
 			}
@@ -178,10 +184,16 @@ struct Bitset32
 			//Note(zshoals Dec-11-2022): The only difference between this and find_first_set
 			//is this inverse.find_first_unset() call here
 			vds::Result<u8> bit_search = this->data[i].find_first_unset();
-			if (bit_search.valid)
+			size_t found_bit = bit_search.value + (Bitset32Util::bit_width() * i);
+
+			//Note(zshoals Dec-11-2022): First, see note in "find_first_set"
+			//Second, we must compare against "found_bit" and "Size" because
+			//it's possible that the bits out of the user selectable range
+			//are affected by various operations inadvertently. 
+			if (bit_search.valid && found_bit < Size)
 			{
 				res.valid = vds::ResultStatus_e::Success;
-				res.value = bit_search.value + (Bitset32Util::bit_width() * i);
+				res.value = found_bit;
 
 				return res;
 			}
