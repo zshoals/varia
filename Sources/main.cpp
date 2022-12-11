@@ -8,6 +8,7 @@
 #include "varia/ds/Bits.hpp"
 #include "varia/ds/Bitset.hpp"
 #include "varia/exd/EntityManifest.hpp"
+#include "varia/exd/World.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
@@ -74,23 +75,11 @@ int kickstart(int argc, char** argv)
 		wo.mode = KINC_WINDOW_MODE_WINDOW;
 	}
 
-	exd::EntityManifest<8192> manifest;
-	exd::Entity ent = manifest.entity_get_free();
-	exd::Entity ent2 = manifest.entity_get_free();
-	exd::Entity ent3 = manifest.entity_get_free();
+	exd::World<1024> w = {};
+	exd::Entity ent = w.ent_create();
 
-	VARIA_LOG_UINT(ent.id);
-	VARIA_LOG_UINT(ent2.id);
-	VARIA_LOG_UINT(ent3.id);
+	w.ent_kill(ent);
 
-	for_range(8192)
-	{
-		ent3 = manifest.entity_get_free();
-		ent.generation_increment(15);
-	}
-
-	VARIA_LOG_UINT(ent3.id_extract(15));
-	VARIA_LOG_UINT(ent.generation_extract(15));
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
