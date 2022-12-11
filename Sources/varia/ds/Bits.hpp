@@ -16,11 +16,11 @@ struct Bits32
 	void and(Bits32 other) { this->storage &= other.storage; }
 	void or(Bits32 other) { this->storage |= other.storage; }
 	void not(void) { this->storage = ~this->storage; }
-	void set(u8 bit_index) { this->storage |= (1 << bit_index); }
-	void set_all(void) { this->clear(); this->storage = ~this->storage; }
 	void unset(u8 bit_index) { this->storage &= ~(1 << bit_index); }
+	void unset_all(void) { this->storage = 0; }
+	void set(u8 bit_index) { this->storage |= (1 << bit_index); }
+	void set_all(void) { this->unset_all(); this->storage = ~this->storage; }
 	void toggle(u8 bit_index) { this->storage ^= (1 << bit_index); }
-	void clear(void) { this->storage = 0; }
 
 	bool is_set(u8 bit_index) { return this->storage & (1 << bit_index); }
 	bool is_unset(u8 bit_index) { return !is_set(bit_index); }
@@ -175,10 +175,10 @@ struct Bits64
 	void or(Bits64 other) { this->storage |= other.storage; }
 	void not(void) { this->storage = ~this->storage; }
 	void set(u8 bit_index) { this->storage |= (1ULL << bit_index); }
-	void set_all(void) { this->clear(); this->storage = ~this->storage; }
+	void set_all(void) { this->unset_all(); this->storage = ~this->storage; }
 	void unset(u8 bit_index) { this->storage &= ~(1ULL << bit_index); }
 	void toggle(u8 bit_index) { this->storage ^= (1ULL << bit_index); }
-	void clear(void) { this->storage = 0; }
+	void unset_all(void) { this->storage = 0; }
 
 	bool is_set(u8 bit_index) { return this->storage & (1ULL << bit_index); }
 	bool is_unset(u8 bit_index) { return !is_set(bit_index); }

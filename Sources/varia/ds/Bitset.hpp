@@ -104,7 +104,7 @@ struct Bitset32
 	{
 		for_range_var(i, true_size())
 		{
-			this->data[i].clear();
+			this->data[i].unset_all();
 		}
 	}
 
