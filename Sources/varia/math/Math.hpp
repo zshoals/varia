@@ -26,12 +26,12 @@ constexpr inline float remap(float value, float s1, float e1, float s2, float e2
 
 constexpr inline float rad2deg(float radians)
 {
-	return radians * (180.0 / PI);
+	return static_cast<float>(radians * (180.0 / PI));
 }
 
 constexpr inline float deg2rad(float degrees)
 {
-	return degrees * (PI / 180.0);
+	return static_cast<float>(degrees * (PI / 180.0));
 }
 
 constexpr inline float minF(float a, float b)
