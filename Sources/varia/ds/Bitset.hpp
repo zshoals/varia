@@ -34,9 +34,6 @@ namespace Bitset32Util
 template<int Size>
 struct Bitset32
 {
-	//VVVVVVVV Utility VVVVVVVV 
-	//^^^^^^^^ End Utility ^^^^^^^^  
-
 
 	static_assert(Size > 0, "Bitset element count must be greater than 0");
 

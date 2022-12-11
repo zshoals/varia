@@ -31,7 +31,7 @@ struct EntityManifest
 
 	bool entity_valid(exd::Entity ent, u8 generation_pivot)
 	{
-		u64 idx = ent.extract_id_exclusively(generation_pivot);
+		u64 idx = ent.id_extract(generation_pivot);
 		return (ent.id == this->manifest[idx].id);
 	}
 
@@ -53,6 +53,7 @@ struct EntityManifest
 	void entity_release(exd::Entity ent, u8 generation_pivot)
 	{
 		DEBUG_ENSURE_UINT_GT_ZERO(ent.id, "Tried to release an INVALID_ENTITY");
+		DEBUG_ENSURE_UINT_LT(ent.id_extract(), Size, "Tried to release an entity id exceeding the maximum entity count.");
 
 		size_t idx = ent.id_extract();
 		bitset.unset(idx);
