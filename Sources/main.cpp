@@ -9,8 +9,13 @@
 #include "varia/ds/Bitset.hpp"
 
 #include "varia/logging.hpp"
+#include "varia/ds/Bits.hpp"
 
 #include <stdbool.h>
+
+#include "varia/math/Math.hpp"
+
+using namespace Varia;
 
 int kickstart(int argc, char** argv) 
 {
@@ -66,6 +71,16 @@ int kickstart(int argc, char** argv)
 		wo.x = -1; //Default window position (centered)
 		wo.y = -1; //Default window position (centered)
 		wo.mode = KINC_WINDOW_MODE_WINDOW;
+	}
+
+	vds::Bitset32<100> bits = {};
+
+	bits.set(57);
+	vds::Result<size_t> res = bits.find_first_unset();
+
+	if (res.valid)
+	{
+		VARIA_LOG_UINT(res.value);
 	}
 
 	kinc_init("Varia", 800, 600, NULL, NULL);

@@ -36,3 +36,6 @@ typedef unsigned int uint;
 #define for_range_var_slice(CAPTURE, START, STOP)\
 	assert(START >= 0 && STOP >= 0);\
 	for (size_t (CAPTURE) = START; (CAPTURE) < (STOP); ++(CAPTURE))
+#define for_range_var_step(CAPTURE, STOP, STEP)\
+	assert(STOP >= 0);\
+	for (size_t (CAPTURE) = 0; (CAPTURE) < (STOP); (CAPTURE) += (STEP))
