@@ -143,18 +143,18 @@ struct Bitset32
 		return Size;
 	}
 
-	vds::Result<size_t> find_first_free(void)
+	vds::Result<size_t> find_first_set(void)
 	{
 		vds::Result<size_t> res;
 
 		for_range_var(i, true_size())
 		{
 			size_t block_idx = Bitset32::compute_block_index(i);
-			vds::Result<u8> bit_search = this->data[block_idx].find_first_free();
+			vds::Result<u8> bit_search = this->data[block_idx].find_first_set();
 			if (bit_search.valid)
 			{
 				res.valid = vds::ResultStatus_e::Success;
-				res.value = bit_search.value;
+				res.value = bit_search.value * block_idx;
 
 				return res;
 			}
