@@ -53,9 +53,9 @@ struct EntityManifest
 	void entity_release(exd::Entity ent, u8 generation_pivot)
 	{
 		DEBUG_ENSURE_UINT_GT_ZERO(ent.id, "Tried to release an INVALID_ENTITY");
-		DEBUG_ENSURE_UINT_LT(ent.id_extract(), Size, "Tried to release an entity id exceeding the maximum entity count.");
+		DEBUG_ENSURE_UINT_LT(ent.id_extract(generation_pivot), Size, "Tried to release an entity id exceeding the maximum entity count.");
 
-		size_t idx = ent.id_extract();
+		size_t idx = ent.id_extract(generation_pivot);
 		bitset.unset(idx);
 		manifest.data[idx].generation_increment(generation_pivot);
 	}
