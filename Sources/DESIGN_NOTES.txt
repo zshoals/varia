@@ -1,0 +1,138 @@
+There should not really be any instances of static variables.
+
+All information should be stored in contexts that are passed in from main or something.
+
+Something in engine.h likely is the overall container for the contexts.
+
+"transaction log" -- track every step of the world so we can step backwards in time?
+
+REMEMBER: KINC IS THE ABSTRACTION LAYER!!!! You don't need to wrap something that's already wrapping everything else!!!!
+
+
+
+
+
+====================================================================================================================
+====================================================================================================================
+Serialization:
+
+We might be able to binary write everything to file if we avoid using pointers and only 
+access things through lookup functions, we'd have to be pretty pedantic about it but it would allow
+us to dump the entire game state and reload it as long as the "shape" of structs and etc. doesn't change
+We could introduce new functions easily and etc.
+
+We could write out the gamestate every rendered frame. To deal with potential crashes,
+the start of a frame has two flags: A "is in serialization mode" flag and a "completed write" flag
+Serialization mode is on, and is written to the binary file as byte 1. We check if that is enabled when reloading
+Completed write gets unset at frame start, and set at completion of binary file write. This is byte 2
+Byte 1 and 2 both get checked at startup. If either one is false, then a problem occurred and it's gg
+
+Ok actually doing this "every frame" is kind of moronic. We only need to do this when we're actually like,
+trying to save and reload shit. I guess we wanted this on the chance that crashes occur or something?
+That's kind of nice maybe. We could take snapshots of the gamestate essentially every time period, which is
+pretty cool actually.
+
+We can't restore things when it comes to new fields and struct "shapes" though. We could be pedantic...
+about setting up struct initialization functions with sane defaults maybe, but IDK if worth
+
+====================================================================================================================
+====================================================================================================================
+Notes on serialization safety: 
+
+Guard bytes and guard zones at the front and back of the gamestate struct can help keep you from running into other
+element storage locations, which sounds like a good idea I think
+
+Every time you reload gamestate, make sure these guard byte sequences match some default sequence that should always
+be the same
+
+Note: Special casing has to apply for some things anyway, such as resources (sounds, images, etc.). A reload should assume
+certain things like this are completely invalid.
+
+super_critical_microsoft_windows_struct D:!!!!! //We're safe as long as we have those zero'd out guard zones! Probably,
+as long as they're big enough at least.
+
+typedef gamestate
+{
+	tec_bytes _DEBUG_GUARD_ZONE_FRONT[TEC_MEGABYTES(1)];
+
+	players[100];
+
+	guard_byte_sequence _debug_seq_1;
+
+	enemies[1000];
+
+	guard_byte_sequence _debug_seq_2;
+
+	loaded_level;
+
+	guard_byte_sequence _debug_seq_3;
+
+	textures[600];
+
+	guard_byte_sequence _debug_seq_4;
+
+	sounds[100];
+
+	tec_bytes _DEBUG_GUARD_ZONE_BACK[TEC_MEGABYTES(1)]; //Entire array is 0 every frame
+	//The array is checked for any non-zero values every frame, if there is, RIP
+}
+gamestate_t;
+
+
+This can happen without crashing as they do not change the overall shape of structs, which may or may not be a bad thing
+	uint32 ---> int32
+
+	uint32 ---> uint16 and uint16 (bad????? IDK???)
+
+Additionally....while editing things, we can add in a "buffer zone" in various structs that are being live edited.
+This buffer zone would be subtracted from to maintain the "shape" of the game state, but we'd have to be careful about
+padding. Ex:
+
+struct {
+	int x;
+	int y;
+	uchar shape_save[64];
+}
+
+then, before reloading...
+
+struct {
+	int x;
+	int y;
+	double color;
+	uchar shape_save[64 - sizeof(double)];
+}
+
+This might work as long as padding doesn't fuck us up too much. Also, stand in values could be added temporarily that
+we could replace and fill out later.
+
+To get around padding issues, we can just accept the unaligned access hit (but make sure to disable this later!!!)
+
+#pragma pack(1)
+struct {
+	int x;
+	int y;
+	uchar hot_reload_buffer[256];
+}
+
+ENABLE_HOT_RELOAD
+struct {
+	int x;
+	int y;
+	double target;
+	int valid_target;
+	uchar hot_reload_buffer[256 - sizeof(double) - sizeof(int)];
+}
+
+#define ENABLE_HOT_RELOAD __pragma(pack(1)) //Have to use this type of pragma or _Pragma("") instead
+
+EXAMPLE:::
+#define ENABLE_HOT_RELOAD __pragma(pack(1))
+#define HOT_RELOADS _Pragma("pack(1)")
+
+ENABLE_HOT_RELOAD
+typedef struct test
+{
+    int a;
+}
+test_t;

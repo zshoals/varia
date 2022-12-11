@@ -1,0 +1,9 @@
+
+
+#define ENTITY_COUNT 1024
+//README:
+//	COMPONENT_DATA FORMAT:
+//	COMPONENT_DATA(TYPE, FIELD_NAME)
+
+COMPONENT_DATA(VPosition, positions)
+// COMPONENT_DATA(VRotation, rotations)

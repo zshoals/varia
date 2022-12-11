@@ -1,0 +1,19 @@
+{
+	"files.associations": {
+		"*.h": "c",
+		"bit": "c",
+		"compare": "c",
+		"cstddef": "c",
+		"limits": "c",
+		"type_traits": "c",
+		"vector": "c",
+		"xutility": "c",
+		"array": "cpp",
+		"string_view": "cpp",
+		"xstring": "cpp",
+		"climits": "c",
+		"cstdlib": "c",
+		"cstring": "c",
+		"utility": "c"
+	}
+}

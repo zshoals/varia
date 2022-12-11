@@ -1,0 +1,73 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Kinc: Launch",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment\\Varia.exe",
+			"cwd": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment",
+			"preLaunchTask": "Kinc: Build for Windows (VS2019)",
+			"console": "newExternalWindow",
+			"logging": {
+				"moduleLoad": false,
+				"trace": true
+			}
+		},
+		{
+			"name": "Kinc: Launch (NoShader)",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment\\Varia.exe",
+			"cwd": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment",
+			"preLaunchTask": "Kinc: Build for Windows (VS2019) NoShaders",
+			"console": "newExternalWindow",
+			"logging": {
+				"moduleLoad": false,
+				"trace": true
+			}
+		},
+		{
+			"name": "Kinc (Release): Launch (NoShader)",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment\\Varia.exe",
+			"cwd": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment",
+			"preLaunchTask": "Kinc (Release): Build for Windows (VS2019) NoShaders",
+			"console": "newExternalWindow",
+			"logging": {
+				"moduleLoad": false,
+				"trace": true
+			}
+		},
+		{
+			"name": "Varia: Debug Launch",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment\\Varia.exe",
+			"cwd": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment",
+			"preLaunchTask": "Varia: Debug Compile",
+			"console": "newExternalWindow",
+			"logging": {
+				"moduleLoad": false,
+				"trace": true
+			}
+		},
+		{
+			"name": "Varia: Release Launch",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment\\Varia.exe",
+			"cwd": "c:\\Users\\Zanarias\\Desktop\\Programming_Projects\\Varia\\Deployment",
+			"preLaunchTask": "Varia: Release Compile",
+			"console": "newExternalWindow",
+			"logging": {
+				"moduleLoad": false,
+				"trace": true
+			}
+		}		
+	]
+}
