@@ -70,7 +70,7 @@ struct Bits32
 		{
 			shifted_upper.rotate_right(pivot);
 			
-			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1 << (31 - pivot + 1)), "Upper range bit overflow");
+			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (31 - pivot + 1)), "Upper range bit overflow");
 
 			++(shifted_upper.storage);
 			shifted_upper.rotate_left(pivot);

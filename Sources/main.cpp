@@ -74,7 +74,7 @@ int kickstart(int argc, char** argv)
 		wo.mode = KINC_WINDOW_MODE_WINDOW;
 	}
 
-	exd::EntityManifest<1024> manifest;
+	exd::EntityManifest<8192> manifest;
 	exd::Entity ent = manifest.entity_get_free();
 	exd::Entity ent2 = manifest.entity_get_free();
 	exd::Entity ent3 = manifest.entity_get_free();
@@ -82,25 +82,14 @@ int kickstart(int argc, char** argv)
 	VARIA_LOG_UINT(ent.id);
 	VARIA_LOG_UINT(ent2.id);
 	VARIA_LOG_UINT(ent3.id);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	ent.generation_increment(15);
-	VARIA_LOG_UINT(ent.id_extract(15));
+
+	for_range(8192)
+	{
+		ent3 = manifest.entity_get_free();
+		ent.generation_increment(15);
+	}
+
+	VARIA_LOG_UINT(ent3.id_extract(15));
 	VARIA_LOG_UINT(ent.generation_extract(15));
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
