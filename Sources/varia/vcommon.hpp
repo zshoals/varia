@@ -29,7 +29,7 @@ typedef unsigned int uint;
 //Note: For now, only support positive values
 #define for_range(STOP)\
 	assert(STOP >= 0);\
-	for (size_t VARIA_CONCAT(_i, __LINE__) = 0; TEC_CONCAT(_i, __LINE__) < (STOP); ++TEC_CONCAT(_i, __LINE__))
+	for (size_t VARIA_CONCAT(_i, __LINE__) = 0; VARIA_CONCAT(_i, __LINE__) < (STOP); ++VARIA_CONCAT(_i, __LINE__))
 #define for_range_var(CAPTURE, STOP)\
 	assert(STOP >= 0);\
 	for (size_t (CAPTURE) = 0; (CAPTURE) < (STOP); ++(CAPTURE))
