@@ -7,6 +7,7 @@
 #include "varia/ds/StaticQueue.hpp"
 #include "varia/ds/Bits.hpp"
 #include "varia/ds/Bitset.hpp"
+#include "varia/exd/EntityManifest.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
@@ -73,15 +74,34 @@ int kickstart(int argc, char** argv)
 		wo.mode = KINC_WINDOW_MODE_WINDOW;
 	}
 
-	vds::Bitset32<100> bits = {};
+	exd::EntityManifest<1024> manifest;
+	exd::Entity ent = manifest.entity_get_free();
+	exd::Entity ent2 = manifest.entity_get_free();
+	exd::Entity ent3 = manifest.entity_get_free();
 
-	bits.set(57);
-	vds::Result<size_t> res = bits.find_first_unset();
-
-	if (res.valid)
-	{
-		VARIA_LOG_UINT(res.value);
-	}
+	VARIA_LOG_UINT(ent.id);
+	VARIA_LOG_UINT(ent2.id);
+	VARIA_LOG_UINT(ent3.id);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	ent.generation_increment(15);
+	VARIA_LOG_UINT(ent.id_extract(15));
+	VARIA_LOG_UINT(ent.generation_extract(15));
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
