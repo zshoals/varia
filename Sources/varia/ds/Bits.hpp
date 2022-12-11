@@ -70,7 +70,7 @@ struct Bits32
 		{
 			shifted_upper.rotate_right(pivot);
 			
-			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, ((1 << (pivot + 1)) - 1), "Upper range bit overflow");
+			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1 << (31 - pivot + 1)), "Upper range bit overflow");
 
 			++(shifted_upper.storage);
 			shifted_upper.rotate_left(pivot);
@@ -79,8 +79,11 @@ struct Bits32
 		//Clear the upper bits and work with the lower bits of the value
 		Bits32 shifted_lower = *this;
 		{
-			shifted_lower.rotate_left(pivot);
-			shifted_lower.rotate_right(pivot);
+			Bits32 lower_mask = {};
+			
+			//Note(zshoals Dec-11-2022): Pivot is not inclusive, lower bits get ripped off here
+			lower_mask.generate_bitmask_lo(pivot - 1);
+			shifted_lower.mask_allow(lower_mask);
 		}
 
 		//Remerge the upper and lower portions of the value after incrementing
@@ -210,7 +213,7 @@ struct Bits64
 		//We want to start with a zero value for that a negation results in all bits being set
 		this->not();
 
-		u8 to_cut = 31 - pivot;
+		u8 to_cut = 63 - pivot;
 		this->rotate_left(to_cut);
 		this->rotate_right(to_cut);
 	}
@@ -235,17 +238,22 @@ struct Bits64
 		{
 			shifted_upper.rotate_right(pivot);
 			
-			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (pivot + 1)), "Upper range bit overflow");
+			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (63 - pivot + 1)), "Upper range bit overflow");
 
-			++(shifted_upper.storage);
+			shifted_upper.storage += 1;
 			shifted_upper.rotate_left(pivot);
 		}
 
 		//Clear the upper bits and work with the lower bits of the value
 		Bits64 shifted_lower = *this;
 		{
-			shifted_lower.rotate_left(pivot);
-			shifted_lower.rotate_right(pivot);
+			// shifted_lower.rotate_left(31 - pivot);
+			// shifted_lower.rotate_right(31 - pivot);
+			Bits64 lower_mask = {};
+			
+			//Note(zshoals Dec-11-2022): Pivot is not inclusive, lower bits get ripped off here
+			lower_mask.generate_bitmask_lo(pivot - 1);
+			shifted_lower.mask_allow(lower_mask);
 		}
 
 		//Remerge the upper and lower portions of the value after incrementing
