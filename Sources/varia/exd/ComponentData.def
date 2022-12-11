@@ -1,9 +1,16 @@
 
+#ifdef EXD_IMPORT_COMPONENT_INCLUDES
+	#include "varia/comps/Position.hpp"
+#else
+
 
 #define ENTITY_COUNT 1024
+#define EXD_ID_BITS 15
 //README:
 //	COMPONENT_DATA FORMAT:
 //	COMPONENT_DATA(TYPE, FIELD_NAME)
 
-COMPONENT_DATA(VPosition, positions)
+COMPONENT_DATA(Position, positions)
 // COMPONENT_DATA(VRotation, rotations)
+
+#endif
