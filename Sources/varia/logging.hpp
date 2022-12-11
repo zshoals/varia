@@ -41,8 +41,8 @@ void tec_log_filtered(tec_logging_flags flags, char const * format, ...);
 //Note(zshoals): Only VARIA_XXX is intended for public usage
 #define VARIA_LOG(FILTER, FORMAT, ...) tec_log_filtered(FILTER, FORMAT, __VA_ARGS__)
 #define VARIA_QLOG(FORMAT, ...) VARIA_LOG(LOG_INFO, FORMAT, __VA_ARGS__)
-#define VARIA_LOG_INT(VALUE) VARIA_QLOG("%lld", VALUE)
-#define VARIA_LOG_UINT(VALUE) VARIA_QLOG("%zu", VALUE)
+#define VARIA_LOG_INT(VALUE) VARIA_QLOG("%lld", static_cast<long long int>(VALUE))
+#define VARIA_LOG_UINT(VALUE) VARIA_QLOG("%zu", static_cast<size_t>(VALUE))
 #define VARIA_LOG_FLOAT(VALUE) VARIA_QLOG("%f", VALUE)
 #define VARIA_LOG_STRING(PTR) VARIA_QLOG("%s", PTR)
 
