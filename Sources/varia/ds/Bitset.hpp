@@ -170,10 +170,9 @@ struct Bitset32
 	{
 		DEBUG_ENSURE_UINT_LT((target_bit / 32), true_size(), "Out of range bit in Bitset.");
 
-		//Note(zshoals): Equivalent to target_bit / bit_width, however, this is faster
-		//in debug builds
-		constexpr size_t pow2_divide = Bits32::pow2_to_bitshift_value(Bitset32::bit_width());
-		return target_bit >> pow2_divide;
+		//Note(zshoals Dec-11-2022): There's no guarantee that the bitset is a power of two,
+		//we don't enforce that. We have to use a simple division instead.
+		return target_bit / Bitset32::bit_width();
 	}
 
 	static u8 compute_bit_index(size_t target_bit)
