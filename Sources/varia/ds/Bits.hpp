@@ -101,7 +101,6 @@ struct Bits32
 		this->and(mask);
 	}
 
-	//Requires that the provided value is not 0
 	vds::Result<u8> find_first_set(void)
 	{
 		//Note(zshoals): Bit "Find First Set" implementation
@@ -112,6 +111,7 @@ struct Bits32
 		//We do a branchless check to determine if this value is 0,
 		//and then multiply "first_set" by the comparison's result in order to
 		//set a default value (0) for res.value
+		//This value determines whether or not the result is valid
 		bool zero_case_fixup = (x != 0);
 
 		//Note(zshoals): Negating x is intentional
