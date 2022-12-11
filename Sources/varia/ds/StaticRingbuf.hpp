@@ -61,7 +61,7 @@ struct StaticRingbuf
 		DEBUG_ENSURE_UINT_LTE(count, Size, "Ringbuf design error; count exceeded Size, which shouldn't occur.");
 		bool overfilled = (count >= Size);
 		rear = (rear + overfilled) % Size;
-		count += !overfilled;
+		count += overfilled ^ (1ULL << 0); //Invert overfilled;
 	}
 
 	T pop_back(void)
