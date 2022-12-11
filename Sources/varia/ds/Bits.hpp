@@ -104,7 +104,7 @@ struct Bits32
 	}
 
 	//Requires that the provided value is not 0
-	vds::Result<u8> find_first_free(void)
+	vds::Result<u8> find_first_set(void)
 	{
 		//Note(zshoals): Bit "Find First Set" implementation
 		//derived from wikipedia https://en.wikipedia.org/wiki/Find_first_set#FFS
@@ -112,7 +112,7 @@ struct Bits32
 
 		//Note(zshoals): FFS implementations do whatever they want when the value is 0
 		//We do a branchless check to determine if this value is 0,
-		//and then multiply "first_set" by the comparison's inverse in order to
+		//and then multiply "first_set" by the comparison's result in order to
 		//set a default value (0) for res.value
 		bool zero_case_fixup = (x != 0);
 
@@ -261,14 +261,14 @@ struct Bits64
 		this->and(mask);
 	}
 
-	vds::Result<u8> find_first_free(void)
+	vds::Result<u8> find_first_set(void)
 	{
 		vds::Result<u8> res;
 
 		//TODO(zshoals): Update with Count Leading Zeroes version
 		for_range_var(i, 64)
 		{
-			if (this->is_unset(static_cast<u8>(i)))
+			if (this->is_set(static_cast<u8>(i)))
 			{
 				res.valid = vds::ResultStatus_e::Success;
 				res.value = static_cast<u8>(i);
