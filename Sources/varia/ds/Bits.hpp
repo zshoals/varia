@@ -116,7 +116,15 @@ struct Bits32
 		//set a default value (0) for res.value
 		bool zero_case_fixup = (x != 0);
 
+		//Note(zshoals): Negating x is intentional
+		//Disables:
+		//"Warning: Unary minus operator applied to unsigned type, result still unsigned"
+		#pragma warning(push)
+		#pragma warning(disable: 4146)
+
 		x &= -x;
+
+		#pragma warning(pop)
 
 		u32 r = (x > 0xFFFF) << 4; x >>= r;
 		u32 q = (x > 0xFF) << 3; x >>= q; r |= q;
