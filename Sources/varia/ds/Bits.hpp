@@ -11,8 +11,6 @@ struct Bits32
 {
 	u32 storage = 0;
 
-	Bits32(u32 value) : storage{value} {}
-
 	void and(Bits32 other) { this->storage &= other.storage; }
 	void or(Bits32 other) { this->storage |= other.storage; }
 	void not(void) { this->storage = ~this->storage; }
@@ -140,6 +138,13 @@ struct Bits32
 
 		return res;
 	}
+
+	vds::Result<u8> find_first_unset(void)
+	{
+		Bits32 inverse = *this;
+		inverse.not();
+		return inverse.find_first_set();
+	}	
 
 	constexpr static size_t pow2_to_bitshift_value(size_t pow2_value)
 	{

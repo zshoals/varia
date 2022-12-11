@@ -10,10 +10,9 @@
 namespace vds
 {
 
-template<int Size>
-struct Bitset32
+namespace Bitset32Util
 {
-	//VVVVVVVV Utility VVVVVVVV 
+
 	constexpr static size_t ceil_next_nearest(size_t value, size_t target_multiple)
 	{
 		bool round_up = (value % target_multiple == 0) ? false : true;
@@ -25,22 +24,33 @@ struct Bitset32
 		return 32;
 	}
 
-	constexpr static size_t true_size(void)
+	constexpr static size_t true_size(size_t size)
 	{
-		return ceil_next_nearest(Size, Bitset32::bit_width()) / Bitset32::bit_width();
+		return ceil_next_nearest(size, Bitset32Util::bit_width()) / Bitset32Util::bit_width();
 	}
+
+}
+
+template<int Size>
+struct Bitset32
+{
+	//VVVVVVVV Utility VVVVVVVV 
 	//^^^^^^^^ End Utility ^^^^^^^^  
 
 
-
-
 	static_assert(Size > 0, "Bitset element count must be greater than 0");
+
+
+	// Bitset32(void){}
+
 	//Note(zshoals): We ceil our total size up to the next full u32 block
-	vds::Bits32 data[true_size()];
+	vds::Bits32 data[Bitset32Util::true_size(Size)];
+
+
 
 	void and(Bitset32<Size> const & other)
 	{
-		for_range_var(i, true_size())
+		for_range_var(i, Bitset32Util::true_size(Size))
 		{
 			this->data[i].and(other.data[i]);
 		}
@@ -48,7 +58,7 @@ struct Bitset32
 
 	void or(Bitset32<Size> const & other)
 	{
-		for_range_var(i, true_size())
+		for_range_var(i, Bitset32Util::true_size(Size))
 		{
 			this->data[i].or(other.data[i]);
 		}
@@ -56,7 +66,7 @@ struct Bitset32
 
 	void not(void)
 	{
-		for_range_var(i, true_size())
+		for_range_var(i, Bitset32Util::true_size(Size))
 		{
 			this->data[i].not();
 		}
@@ -94,7 +104,7 @@ struct Bitset32
 
 	void set_all(void)
 	{
-		for_range_var(i, true_size())
+		for_range_var(i, Bitset32Util::true_size(Size))
 		{
 			this->data[i].set_all();
 		}
@@ -102,7 +112,7 @@ struct Bitset32
 
 	void unset_all(void)
 	{
-		for_range_var(i, true_size())
+		for_range_var(i, Bitset32Util::true_size(Size))
 		{
 			this->data[i].unset_all();
 		}
@@ -126,15 +136,9 @@ struct Bitset32
 		return !this->is_set(target_bit);
 	}
 
-	u8 find_first_set(size_t target_block)
-	{
-		//We need to get this one working a little better
-		ENSURE_UNIMPLEMENTED();
-	}
-
 	size_t storage_bit_count(void)
 	{
-		return ceil_next_nearest(Size, Bitset32::bit_width());
+		return ceil_next_nearest(Size, Bitset32Util::bit_width());
 		// return Size * Bitset32::bit_width();
 	}
 
@@ -147,14 +151,13 @@ struct Bitset32
 	{
 		vds::Result<size_t> res;
 
-		for_range_var(i, true_size())
+		for_range_var(i, Bitset32Util::true_size(Size))
 		{
-			size_t block_idx = Bitset32::compute_block_index(i);
-			vds::Result<u8> bit_search = this->data[block_idx].find_first_set();
+			vds::Result<u8> bit_search = this->data[i].find_first_set();
 			if (bit_search.valid)
 			{
 				res.valid = vds::ResultStatus_e::Success;
-				res.value = bit_search.value * block_idx;
+				res.value = bit_search.value + (Bitset32Util::bit_width() * i);
 
 				return res;
 			}
@@ -166,26 +169,54 @@ struct Bitset32
 		return res;
 	}
 
-	static size_t compute_block_index(size_t target_bit)
+	vds::Result<size_t> find_first_unset(void)
 	{
-		DEBUG_ENSURE_UINT_LT((target_bit / 32), true_size(), "Out of range bit in Bitset.");
+		vds::Result<size_t> res;
+
+		for_range_var(i, Bitset32Util::true_size(Size))
+		{
+			//Note(zshoals Dec-11-2022): The only difference between this and find_first_set
+			//is this inverse.find_first_unset() call here
+			vds::Result<u8> bit_search = this->data[i].find_first_unset();
+			if (bit_search.valid)
+			{
+				res.valid = vds::ResultStatus_e::Success;
+				res.value = bit_search.value + (Bitset32Util::bit_width() * i);
+
+				return res;
+			}
+		}
+
+		res.valid = vds::ResultStatus_e::Failure;
+		res.value = 0;
+
+		return res;
+	}
+
+
+	size_t compute_block_index(size_t target_bit)
+	{
+		DEBUG_ENSURE_UINT_LT((target_bit / 32), Bitset32Util::true_size(Size), "Out of range bit in Bitset.");
 
 		//Note(zshoals Dec-11-2022): There's no guarantee that the bitset is a power of two,
 		//we don't enforce that. We have to use a simple division instead.
-		return target_bit / Bitset32::bit_width();
+		return target_bit / Bitset32Util::bit_width();
 	}
 
-	static u8 compute_bit_index(size_t target_bit)
+
+
+	u8 compute_bit_index(size_t target_bit)
 	{
 		DEBUG_ENSURE_UINT_LT(target_bit, Size, "Out of range bit in Bitset.");
 
 		//Note(zshoals): Equivalent to target_bit % bit_width, however, this is faster
 		//in debug builds
-		constexpr size_t shift = Bits32::pow2_to_bitshift_value(Bitset32::bit_width());
+		constexpr size_t shift = Bits32::pow2_to_bitshift_value(Bitset32Util::bit_width());
 		return target_bit & ( (1 << shift) - 1);
 	}
 
 };
+
 
 }
 
