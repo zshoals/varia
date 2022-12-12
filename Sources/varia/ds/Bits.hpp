@@ -28,35 +28,29 @@ struct Bits32
 
 	constexpr void rotate_left(u8 shift)
  	{ 
-		// DEBUG_ENSURE_UINT_LT(shift, 32, "Exceeded bitwidth during shift."); 
+		assert(shift < 32 && "Exceeded bitwidth during shift.");
 
 		this->storage <<= shift; 
 	}
 
 	constexpr void rotate_right(u8 shift) 
 	{ 
-		// DEBUG_ENSURE_UINT_LT(shift, 32, "Exceeded bitwidth during shift."); 
-
+		assert(shift < 32 && "Exceeded bitwidth during shift.");
 		this->storage >>= shift; 
 	}
 
 	constexpr void generate_bitmask_lo(u8 pivot)
 	{
-		// DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
-		// DEBUG_ENSURE_UINT_LT(pivot, 32, "Exceeded bitwidth during shift."); 
+		assert(pivot < 32 && "Exceeded bitwidth during shift.");
 
 		//We want to start with a zero value for that a negation results in all bits being set
-		this->not();
-
-		u8 to_cut = 31 - pivot;
-		this->rotate_left(to_cut);
-		this->rotate_right(to_cut);
+		this->storage = 0;
+		this->storage = (1 << pivot) - 1;
 	}
 
 	constexpr void generate_bitmask_hi(u8 pivot)
 	{
-		// DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
-		// DEBUG_ENSURE_UINT_LT(pivot, 32, "Exceeded bitwidth during shift."); 
+		assert(pivot < 32 && "Exceeded bitwidth during shift.");
 
 		//Note(zshoals): View the high bitmask as being generated from a left shift!
 		//Not from shifting to the right!
@@ -66,14 +60,14 @@ struct Bits32
 
 	constexpr void increment_upper(u8 pivot)
 	{
-		// DEBUG_ENSURE_UINT_LT(pivot, 32, "Exceeded bitwidth during shift."); 
+		assert(pivot < 32 && "Exceeded bitwidth during shift.");
 
 		//Clear the lower bits and work only with the upper bits of the value
 		Bits32 shifted_upper = *this;
 		{
 			shifted_upper.rotate_right(pivot + 1);
 			
-			// DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (31 - pivot + 1)), "Upper range bit overflow");
+			assert( (1ULL << (31 - pivot + 1)) && "Upper range bit overflow.");
 
 			++(shifted_upper.storage);
 			shifted_upper.rotate_left(pivot + 1);
@@ -106,7 +100,7 @@ struct Bits32
 		this->and(mask);
 	}
 
-	vds::Result<u8> find_first_set(void)
+	constexpr vds::Result<u8> find_first_set(void)
 	{
 		//Note(zshoals): Bit "Find First Set" implementation
 		//derived from wikipedia https://en.wikipedia.org/wiki/Find_first_set#FFS
@@ -137,14 +131,14 @@ struct Bits32
 
 		u32 first_set = r * zero_case_fixup;
 
-		vds::Result<u8> res;
+		vds::Result<u8> res = {};
 		res.valid = static_cast<vds::ResultStatus_e>(zero_case_fixup);
 		res.value = first_set;
 
 		return res;
 	}
 
-	vds::Result<u8> find_first_unset(void)
+	constexpr vds::Result<u8> find_first_unset(void)
 	{
 		Bits32 inverse = *this;
 		inverse.not();
@@ -198,37 +192,27 @@ struct Bits64
 
 	constexpr void rotate_left(u8 shift)
  	{ 
-		// DEBUG_ENSURE_UINT_LT(shift, 64, "Exceeded bitwidth during shift."); 
-
+		assert(shift < 64 && "Exceeded bitwidth during shift.");
 		this->storage <<= shift; 
 	}
 
 	constexpr void rotate_right(u8 shift) 
 	{ 
-		// DEBUG_ENSURE_UINT_LT(shift, 64, "Exceeded bitwidth during shift."); 
-
+		assert(shift < 64 && "Exceeded bitwidth during shift.");
 		this->storage >>= shift; 
 	}
 
 	constexpr void generate_bitmask_lo(u8 pivot)
 	{
-		// DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
-		// DEBUG_ENSURE_UINT_LT(pivot, 64, "Exceeded bitwidth during shift."); 
+		assert(pivot < 64 && "Exceeded bitwidth during shift.");
 
-		//We want to start with a zero value for that a negation results in all bits being set
-		// this->not();
-
-		// u8 to_cut = 63 - pivot;
-		// this->rotate_left(to_cut);
-		// this->rotate_right(to_cut);
-
-		 this->storage = (1 << pivot) - 1;
+		this->storage = 0;
+		this->storage = (1 << pivot) - 1;
 	}
 
 	constexpr void generate_bitmask_hi(u8 pivot)
 	{
-		// DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
-		// DEBUG_ENSURE_UINT_LT(pivot, 64, "Exceeded bitwidth during shift."); 
+		assert(pivot < 64 && "Exceeded bitwidth during shift.");
 
 		//Note(zshoals): View the high bitmask as being generated from a left shift!
 		//Not from shifting to the right!
@@ -238,14 +222,14 @@ struct Bits64
 
 	constexpr void increment_upper(u8 pivot)
 	{
-		// DEBUG_ENSURE_UINT_LT(pivot, 64, "Exceeded bitwidth during shift."); 
+		assert(pivot < 64 && "Exceeded bitwidth during shift.");
 
 		//Clear the lower bits and work only with the upper bits of the value
 		Bits64 shifted_upper = *this;
 		{
 			shifted_upper.rotate_right(pivot + 1);
 			
-			// DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (63 - pivot + 1)), "Upper range bit overflow");
+			assert( (1ULL << (63 - pivot + 1)) && "Upper range bit overflow.");
 
 			shifted_upper.storage += 1;
 			shifted_upper.rotate_left(pivot + 1);
@@ -280,9 +264,9 @@ struct Bits64
 		this->and(mask);
 	}
 
-	vds::Result<u8> find_first_set(void)
+	constexpr vds::Result<u8> find_first_set(void)
 	{
-		vds::Result<u8> res;
+		vds::Result<u8> res = {};
 
 		//TODO(zshoals): Update with Count Leading Zeroes version
 		for_range_var(i, 64)
