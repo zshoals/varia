@@ -13,6 +13,7 @@
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
+#include "varia/comps/Position.hpp"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -78,9 +79,9 @@ int kickstart(int argc, char** argv)
 
 	using exd::World;
 	using exd::Entity;
+	using exd::Component;
 
 	World<8192> w = {};
-
 	Entity ent = w.ent_create();
 
 	VARIA_LOG_UINT(w.ent_id(ent));
@@ -105,6 +106,18 @@ int kickstart(int argc, char** argv)
 	w.ent_kill(ent);
 	ent = w.ent_create();
 	VARIA_LOG_UINT(w.ent_gen(ent));
+	VARIA_LOG_UINT(w.positions2.bitset_handle);
+
+	Component<Position, 8192> * posits = &w.positions;
+
+	Position * p = posits->comp_set_ent(&w, ent);
+	p->x = 1;
+	p->y = 99;
+
+	Position const * p2 = posits->comp_get(&w, ent);
+
+	VARIA_LOG_INT(p2->x);
+	VARIA_LOG_INT(p2->y);
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
