@@ -16,7 +16,7 @@ namespace exd
 
 namespace WorldUtil
 {
-	constexpr size_t id_shift(size_t entity_count)
+	constexpr u8 id_shift(size_t entity_count)
 	{
 		size_t nearest = Varia::Math::pow2_next_nearest(entity_count);
 		u8 shift = Varia::Math::pow2_to_bitshift_value(nearest);
