@@ -60,14 +60,18 @@ struct World
 		#include "ComponentData.def"
 
 		#pragma warning(pop)
+
+		DEBUG_ENSURE_UINT_LT(counter, exd::Constants::exd_max_components, "Exceeded max allowed components; raise the limit if you need more.");
 	}
 
 
 	exd::Entity ent_create(void) { return entities.entity_get_free(); }
 	void ent_kill(exd::Entity ent) { entities.entity_release(ent, id_shift); internal_remove_from_components(ent); };
+
 	bool ent_valid(exd::Entity ent) { return entities.entity_valid(ent, id_shift); }
+
 	size_t ent_id(exd::Entity ent) { return ent.id_extract(id_shift); }
-	size_t ent_gen(exd::Entity ent) { return ent.generation_extract(id_shift); }
+	size_t ent_generation(exd::Entity ent) { return ent.generation_extract(id_shift); }
 
 	void internal_remove_from_components(exd::Entity ent)
 	{
@@ -92,11 +96,6 @@ struct World
 		return &component_ents[idx];
 	}
 
-
-
-
-	//Note: Might be unnecessary, check component array instead
-	void ent_has(void) { ENSURE_UNIMPLEMENTED(); }; 
 };
 
 }

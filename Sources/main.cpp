@@ -105,7 +105,7 @@ int kickstart(int argc, char** argv)
 	ent = w.ent_create();
 	w.ent_kill(ent);
 	ent = w.ent_create();
-	VARIA_LOG_UINT(w.ent_gen(ent));
+	VARIA_LOG_UINT(w.ent_generation(ent));
 	VARIA_LOG_UINT(w.positions2.bitset_handle);
 
 	Component<Position, 8192> * posits = &w.positions;
