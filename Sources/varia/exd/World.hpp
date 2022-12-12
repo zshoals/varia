@@ -2,6 +2,7 @@
 
 #include "Entity.hpp"
 #include "EntityManifest.hpp"
+#include "Tag.hpp"
 #include "Component.hpp"
 #include "EXDUtil.hpp"
 #include "EXDConstants.hpp"
@@ -22,14 +23,15 @@ struct World
 	//TODO(zshoals): This struct needs to define a COMPONENT_DATA macro and import all components
 	//And also bitsets and tags
 
-	exd::EntityManifest<Size> entities;
+	exd::EntityManifest<Size> entities = {};
+	constexpr static u8 id_shift = EXDUtil::id_shift(Size);
+	u64 active_entities = 0;
 	//Note(zshoals Dec-12-2022): We just set an upper bound here...hacky but simple...
 	//500kb at 8192 entities at 512 bitsets
-	vds::Bitset32<Size> component_ents[exd::Constants::exd_max_components];
-	constexpr static u8 id_shift = EXDUtil::id_shift(Size);
-
+	vds::Bitset32<Size> component_ents[exd::Constants::exd_max_components] = {};
 	//====================================================
-	//           Import all component data arrays
+	//           Import all tags, and then
+	//           all component data
 	//====================================================
 
 	//Note(zshoals Dec-11-2022): Disable warning 4005
@@ -37,13 +39,14 @@ struct World
 	#pragma warning(push)
 	#pragma warning(disable: 4005)
 
-	#define COMPONENT_DATA(TYPE, FIELD_NAME) exd::Component<TYPE, Size> FIELD_NAME = {id_shift}; 
+	#define EXD_TAG(FIELD_NAME) exd::Tag<Size> FIELD_NAME = {};
+	#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) exd::Component<TYPE, Size> FIELD_NAME = {id_shift}; 
 	#include "ComponentData.def"
 
 	#pragma warning(pop)
 
 	//====================================================
-	//          End bitsets and data arrays 
+	//          End tags and data arrays 
 	//====================================================
 
 	World(void)
@@ -56,7 +59,7 @@ struct World
 		#pragma warning(push)
 		#pragma warning(disable: 4005)
 
-		#define COMPONENT_DATA(TYPE, FIELD_NAME) FIELD_NAME.bitset_handle = counter; ++counter; 
+		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) FIELD_NAME.bitset_handle = counter; ++counter; 
 		#include "ComponentData.def"
 
 		#pragma warning(pop)
@@ -65,8 +68,8 @@ struct World
 	}
 
 
-	exd::Entity ent_create(void) { return entities.entity_get_free(); }
-	void ent_kill(exd::Entity ent) { entities.entity_release(ent, id_shift); internal_remove_from_components(ent); };
+	exd::Entity ent_create(void) { ++active_entities; return entities.entity_get_free(); }
+	void ent_kill(exd::Entity ent) { --active_entities; entities.entity_release(ent, id_shift); internal_remove_from_components(ent); };
 
 	bool ent_valid(exd::Entity ent) { return entities.entity_valid(ent, id_shift); }
 
@@ -84,7 +87,8 @@ struct World
 
 		size_t counter = 0;
 
-		#define COMPONENT_DATA(TYPE, FIELD_NAME) component_ents[counter].unset(ent.id_extract(id_shift)); ++counter;
+		#define EXD_TAG(FIELD_NAME) FIELD_NAME.tag_unset(this, ent);
+		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) component_ents[counter].unset(ent.id_extract(id_shift)); ++counter;
 		#include "ComponentData.def"
 
 		#pragma warning(pop)
