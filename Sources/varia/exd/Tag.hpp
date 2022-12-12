@@ -37,7 +37,8 @@ struct Tag
 		}
 		else
 		{
-			ENSURE_UNREACHABLE("Error: Tried to check a tag with an invalid entity. Did your entity expire?");
+			//Note(zshoals Dec-12-2022):
+			//No operation: It's acceptable to remove entities that are not actually set 
 		}
 	}
 
