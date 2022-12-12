@@ -10,6 +10,6 @@
 
 EXD_COMPONENT_DATA(Position, positions)
 EXD_COMPONENT_DATA(Position, positions2)
-EXD_TAG(Flammables)
+EXD_TAG(flammables)
 
 #endif

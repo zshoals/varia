@@ -110,7 +110,7 @@ int kickstart(int argc, char** argv)
 
 	Component<Position, 8192> * posits = &w.positions;
 
-	Position * p = posits->comp_set_ent(&w, ent);
+	Position * p = posits->comp_set(&w, ent);
 	p->x = 1;
 	p->y = 99;
 

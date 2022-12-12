@@ -68,7 +68,7 @@ struct Component
 	T const * comp_get_unchecked(Entity ent) { return comps.get_unsafe(ent.id_extract(id_bits)); }
 	T * comp_get_mut_unchecked(Entity ent) { return comps.get_mut_unsafe(ent.id_extract(id_bits)); }
 
-	T * comp_set_ent(World<Size> * w, Entity ent)
+	T * comp_set(World<Size> * w, Entity ent)
 	{
 		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
 		u64 id = ent.id_extract(id_bits);
@@ -91,7 +91,26 @@ struct Component
 		}
 	}
 
-	T * comp_set_ent_unchecked(Entity ent) { return comps.get_mut_unsafe(ent.id_extract(id_bits)); }
+	T * comp_set_unchecked(Entity ent) { return comps.get_mut_unsafe(ent.id_extract(id_bits)); }
+
+	void comp_unset(Entity ent)
+	{
+		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
+		u64 id = ent.id_extract(id_bits);
+		//Note(zshoals Dec-12-2022): No check if this entity exists in this component bitset;
+		//simply blindly remove it as long as the entity matches the reference entity's generation
+		bool valid = w->ent_valid(ent);
+
+		if (valid)
+		{
+			ent_states->unset(id);
+		}
+	}
+
+	void comp_unset_unchecked(World<Size> * w, Entity ent)
+	{
+		w->internal_bitset_lookup(bitset_handle).unset(ent.id_extract(id_bits));
+	}
 
 	bool comp_has(Entity ent)
 	{
