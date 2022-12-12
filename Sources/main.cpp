@@ -9,13 +9,14 @@
 #include "varia/ds/Bitset.hpp"
 #include "varia/exd/EntityManifest.hpp"
 #include "varia/exd/World.hpp"
+#include "varia/math/Math.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
 
 #include <stdbool.h>
+#include <stdio.h>
 
-#include "varia/math/Math.hpp"
 
 using namespace Varia;
 
@@ -74,11 +75,6 @@ int kickstart(int argc, char** argv)
 		wo.y = -1; //Default window position (centered)
 		wo.mode = KINC_WINDOW_MODE_WINDOW;
 	}
-
-	exd::World<1024> w = {};
-	exd::Entity ent = w.ent_create();
-
-	w.ent_kill(ent);
 
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
