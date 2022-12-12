@@ -19,7 +19,7 @@ namespace exd
 {
 
 //Component is a very thin data container. Due to cache coherency concerns,
-//the bitset that corresponds to this container is not stored here.
+//the bitset that corresponds to this container is not stored here but rather in World
 template<typename T, int Size>
 struct Component
 {
