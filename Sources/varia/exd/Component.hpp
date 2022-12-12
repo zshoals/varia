@@ -92,6 +92,16 @@ struct Component
 	}
 
 	T * comp_set_ent_unchecked(Entity ent) { return comps.get_mut_unsafe(ent.id_extract(id_bits)); }
+
+	bool comp_has(Entity ent)
+	{
+		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
+		u64 id = ent.id_extract(id_bits);
+		bool alive = ent_states->is_set(id);
+		bool valid = w->ent_valid(ent);
+
+		return (alive && valid);
+	}
 };
 
 }
