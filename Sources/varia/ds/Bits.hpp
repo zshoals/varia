@@ -11,36 +11,39 @@ struct Bits32
 {
 	u32 storage = 0;
 
-	void and(Bits32 other) { this->storage &= other.storage; }
-	void or(Bits32 other) { this->storage |= other.storage; }
-	void not(void) { this->storage = ~this->storage; }
-	void unset(u8 bit_index) { this->storage &= ~(1 << bit_index); }
-	void unset_all(void) { this->storage = 0; }
-	void set(u8 bit_index) { this->storage |= (1 << bit_index); }
-	void set_all(void) { this->unset_all(); this->storage = ~this->storage; }
-	void toggle(u8 bit_index) { this->storage ^= (1 << bit_index); }
+	constexpr Bits32(u32 value) : storage{value} {}
+	constexpr Bits32(void) {}
 
-	bool is_set(u8 bit_index) { return this->storage & (1 << bit_index); }
-	bool is_unset(u8 bit_index) { return !is_set(bit_index); }
+	constexpr void and(Bits32 other) { this->storage &= other.storage; }
+	constexpr void or(Bits32 other) { this->storage |= other.storage; }
+	constexpr void not(void) { this->storage = ~this->storage; }
+	constexpr void unset(u8 bit_index) { this->storage &= ~(1 << bit_index); }
+	constexpr void unset_all(void) { this->storage = 0; }
+	constexpr void set(u8 bit_index) { this->storage |= (1 << bit_index); }
+	constexpr void set_all(void) { this->unset_all(); this->storage = ~this->storage; }
+	constexpr void toggle(u8 bit_index) { this->storage ^= (1 << bit_index); }
 
-	void rotate_left(u8 shift)
+	constexpr bool is_set(u8 bit_index) { return this->storage & (1 << bit_index); }
+	constexpr bool is_unset(u8 bit_index) { return !is_set(bit_index); }
+
+	constexpr void rotate_left(u8 shift)
  	{ 
-		DEBUG_ENSURE_UINT_LT(shift, 32, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_LT(shift, 32, "Exceeded bitwidth during shift."); 
 
 		this->storage <<= shift; 
 	}
 
-	void rotate_right(u8 shift) 
+	constexpr void rotate_right(u8 shift) 
 	{ 
-		DEBUG_ENSURE_UINT_LT(shift, 32, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_LT(shift, 32, "Exceeded bitwidth during shift."); 
 
 		this->storage >>= shift; 
 	}
 
-	void generate_bitmask_lo(u8 pivot)
+	constexpr void generate_bitmask_lo(u8 pivot)
 	{
-		DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
-		DEBUG_ENSURE_UINT_LT(pivot, 32, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
+		// DEBUG_ENSURE_UINT_LT(pivot, 32, "Exceeded bitwidth during shift."); 
 
 		//We want to start with a zero value for that a negation results in all bits being set
 		this->not();
@@ -50,10 +53,10 @@ struct Bits32
 		this->rotate_right(to_cut);
 	}
 
-	void generate_bitmask_hi(u8 pivot)
+	constexpr void generate_bitmask_hi(u8 pivot)
 	{
-		DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
-		DEBUG_ENSURE_UINT_LT(pivot, 32, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
+		// DEBUG_ENSURE_UINT_LT(pivot, 32, "Exceeded bitwidth during shift."); 
 
 		//Note(zshoals): View the high bitmask as being generated from a left shift!
 		//Not from shifting to the right!
@@ -61,16 +64,16 @@ struct Bits32
 		this->not();
 	}
 
-	void increment_upper(u8 pivot)
+	constexpr void increment_upper(u8 pivot)
 	{
-		DEBUG_ENSURE_UINT_LT(pivot, 32, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_LT(pivot, 32, "Exceeded bitwidth during shift."); 
 
 		//Clear the lower bits and work only with the upper bits of the value
 		Bits32 shifted_upper = *this;
 		{
 			shifted_upper.rotate_right(pivot + 1);
 			
-			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (31 - pivot + 1)), "Upper range bit overflow");
+			// DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (31 - pivot + 1)), "Upper range bit overflow");
 
 			++(shifted_upper.storage);
 			shifted_upper.rotate_left(pivot + 1);
@@ -92,12 +95,12 @@ struct Bits32
 		this->storage = shifted_upper.storage;
 	}
 
-	void mask_allow(Bits32 mask)
+	constexpr void mask_allow(Bits32 mask)
 	{
 		this->and(mask);
 	}
 
-	void mask_deny(Bits32 mask)
+	constexpr void mask_deny(Bits32 mask)
 	{
 		mask.not();
 		this->and(mask);
@@ -178,49 +181,54 @@ struct Bits64
 {
 	u64 storage = 0;
 
-	void and(Bits64 other) { this->storage &= other.storage; }
-	void or(Bits64 other) { this->storage |= other.storage; }
-	void not(void) { this->storage = ~this->storage; }
-	void set(u8 bit_index) { this->storage |= (1ULL << bit_index); }
-	void set_all(void) { this->unset_all(); this->storage = ~this->storage; }
-	void unset(u8 bit_index) { this->storage &= ~(1ULL << bit_index); }
-	void toggle(u8 bit_index) { this->storage ^= (1ULL << bit_index); }
-	void unset_all(void) { this->storage = 0; }
+	constexpr Bits64(u64 value) : storage{value}{}
+	constexpr Bits64(void){}
 
-	bool is_set(u8 bit_index) { return this->storage & (1ULL << bit_index); }
-	bool is_unset(u8 bit_index) { return !is_set(bit_index); }
+	constexpr void and(Bits64 other) { this->storage &= other.storage; }
+	constexpr void or(Bits64 other) { this->storage |= other.storage; }
+	constexpr void not(void) { this->storage = ~this->storage; }
+	constexpr void set(u8 bit_index) { this->storage |= (1ULL << bit_index); }
+	constexpr void set_all(void) { this->unset_all(); this->storage = ~this->storage; }
+	constexpr void unset(u8 bit_index) { this->storage &= ~(1ULL << bit_index); }
+	constexpr void toggle(u8 bit_index) { this->storage ^= (1ULL << bit_index); }
+	constexpr void unset_all(void) { this->storage = 0; }
 
-	void rotate_left(u8 shift)
+	constexpr bool is_set(u8 bit_index) { return this->storage & (1ULL << bit_index); }
+	constexpr bool is_unset(u8 bit_index) { return !is_set(bit_index); }
+
+	constexpr void rotate_left(u8 shift)
  	{ 
-		DEBUG_ENSURE_UINT_LT(shift, 64, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_LT(shift, 64, "Exceeded bitwidth during shift."); 
 
 		this->storage <<= shift; 
 	}
 
-	void rotate_right(u8 shift) 
+	constexpr void rotate_right(u8 shift) 
 	{ 
-		DEBUG_ENSURE_UINT_LT(shift, 64, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_LT(shift, 64, "Exceeded bitwidth during shift."); 
 
 		this->storage >>= shift; 
 	}
 
-	void generate_bitmask_lo(u8 pivot)
+	constexpr void generate_bitmask_lo(u8 pivot)
 	{
-		DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
-		DEBUG_ENSURE_UINT_LT(pivot, 64, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
+		// DEBUG_ENSURE_UINT_LT(pivot, 64, "Exceeded bitwidth during shift."); 
 
 		//We want to start with a zero value for that a negation results in all bits being set
-		this->not();
+		// this->not();
 
-		u8 to_cut = 63 - pivot;
-		this->rotate_left(to_cut);
-		this->rotate_right(to_cut);
+		// u8 to_cut = 63 - pivot;
+		// this->rotate_left(to_cut);
+		// this->rotate_right(to_cut);
+
+		 this->storage = (1 << pivot) - 1;
 	}
 
-	void generate_bitmask_hi(u8 pivot)
+	constexpr void generate_bitmask_hi(u8 pivot)
 	{
-		DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
-		DEBUG_ENSURE_UINT_LT(pivot, 64, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_EQUALS(this->storage, 0, "A generated bitmask must start with a zero value.");
+		// DEBUG_ENSURE_UINT_LT(pivot, 64, "Exceeded bitwidth during shift."); 
 
 		//Note(zshoals): View the high bitmask as being generated from a left shift!
 		//Not from shifting to the right!
@@ -228,16 +236,16 @@ struct Bits64
 		this->not();
 	}
 
-	void increment_upper(u8 pivot)
+	constexpr void increment_upper(u8 pivot)
 	{
-		DEBUG_ENSURE_UINT_LT(pivot, 64, "Exceeded bitwidth during shift."); 
+		// DEBUG_ENSURE_UINT_LT(pivot, 64, "Exceeded bitwidth during shift."); 
 
 		//Clear the lower bits and work only with the upper bits of the value
 		Bits64 shifted_upper = *this;
 		{
 			shifted_upper.rotate_right(pivot + 1);
 			
-			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (63 - pivot + 1)), "Upper range bit overflow");
+			// DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (63 - pivot + 1)), "Upper range bit overflow");
 
 			shifted_upper.storage += 1;
 			shifted_upper.rotate_left(pivot + 1);
@@ -261,12 +269,12 @@ struct Bits64
 		this->storage = shifted_upper.storage;
 	}
 
-	void mask_allow(Bits64 mask)
+	constexpr void mask_allow(Bits64 mask)
 	{
 		this->and(mask);
 	}
 
-	void mask_deny(Bits64 mask)
+	constexpr void mask_deny(Bits64 mask)
 	{
 		mask.not();
 		this->and(mask);
