@@ -5,10 +5,11 @@
 
 //README:
 //	COMPONENT_DATA FORMAT:
-//	COMPONENT_DATA(TYPE, FIELD_NAME)
+//	EXD_COMPONENT_DATA(TYPE, FIELD_NAME)
+//  EXD_TAG(FIELD_NAME)
 
-COMPONENT_DATA(Position, positions)
-COMPONENT_DATA(Position, positions2)
-// COMPONENT_DATA(VRotation, rotations)
+EXD_COMPONENT_DATA(Position, positions)
+EXD_COMPONENT_DATA(Position, positions2)
+EXD_TAG(Flammables)
 
 #endif

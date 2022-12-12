@@ -11,15 +11,15 @@ template<int Size> struct World;
 namespace exd
 {
 
-template<typename T, int Size>
+template<int Size>
 struct Tag
 {
-	vds::Bitset32<Size> entities;
+	vds::Bitset32<Size> entities = {};
 	constexpr static u8 id_bits = EXDUtil::id_shift(Size);
 
-	void tag_set(World<Size> w, exd::Entity ent)
+	void tag_set(World<Size> * w, exd::Entity ent)
 	{
-		if (w.ent_valid(ent))
+		if (w->ent_valid(ent))
 		{
 			entities.set(ent.id_extract(id_bits));
 		}
@@ -29,9 +29,9 @@ struct Tag
 		}
 	}
 
-	void tag_unset(World<Size> w, exd::Entity ent)
+	void tag_unset(World<Size> * w, exd::Entity ent)
 	{
-		if (w.ent_valid(ent))
+		if (w->ent_valid(ent))
 		{
 			entities.unset(ent.id_extract(id_bits));
 		}
@@ -41,9 +41,9 @@ struct Tag
 		}
 	}
 
-	bool tag_get(World<Size> w, exd::Entity ent)
+	bool tag_get(World<Size> * w, exd::Entity ent)
 	{
-		if (w.ent_valid(ent))
+		if (w->ent_valid(ent))
 		{
 			return entities.is_set(ent.id_extract(id_bits));
 		}
@@ -53,17 +53,17 @@ struct Tag
 		}
 	}
 
-	void tag_set_unchecked(World<Size> w, exd::Entity ent)
+	void tag_set_unchecked(exd::Entity ent)
 	{
 		entities.set(ent.id_extract(id_bits));
 	}
 
-	void tag_unset_unchecked(World<Size> w, exd::Entity ent)
+	void tag_unset_unchecked(exd::Entity ent)
 	{
 		entities.unset(ent.id_extract(id_bits));
 	}
 
-	bool tag_get_unchecked(World<Size> w, exd::Entity ent)
+	bool tag_get_unchecked(exd::Entity ent)
 	{
 		return entities.is_set(ent.id_extract(id_bits));
 	}
