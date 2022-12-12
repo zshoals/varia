@@ -51,6 +51,7 @@ struct Tag
 		else
 		{
 			ENSURE_UNREACHABLE("Error: Tried to check a tag with an invalid entity. Did your entity expire?");
+			return false;
 		}
 	}
 
