@@ -68,12 +68,12 @@ struct Bits32
 		//Clear the lower bits and work only with the upper bits of the value
 		Bits32 shifted_upper = *this;
 		{
-			shifted_upper.rotate_right(pivot);
+			shifted_upper.rotate_right(pivot + 1);
 			
 			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (31 - pivot + 1)), "Upper range bit overflow");
 
 			++(shifted_upper.storage);
-			shifted_upper.rotate_left(pivot);
+			shifted_upper.rotate_left(pivot + 1);
 		}
 
 		//Clear the upper bits and work with the lower bits of the value
@@ -81,8 +81,7 @@ struct Bits32
 		{
 			Bits32 lower_mask = {};
 			
-			//Note(zshoals Dec-11-2022): Pivot is not inclusive, lower bits get ripped off here
-			lower_mask.generate_bitmask_lo(pivot - 1);
+			lower_mask.generate_bitmask_lo(pivot);
 			shifted_lower.mask_allow(lower_mask);
 		}
 
@@ -149,9 +148,9 @@ struct Bits32
 		return inverse.find_first_set();
 	}	
 
-	constexpr static size_t pow2_to_bitshift_value(size_t pow2_value)
+	constexpr static u8 pow2_to_bitshift_value(size_t pow2_value)
 	{
-		size_t shift = 0;
+		u8 shift = 0;
 		while (pow2_value > 1)
 		{
 			pow2_value /= 2;
@@ -236,12 +235,12 @@ struct Bits64
 		//Clear the lower bits and work only with the upper bits of the value
 		Bits64 shifted_upper = *this;
 		{
-			shifted_upper.rotate_right(pivot);
+			shifted_upper.rotate_right(pivot + 1);
 			
 			DEBUG_ENSURE_UINT_LT(shifted_upper.storage, (1ULL << (63 - pivot + 1)), "Upper range bit overflow");
 
 			shifted_upper.storage += 1;
-			shifted_upper.rotate_left(pivot);
+			shifted_upper.rotate_left(pivot + 1);
 		}
 
 		//Clear the upper bits and work with the lower bits of the value
@@ -251,8 +250,7 @@ struct Bits64
 			// shifted_lower.rotate_right(31 - pivot);
 			Bits64 lower_mask = {};
 			
-			//Note(zshoals Dec-11-2022): Pivot is not inclusive, lower bits get ripped off here
-			lower_mask.generate_bitmask_lo(pivot - 1);
+			lower_mask.generate_bitmask_lo(pivot);
 			shifted_lower.mask_allow(lower_mask);
 		}
 

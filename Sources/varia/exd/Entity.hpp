@@ -22,7 +22,7 @@ struct Entity
 	{
 		vds::Bits64 bitmode = {};
 		bitmode.storage = this->id;
-		bitmode.rotate_right(generation_pivot);
+		bitmode.rotate_right(generation_pivot + 1);
 
 		return bitmode.storage;
 	}

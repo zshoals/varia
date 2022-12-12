@@ -6,6 +6,7 @@
 #include "varia/ds/StaticArray.hpp"
 #include "varia/vcommon.hpp"
 #include "varia/validation.hpp"
+#include "varia/logging.hpp"
 
 namespace exd
 {
@@ -53,6 +54,7 @@ struct EntityManifest
 	void entity_release(exd::Entity ent, u8 generation_pivot)
 	{
 		DEBUG_ENSURE_UINT_GT_ZERO(ent.id, "Tried to release an INVALID_ENTITY");
+		VARIA_LOG_UINT(ent.id_extract(generation_pivot));
 		DEBUG_ENSURE_UINT_LT(ent.id_extract(generation_pivot), Size, "Tried to release an entity id exceeding the maximum entity count.");
 
 		size_t idx = ent.id_extract(generation_pivot);

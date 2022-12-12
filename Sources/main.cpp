@@ -76,6 +76,35 @@ int kickstart(int argc, char** argv)
 		wo.mode = KINC_WINDOW_MODE_WINDOW;
 	}
 
+	using exd::World;
+	using exd::Entity;
+
+	World<8192> w = {};
+
+	Entity ent = w.ent_create();
+
+	VARIA_LOG_UINT(w.ent_id(ent));
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	w.ent_kill(ent);
+	ent = w.ent_create();
+	VARIA_LOG_UINT(w.ent_gen(ent));
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);

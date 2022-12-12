@@ -83,5 +83,30 @@ constexpr inline T ceil_next_nearest(T value, T target_multiple)
 	return (((target_multiple - (value % target_multiple)) * round_up) + value);
 }
 
+constexpr static u8 pow2_to_bitshift_value(size_t pow2_value)
+{
+	u8 shift = 0;
+	while (pow2_value > 1)
+	{
+		pow2_value /= 2;
+		++shift;
+	}
+
+	return shift;
+}
+
+constexpr static size_t pow2_next_nearest(size_t value)
+{
+	--value;
+	value |= (value >> 1);
+	value |= (value >> 2);
+	value |= (value >> 4);
+	value |= (value >> 8);
+	value |= (value >> 16);
+	++value;
+
+	return value;
+}
+
 }
 }
