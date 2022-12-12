@@ -10,6 +10,7 @@
 #include "varia/exd/EntityManifest.hpp"
 #include "varia/exd/World.hpp"
 #include "varia/math/Math.hpp"
+#include "varia/exd/Tag.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
@@ -80,6 +81,7 @@ int kickstart(int argc, char** argv)
 	using exd::World;
 	using exd::Entity;
 	using exd::Component;
+	using exd::Tag;
 
 	World<8192> w = {};
 	Entity ent = w.ent_create();
@@ -109,6 +111,10 @@ int kickstart(int argc, char** argv)
 	VARIA_LOG_UINT(w.positions2.bitset_handle);
 
 	Component<Position, 8192> * posits = &w.positions;
+	Tag<8192> * flams = &w.flammables; 
+	flams->tag_unset(&w, ent);
+	VARIA_QLOG("This is a test");
+	VARIA_LOG_INT(flams->tag_get(&w, ent));
 
 	Position * p = posits->comp_set(&w, ent);
 	p->x = 1;

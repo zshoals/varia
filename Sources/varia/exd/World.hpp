@@ -87,8 +87,8 @@ struct World
 
 		size_t counter = 0;
 
-		#define EXD_TAG(FIELD_NAME) FIELD_NAME.tag_unset(this, ent);
 		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) component_ents[counter].unset(ent.id_extract(id_shift)); ++counter;
+		#define EXD_TAG(FIELD_NAME) FIELD_NAME.tag_unset(this, ent);
 		#include "ComponentData.def"
 
 		#pragma warning(pop)
