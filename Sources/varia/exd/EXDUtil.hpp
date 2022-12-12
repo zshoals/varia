@@ -3,6 +3,9 @@
 #include "varia/vcommon.hpp"
 #include "varia/math/Math.hpp"
 
+namespace exd
+{
+
 namespace EXDUtil
 {
 	constexpr u8 id_shift(size_t entity_count)
@@ -14,4 +17,6 @@ namespace EXDUtil
 		//This value should result in 
 		return shift - 1;
 	}
+}
+
 }
