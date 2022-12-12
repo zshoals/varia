@@ -43,8 +43,6 @@ struct Bitset32
 	//Note(zshoals): We ceil our total size up to the next full u32 block
 	vds::Bits32 data[Bitset32Util::true_size(Size)];
 
-
-
 	void and(Bitset32<Size> const & other)
 	{
 		for_range_var(i, Bitset32Util::true_size(Size))
