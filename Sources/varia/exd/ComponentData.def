@@ -7,9 +7,13 @@
 //	COMPONENT_DATA FORMAT:
 //	EXD_COMPONENT_DATA(TYPE, FIELD_NAME)
 //  EXD_TAG(FIELD_NAME)
+//  It is recommended that you add Tags first; this is more cache coherent
+//  while removing entities. 
 
+EXD_TAG(flammables1)
 EXD_COMPONENT_DATA(Position, positions)
 EXD_COMPONENT_DATA(Position, positions2)
-EXD_TAG(flammables)
 
+#undef EXD_TAG
+#undef EXD_COMPONENT_DATA
 #endif

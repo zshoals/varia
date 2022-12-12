@@ -59,6 +59,7 @@ struct World
 		#pragma warning(push)
 		#pragma warning(disable: 4005)
 
+		#define EXD_TAG(FIELD_NAME)
 		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) FIELD_NAME.bitset_handle = counter; ++counter; 
 		#include "ComponentData.def"
 

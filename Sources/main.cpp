@@ -110,8 +110,12 @@ int kickstart(int argc, char** argv)
 	VARIA_LOG_UINT(w.ent_generation(ent));
 	VARIA_LOG_UINT(w.positions2.bitset_handle);
 
-	Component<Position, 8192> * posits = &w.positions;
-	Tag<8192> * flams = &w.flammables; 
+	#define TAG Tag<8192>
+	#define COMP(TYPE) Component<TYPE, 8192>
+
+
+	COMP(Position) * posits = &w.positions;
+	TAG * flams = &w.flammables24; 
 	flams->tag_unset(&w, ent);
 	VARIA_QLOG("This is a test");
 	VARIA_LOG_INT(flams->tag_get(&w, ent));
@@ -119,6 +123,7 @@ int kickstart(int argc, char** argv)
 	Position * p = posits->comp_set(&w, ent);
 	p->x = 1;
 	p->y = 99;
+
 
 	Position const * p2 = posits->comp_get(&w, ent);
 
