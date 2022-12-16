@@ -102,7 +102,7 @@ int kickstart(int argc, char** argv)
 
 	Elapsed timer = {};
 	timer.begin();
-	for_range(100)
+	for_range(4000)
 	{
 		cont.push(w->ent_create());
 	}
@@ -111,7 +111,19 @@ int kickstart(int argc, char** argv)
 
 	timer.reset();
 	timer.begin();
-	for_range(100)
+	for_range_var(i, 4000)
+	{
+		Entity ent = *cont.get_mut(i);
+		Position * pos = w->positions0.comp_set_unchecked(ent);
+		pos->x = 100;
+		pos->y = 99999;
+	}
+	timer.end();
+	VARIA_LOG_FLOAT(timer.dt());
+
+	timer.reset();
+	timer.begin();
+	for_range(4000)
 	{
 		w->ent_kill(cont.pop());
 	}

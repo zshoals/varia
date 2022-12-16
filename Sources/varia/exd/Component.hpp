@@ -42,6 +42,7 @@ struct Component
 		}
 		else
 		{
+			ENSURE_UNREACHABLE("Error: You tried to use a dead entity to retrieve a component or accessed a component without setting it first");
 			return nullptr;
 		}
 	} 
@@ -61,6 +62,7 @@ struct Component
 		}
 		else
 		{
+			ENSURE_UNREACHABLE("Error: You tried to use a dead entity to retrieve a component or accessed a component without setting it first");
 			return nullptr;
 		}
 	}
