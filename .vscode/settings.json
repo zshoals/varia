@@ -14,6 +14,10 @@
 		"climits": "c",
 		"cstdlib": "c",
 		"cstring": "c",
-		"utility": "c"
+		"utility": "c",
+		"tuple": "cpp",
+		"xmemory": "cpp",
+		"xtr1common": "cpp",
+		"*.def": "cpp"
 	}
 }
