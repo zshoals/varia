@@ -26,6 +26,7 @@ struct Elapsed
 		this->expired = true; this->m_end = kinc_time(); return this->m_end - this->m_start; 
 	}
 	double dt(void) { return this->m_end - this->m_start; }
+	void reset(void) { this->expired = false; }
 	void log_time(void) { VARIA_LOG_FLOAT(this->dt()); }
 	void log_time_message(char const * str) { VARIA_QLOG("%s :: %f", str, this->dt()); }
 };

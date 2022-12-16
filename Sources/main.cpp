@@ -84,18 +84,39 @@ int kickstart(int argc, char** argv)
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
 
-
-	srand(kinc_time());
-
 	using exd::World;
 	using exd::Component;
+	using exd::Entity;
 
 	World<8192> * w = new World<8192>();
-	for_range_var(i, 100)
+	Entity ent = w->ent_create();
+	Position * pos = w->positions0.comp_set(w, ent);
+	pos->x = 100;
+	pos->y = 200;
+
+	Position const * pos_edit = w->positions0.comp_get(w, ent);
+	VARIA_LOG_INT(pos_edit->x);
+	VARIA_LOG_INT(pos_edit->y);
+
+	vds::StaticArray<Entity, 4000> cont = {};
+
+	Elapsed timer = {};
+	timer.begin();
+	for_range(100)
 	{
-		u64 id = w->entities.manifest.get(i)->id;
-		VARIA_LOG_UINT(id);
+		cont.push(w->ent_create());
 	}
+	timer.end();
+	VARIA_LOG_FLOAT(timer.dt());
+
+	timer.reset();
+	timer.begin();
+	for_range(100)
+	{
+		w->ent_kill(cont.pop());
+	}
+	timer.end();
+	VARIA_LOG_FLOAT(timer.dt());
 
 	kinc_start();
 
