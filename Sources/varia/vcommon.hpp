@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <assert.h>
+#include <string.h>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -24,7 +25,9 @@ typedef unsigned int uint;
 #define VARIA_CONCAT_IMPL(A, B) A##B
 #define VARIA_CONCAT(A, B) VARIA_CONCAT_IMPL(A, B)
 
-// #define DEREF(PTR) (*(PTR))
+#define VARIA_NO_OPERATION() ((void)0)
+
+#define VARIA_ZERO_INIT(THIS_PTR) memset((THIS_PTR), 0, (sizeof(*THIS_PTR)))
 
 //Note: For now, only support positive values
 #define for_range(STOP)\
