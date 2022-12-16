@@ -14,11 +14,11 @@ namespace exd
 template <int Size>
 struct EntityManifest
 {
-	vds::StaticArray<Entity, Size> manifest = {};
+	vds::StaticArray<Entity, Size> manifest;
 	// vds::StaticArray<exd::Entity, 10> manifest;
-	vds::Bitset32<Size> bitset = {};
+	vds::Bitset32<Size> bitset;
 
-	EntityManifest(void)
+	void init(void)
 	{
 		for_range_var(i, Size)
 		{

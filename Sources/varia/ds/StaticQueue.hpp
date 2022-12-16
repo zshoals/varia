@@ -14,6 +14,11 @@ struct StaticQueue
 {
 	vds::StaticRingbuf<T, Size> ring;
 
+	StaticQueue(void)
+	{
+		VARIA_ZERO_INIT(this);
+	}
+
 	//Tries to push a new value onto the queue. 
 	//If there was room to add the value, returns true, otherwise false
 	bool enqueue(T value)

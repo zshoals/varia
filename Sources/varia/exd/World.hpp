@@ -10,6 +10,8 @@
 #include "varia/math/Math.hpp"
 #include "varia/vcommon.hpp"
 
+#include <string.h>
+
 #define EXD_IMPORT_COMPONENT_INCLUDES
 #include "ComponentData.def"
 #undef EXD_IMPORT_COMPONENT_INCLUDES
@@ -23,12 +25,12 @@ struct World
 	//TODO(zshoals): This struct needs to define a COMPONENT_DATA macro and import all components
 	//And also bitsets and tags
 
-	exd::EntityManifest<Size> entities = {};
+	exd::EntityManifest<Size> entities;
 	constexpr static u8 id_shift = EXDUtil::id_shift(Size);
 	u64 active_entities = 0;
 	//Note(zshoals Dec-12-2022): We just set an upper bound here...hacky but simple...
 	//500kb at 8192 entities at 512 bitsets
-	vds::Bitset32<Size> component_ents[exd::Constants::exd_max_components] = {};
+	vds::Bitset32<Size> component_ents[exd::Constants::exd_max_components];
 	//====================================================
 	//           Import all tags, and then
 	//           all component data
@@ -39,8 +41,8 @@ struct World
 	#pragma warning(push)
 	#pragma warning(disable: 4005)
 
-	#define EXD_TAG(FIELD_NAME) exd::Tag<Size> FIELD_NAME = {};
-	#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) exd::Component<TYPE, Size> FIELD_NAME = {id_shift}; 
+	#define EXD_TAG(FIELD_NAME) exd::Tag<Size> FIELD_NAME;
+	#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) exd::Component<TYPE, Size> FIELD_NAME; 
 	#include "ComponentData.def"
 
 	#pragma warning(pop)
@@ -51,6 +53,10 @@ struct World
 
 	World(void)
 	{
+		VARIA_ZERO_INIT(this);
+		entities.init();
+		//Note(zshoals Dec-16-2022):> Components and tags are handled fine by being defaulted to zero
+
 		//====================================================
 		//          Set all component bitset handles
 		//====================================================

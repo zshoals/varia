@@ -12,6 +12,11 @@ struct StaticStack
 	T data[Size];
 	size_t push_idx = 0;
 
+	StaticStack(void)
+	{
+		VARIA_ZERO_INIT(this);
+	}
+
 	void push(T value)
 	{
 		DEBUG_ENSURE_UINT_LT(push_idx, Size, "Attempted element push of full StaticStack.");

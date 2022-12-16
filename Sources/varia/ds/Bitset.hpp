@@ -43,6 +43,11 @@ struct Bitset32
 	//Note(zshoals): We ceil our total size up to the next full u32 block
 	vds::Bits32 data[Bitset32Util::true_size(Size)];
 
+	Bitset32(void)
+	{
+		VARIA_ZERO_INIT(this);
+	}
+
 	void and(Bitset32<Size> const & other)
 	{
 		for_range_var(i, Bitset32Util::true_size(Size))
@@ -216,9 +221,9 @@ struct Bitset32
 	{
 		DEBUG_ENSURE_UINT_LT(target_bit, Size, "Out of range bit in Bitset.");
 
-		//Note(zshoals): Equivalent to target_bit % bit_width, however, this is faster
+		//Note(zshoals Dec-11-2022): Equivalent to target_bit % bit_width, however, this is faster
 		//in debug builds
-		constexpr size_t shift = Bits32::pow2_to_bitshift_value(Bitset32Util::bit_width());
+		size_t shift = Bits32::pow2_to_bitshift_value(Bitset32Util::bit_width());
 		return target_bit & ( (1 << shift) - 1);
 	}
 

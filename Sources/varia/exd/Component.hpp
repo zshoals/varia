@@ -23,7 +23,7 @@ namespace exd
 template<typename T, int Size>
 struct Component
 {
-	vds::StaticArray<T, Size> comps = {};
+	vds::StaticArray<T, Size> comps;
 	size_t bitset_handle = SIZE_MAX;
 	constexpr static u8 id_bits = EXDUtil::id_shift(Size);
 

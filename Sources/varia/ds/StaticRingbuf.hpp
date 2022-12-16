@@ -42,6 +42,11 @@ struct StaticRingbuf
 	size_t rear = 0;
 	size_t count = 0;
 
+	StaticRingbuf(void)
+	{
+		VARIA_ZERO_INIT(this);
+	}
+
 	StaticRingbufIterator begin(void)
 	{
 		return StaticRingbufIterator(&this->data[0], rear, count);

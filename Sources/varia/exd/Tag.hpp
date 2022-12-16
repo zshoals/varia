@@ -14,7 +14,7 @@ namespace exd
 template<int Size>
 struct Tag
 {
-	vds::Bitset32<Size> entities = {};
+	vds::Bitset32<Size> entities;
 	constexpr static u8 id_bits = EXDUtil::id_shift(Size);
 
 	void tag_set(World<Size> * w, exd::Entity ent)

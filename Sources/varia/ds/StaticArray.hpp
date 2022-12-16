@@ -5,6 +5,8 @@
 #include "varia/ds/qsort.h"
 #include "varia/ds/SearchResult.hpp"
 
+#include <string.h>
+
 namespace vds
 {
 
@@ -35,7 +37,12 @@ struct StaticArray
 
 
 	T data[Size];
-	size_t push_idx = 0;
+	size_t push_idx;
+
+	StaticArray(void)
+	{
+		VARIA_ZERO_INIT(this);
+	}
 
 	//TODO(zshoals): Figure out what const after the function parameters means, this doesn't with them present however
 	//examples seem to use the const version without any issues
