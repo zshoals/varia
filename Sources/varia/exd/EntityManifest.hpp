@@ -59,6 +59,10 @@ struct EntityManifest
 		DEBUG_ENSURE_UINT_GT_ZERO(ent.id, "Tried to release an INVALID_ENTITY");
 		DEBUG_ENSURE_UINT_LT(ent.id_extract(generation_pivot), Size, "Tried to release an entity id exceeding the maximum entity count.");
 
+		bool valid = this->entity_valid(ent, generation_pivot);
+		
+		DEBUG_ENSURE_TRUE(valid, "Tried to kill an entity that is already out of date.");
+
 		size_t idx = ent.id_extract(generation_pivot);
 		bitset.unset(idx);
 		manifest.data[idx].generation_increment(generation_pivot);
