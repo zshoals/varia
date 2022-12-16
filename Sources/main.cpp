@@ -7,18 +7,20 @@
 #include "varia/ds/StaticQueue.hpp"
 #include "varia/ds/Bits.hpp"
 #include "varia/ds/Bitset.hpp"
-#include "varia/exd/EntityManifest.hpp"
-#include "varia/exd/World.hpp"
 #include "varia/math/Math.hpp"
-#include "varia/exd/Tag.hpp"
+#include "varia/util/Elapsed.hpp"
+
+#include "varia/exd/World.hpp"
+#include "varia/exd/Component.hpp"
+
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
 #include "varia/comps/Position.hpp"
 
+#include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
-
 
 using namespace Varia;
 
@@ -78,61 +80,25 @@ int kickstart(int argc, char** argv)
 		wo.mode = KINC_WINDOW_MODE_WINDOW;
 	}
 
-	using exd::World;
-	using exd::Entity;
-	using exd::Component;
-	using exd::Tag;
-
-	World<8192> w = {};
-	Entity ent = w.ent_create();
-
-	VARIA_LOG_UINT(w.ent_id(ent));
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	w.ent_kill(ent);
-	ent = w.ent_create();
-	VARIA_LOG_UINT(w.ent_generation(ent));
-	VARIA_LOG_UINT(w.positions2.bitset_handle);
-
-	#define TAG Tag<8192>
-	#define COMP(TYPE) Component<TYPE, 8192>
-
-
-	COMP(Position) * posits = &w.positions;
-	TAG * flams = &w.flammables24; 
-	flams->tag_unset(&w, ent);
-	VARIA_QLOG("This is a test");
-	VARIA_LOG_INT(flams->tag_get(&w, ent));
-
-	Position * p = posits->comp_set(&w, ent);
-	p->x = 1;
-	p->y = 99;
-
-
-	Position const * p2 = posits->comp_get(&w, ent);
-
-	VARIA_LOG_INT(p2->x);
-	VARIA_LOG_INT(p2->y);
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
+
+
+	srand(kinc_time());
+
+	using exd::World;
+	using exd::Component;
+
+	World<8192> * w = new World<8192>();
+	for_range_var(i, 100)
+	{
+		u64 id = w->entities.manifest.get(i)->id;
+		VARIA_LOG_UINT(id);
+	}
+
 	kinc_start();
 
 	return 0;
 }
+
