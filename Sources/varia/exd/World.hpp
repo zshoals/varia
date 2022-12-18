@@ -65,8 +65,8 @@ struct World
 		#pragma warning(push)
 		#pragma warning(disable: 4005)
 
-		#define EXD_TAG(FIELD_NAME)
-		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) FIELD_NAME.bitset_handle = counter; ++counter; 
+		#define EXD_TAG(FIELD_NAME) FIELD_NAME.w = this;
+		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) FIELD_NAME.bitset_handle = counter; FIELD_NAME.w = this; ++counter; 
 		#include "ComponentData.def"
 
 		#pragma warning(pop)
@@ -94,8 +94,11 @@ struct World
 
 		size_t counter = 0;
 
+		//Note(zshoals Dec-18-2022):> We're accessing the component bitset in world here, not the component
+		//itself. That's why there's no "comp_unset_unchecked" line here and rather just unset.
 		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) component_ents[counter].unset(ent.id_extract(id_shift)); ++counter;
-		#define EXD_TAG(FIELD_NAME) FIELD_NAME.tag_unset(this, ent);
+		//However, tag stores its own bitset so it is in fact right here.
+		#define EXD_TAG(FIELD_NAME) FIELD_NAME.tag_unset_unchecked(ent);
 		#include "ComponentData.def"
 
 		#pragma warning(pop)

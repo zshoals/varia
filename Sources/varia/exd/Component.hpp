@@ -25,9 +25,10 @@ struct Component
 {
 	vds::StaticArray<T, Size> comps;
 	size_t bitset_handle = SIZE_MAX;
+	World<Size> * w;
 	constexpr static u8 id_bits = EXDUtil::id_shift(Size);
 
-	T const * comp_get(World<Size> * w, Entity ent) 
+	T const * comp_get(Entity ent) 
 	{ 
 		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
 		u64 id = ent.id_extract(id_bits);
@@ -47,7 +48,7 @@ struct Component
 		}
 	} 
 
-	T * comp_get_mut(World<Size> * w, Entity ent) 
+	T * comp_get_mut(Entity ent) 
 	{ 
 		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
 		u64 id = ent.id_extract(id_bits);
@@ -70,7 +71,7 @@ struct Component
 	T const * comp_get_unchecked(Entity ent) { return comps.get_unsafe(ent.id_extract(id_bits)); }
 	T * comp_get_mut_unchecked(Entity ent) { return comps.get_mut_unsafe(ent.id_extract(id_bits)); }
 
-	T * comp_set(World<Size> * w, Entity ent)
+	T * comp_set(Entity ent)
 	{
 		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
 		u64 id = ent.id_extract(id_bits);
@@ -89,6 +90,7 @@ struct Component
 		}
 		else
 		{
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to set a component on a dead entity, however, it was permitted. Are you sure you want to do that? Ent ID: %zu", id);
 			return nullptr;
 		}
 	}
@@ -107,9 +109,11 @@ struct Component
 		{
 			ent_states->unset(id);
 		}
+
+		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to unset a component on a dead entity, however, it was permitted. Are you sure you want to do that? Ent ID: %zu", id);
 	}
 
-	void comp_unset_unchecked(World<Size> * w, Entity ent)
+	void comp_unset_unchecked(Entity ent)
 	{
 		w->internal_bitset_lookup(bitset_handle).unset(ent.id_extract(id_bits));
 	}

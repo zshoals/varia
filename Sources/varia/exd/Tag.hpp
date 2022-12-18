@@ -15,9 +15,10 @@ template<int Size>
 struct Tag
 {
 	vds::Bitset32<Size> entities;
+	World<Size> * w;
 	constexpr static u8 id_bits = EXDUtil::id_shift(Size);
 
-	void tag_set(World<Size> * w, exd::Entity ent)
+	void tag_set(exd::Entity ent)
 	{
 		if (w->ent_valid(ent))
 		{
@@ -29,7 +30,7 @@ struct Tag
 		}
 	}
 
-	void tag_unset(World<Size> * w, exd::Entity ent)
+	void tag_unset(exd::Entity ent)
 	{
 		if (w->ent_valid(ent))
 		{
@@ -42,7 +43,7 @@ struct Tag
 		}
 	}
 
-	bool tag_get(World<Size> * w, exd::Entity ent)
+	bool tag_get(exd::Entity ent)
 	{
 		if (w->ent_valid(ent))
 		{
