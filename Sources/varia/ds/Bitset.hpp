@@ -72,6 +72,16 @@ struct Bitset32
 		}
 	}
 
+	void andNot(Bitset32<Size> const & other)
+	{
+		for_range_var(i, Bitset32Util::true_size(Size))
+		{
+			Bits32 copy = other.data[i];
+			copy.not();
+			this->data[i].and(copy);
+		}
+	}
+
 	void set(size_t target_bit)
 	{
 		DEBUG_ENSURE_UINT_LT(target_bit, Size, "Out of range bit in Bitset.");
