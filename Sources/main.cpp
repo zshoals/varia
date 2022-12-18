@@ -10,6 +10,7 @@
 #include "varia/math/Math.hpp"
 #include "varia/util/Elapsed.hpp"
 
+#include "varia/exd/Query.hpp"
 #include "varia/exd/World.hpp"
 #include "varia/exd/Component.hpp"
 
@@ -90,11 +91,11 @@ int kickstart(int argc, char** argv)
 
 	World<8192> * w = new World<8192>();
 	Entity ent = w->ent_create();
-	Position * pos = w->positions0.comp_set(w, ent);
+	Position * pos = w->positions_0.comp_set(ent);
 	pos->x = 100;
 	pos->y = 200;
 
-	Position const * pos_edit = w->positions0.comp_get(w, ent);
+	Position const * pos_edit = w->positions_0.comp_get(ent);
 	VARIA_LOG_INT(pos_edit->x);
 	VARIA_LOG_INT(pos_edit->y);
 
@@ -114,11 +115,12 @@ int kickstart(int argc, char** argv)
 	for_range_var(i, 4000)
 	{
 		Entity ent = *cont.get_mut(i);
-		Position * pos = w->positions0.comp_set_unchecked(ent);
+		Position * pos = w->positions_0.comp_set_unchecked(ent);
 		pos->x = 100;
 		pos->y = 99999;
 	}
 	timer.end();
+
 	VARIA_LOG_FLOAT(timer.dt());
 
 	timer.reset();
@@ -129,6 +131,31 @@ int kickstart(int argc, char** argv)
 	}
 	timer.end();
 	VARIA_LOG_FLOAT(timer.dt());
+
+
+
+	for_range_var(i, 5)
+	{
+		Entity temp = w->ent_create();
+		Position * poss = w->positions_0.comp_set(temp);
+		poss->x = (int)i;
+		poss->y = (int)i;
+	}
+
+	#define COMP(TYPE) Component<TYPE, 8192>
+
+	exd::Query<8192> q = { w };
+	q.include(&w->positions_0);
+	q.compile();
+
+	for(Entity & ent : q)
+	{
+		Position const * possy = w->positions_0.comp_get(ent);
+		VARIA_QLOG("We somehow made it here");
+		VARIA_LOG_INT(possy->x);
+		VARIA_LOG_INT(possy->y);
+	}
+
 
 	kinc_start();
 
