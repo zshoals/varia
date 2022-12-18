@@ -110,6 +110,11 @@ struct World
 		return &component_ents[idx];
 	}
 
+	Entity internal_lookup_entity_via_id(size_t idx)
+	{
+		return *this->entities.manifest.get_unsafe(idx);
+	}
+
 };
 
 }
