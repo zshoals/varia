@@ -10,10 +10,8 @@
 #include "varia/math/Math.hpp"
 #include "varia/util/Elapsed.hpp"
 
-#include "varia/exd/Query.hpp"
-#include "varia/exd/World.hpp"
-#include "varia/exd/Component.hpp"
 
+#include "varia/exd/Component.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
@@ -87,30 +85,25 @@ int kickstart(int argc, char** argv)
 
 
 
+	exd::Component<Position> pos;
+	exd::Entity ent = {1};
+	exd::Entity ent2 = {5};
+	exd::Entity ent3 = {9};
 
+	pos.add(ent);
+	pos.add(ent2);
+	pos.add(ent3);
+	pos.remove(ent);
+	pos.remove(ent);
+	pos.get(ent);
+	VARIA_LOG_UINT(pos.entity_count);
 
-	using exd::World;
-	using exd::Component;
-	using exd::Entity;
+	Position * elem = pos.get_mut(ent2);
+	elem->x = 100;
+	elem->y = 200;
 
-	World<8192> * w = new World<8192>();
-	vds::StaticArray<Entity, 4000> cont = {};
-
-	Elapsed timer = {};
-	Entity ent = w->ent_create();
-	w->ent_kill(ent);
-	ent = w->ent_create();
-	w->ent_kill(ent);
-	ent = w->ent_create();
-	w->ent_kill(ent);
-	ent = w->ent_create();
-	w->ent_kill(ent);
-	ent = w->ent_create();
-
-
-
-
-
+	Position const * elem2 = pos.get(ent2);
+	VARIA_LOG_INT(elem2->x);
 
 	kinc_start();
 

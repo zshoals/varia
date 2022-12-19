@@ -4,7 +4,6 @@
 
 #include "Entity.hpp"
 #include "EXDUtil.hpp"
-#include "World.hpp"
 
 template<int Size> struct World;
 

@@ -1,23 +1,23 @@
 
-#ifdef EXD_IMPORT_COMPONENT_INCLUDES
-	#include "varia/comps/Position.hpp"
-	#include "varia/comps/Flammable.hpp"
-#else
+// #ifdef EXD_IMPORT_COMPONENT_INCLUDES
+// 	#include "varia/comps/Position.hpp"
+// 	#include "varia/comps/Flammable.hpp"
+// #else
 
-//README:
-//	COMPONENT_DATA FORMAT:
-//	EXD_COMPONENT_DATA(TYPE, FIELD_NAME)
-//  EXD_TAG(TYPE, FIELD_NAME)
-//  It is recommended that you add Tags first; this is more cache coherent
-//  while removing entities. 
+// //README:
+// //	COMPONENT_DATA FORMAT:
+// //	EXD_COMPONENT_DATA(TYPE, FIELD_NAME)
+// //  EXD_TAG(TYPE, FIELD_NAME)
+// //  It is recommended that you add Tags first; this is more cache coherent
+// //  while removing entities. 
 
-EXD_COMPONENT_DATA(Position, positions_0)
-EXD_COMPONENT_DATA(Position, positions_1)
-EXD_COMPONENT_DATA(Position, positions_2)
-EXD_COMPONENT_DATA(Position, positions_3)
-EXD_COMPONENT_DATA(Position, positions_4)
-EXD_COMPONENT_DATA(Position, positions_5)
+// EXD_COMPONENT_DATA(Position, positions_0)
+// EXD_COMPONENT_DATA(Position, positions_1)
+// EXD_COMPONENT_DATA(Position, positions_2)
+// EXD_COMPONENT_DATA(Position, positions_3)
+// EXD_COMPONENT_DATA(Position, positions_4)
+// EXD_COMPONENT_DATA(Position, positions_5)
 
-#undef EXD_TAG
-#undef EXD_COMPONENT_DATA
-#endif
+// #undef EXD_TAG
+// #undef EXD_COMPONENT_DATA
+// #endif
