@@ -220,6 +220,32 @@ struct Bits64
 		this->not();
 	}
 
+	constexpr void set_upper(u64 value, u8 pivot)
+	{
+		assert(pivot < 64 && "Exceeded bitwidth during shift.");
+
+		Bits64 himask = {};
+		himask.generate_bitmask_hi(pivot);
+		this->mask_deny(himask);
+		Bits64 new_upper = {value};
+		new_upper.rotate_left(pivot);
+
+		this->or(new_upper);
+	}
+
+	constexpr void set_lower(u64 value, u8 pivot)
+	{
+		assert(pivot < 64 && "Exceeded bitwidth during shift.");
+		assert(value < (1ULL << pivot) && "Setting lower value would overrun bitrange.");  
+
+		Bits64 lomask = {};
+		lomask.generate_bitmask_lo(pivot);
+		this->mask_deny(lomask);
+
+		//Note(zshoals Dec-19-2022):> Unsafe, value might exceed the lower range
+		this->or(value);
+	}
+
 	constexpr void increment_upper(u8 pivot)
 	{
 		assert(pivot < 64 && "Exceeded bitwidth during shift.");
