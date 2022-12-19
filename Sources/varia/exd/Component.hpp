@@ -1,132 +1,104 @@
 #pragma once
 
-#include "Entity.hpp"
-#include "World.hpp"
-#include "EXDUtil.hpp"
-#include "EXDConstants.hpp"
-
-#include "varia/ds/Bitset.hpp"
+#include "varia/logging.hpp"
+#include "varia/vcommon.hpp"
 #include "varia/ds/StaticArray.hpp"
-#include "varia/validation.hpp"
-
-//Note(zshoals Dec-12-2022): Lame, but for convenient usage of components we have to 
-//break this circular dependency, otherwise life is going to get annoying real fast
-//Kind of bad architecture but we're interntionally doing weird things with the 
-//component bitsets that are stored in World
-template<int Size> struct World;
+#include "EXDConstants.hpp"
+#include "Entity.hpp"
 
 namespace exd
 {
 
-//Component is a very thin data container. Due to cache coherency concerns,
-//the bitset that corresponds to this container is not stored here but rather in World
-template<typename T, int Size>
+template<typename T>
 struct Component
 {
-	vds::StaticArray<T, Size> comps;
-	size_t bitset_handle = SIZE_MAX;
-	World<Size> * w;
-	constexpr static u8 id_bits = EXDUtil::id_shift(Size);
+	vds::StaticArray<size_t, Constants::exd_max_entities> sparse_ents;
+	vds::StaticArray<Entity, Constants::exd_max_entities> dense_ents;
+	vds::StaticArray<T, Constants::exd_max_entities> data;
+	size_t entity_count;
 
-	T const * comp_get(Entity ent) 
-	{ 
-		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
-		u64 id = ent.id_extract(id_bits);
-		bool alive = ent_states->is_set(id);
-		bool valid = w->ent_valid(ent);
-
-		if (alive && valid)
-		{
-			//Note(zshoals Dec-12-2022): We already know that the selected ID will be in bounds
-			//as everything in World is templated to a fixed size
-			return comps.get_unsafe(id);
-		}
-		else
-		{
-			ENSURE_UNREACHABLE("Error: You tried to use a dead entity to retrieve a component or accessed a component without setting it first");
-			return nullptr;
-		}
-	} 
-
-	T * comp_get_mut(Entity ent) 
-	{ 
-		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
-		u64 id = ent.id_extract(id_bits);
-		bool alive = ent_states->is_set(id);
-		bool valid = w->ent_valid(ent);
-
-		if (alive && valid)
-		{
-			//Note(zshoals Dec-12-2022): We already know that the selected ID will be in bounds
-			//as everything in World is templated to a fixed size
-			return comps.get_mut_unsafe(id);
-		}
-		else
-		{
-			ENSURE_UNREACHABLE("Error: You tried to use a dead entity to retrieve a component or accessed a component without setting it first");
-			return nullptr;
-		}
+	Component(void)
+	{
+		VARIA_ZERO_INIT(this);
 	}
 
-	T const * comp_get_unchecked(Entity ent) { return comps.get_unsafe(ent.id_extract(id_bits)); }
-	T * comp_get_mut_unchecked(Entity ent) { return comps.get_mut_unsafe(ent.id_extract(id_bits)); }
-
-	T * comp_set(Entity ent)
+	bool has(Entity ent)
 	{
-		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
-		u64 id = ent.id_extract(id_bits);
-		bool not_set_in_component = ent_states->is_unset(id);
-		bool valid = w->ent_valid(ent);
+		u64 id = ent.id_extract();
+		size_t target_idx = *sparse_ents.get_unsafe(id);
 
-		DEBUG_ENSURE_TRUE(not_set_in_component, "Entity was already created in this bitset; did you set this entity twice?");
-		DEBUG_ENSURE_TRUE(valid, "Entity was invalid while trying to set a component; did you use an expired entity?");
+		if (target_idx != INVALID_ENTITY.id)
+		{
+			Entity other = *dense_ents.get_unsafe(target_idx);
+			return ent.matches(other);
+		}
 
-		if (not_set_in_component && valid)
-		{
-			//Note(zshoals Dec-12-2022): We already know that the selected ID will be in bounds
-			//as everything in World is templated to a fixed size
-			ent_states->set(id);
-			return comps.get_mut_unsafe(id);
-		}
-		else
-		{
-			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to set a component on a dead entity, however, it was permitted. Are you sure you want to do that? Ent ID: %zu", id);
-			return nullptr;
-		}
+		return false;
 	}
 
-	T * comp_set_unchecked(Entity ent) { return comps.get_mut_unsafe(ent.id_extract(id_bits)); }
-
-	void comp_unset(Entity ent)
+	T const * get(Entity ent)
 	{
-		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
-		u64 id = ent.id_extract(id_bits);
-		//Note(zshoals Dec-12-2022): No check if this entity exists in this component bitset;
-		//simply blindly remove it as long as the entity matches the reference entity's generation
-		bool valid = w->ent_valid(ent);
+		if (has(ent))
+		{
+			size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
+			Entity target_ent = *dense_ents.get_unsafe(target_idx);
+			return data.get_unsafe(target_ent.id_extract());
+		}
+		ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
 
+		return nullptr;
+	}
+
+	T * get_mut(Entity ent)
+	{
+		if (has(ent))
+		{
+			size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
+			Entity target_ent = *dense_ents.get_unsafe(target_idx);
+			return data.get_mut_unsafe(target_ent.id_extract());
+		}
+		ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
+
+		return nullptr;
+	}
+
+
+	void add(Entity ent)
+	{
+		u64 id = ent.id_extract();
+
+		if (*sparse_ents.get_unsafe(id) == INVALID_ENTITY.id)
+		{
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to push an entity into this component, but it already exists. ID (no generation): %zu", ent.id_extract());
+			return;
+		}
+
+		dense_ents.push(ent);
+		sparse_ents.set_unsafe(id, dense_ents.back());
+		data.push_without_data();
+		++entity_count;
+	}
+
+	void remove(Entity ent)
+	{
+		size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
+		if (target_idx == INVALID_ENTITY.id) return;
+
+		Entity dense_ent = *dense_ents.get_unsafe(target_idx);
+		bool valid = ent.matches(dense_ent);
 		if (valid)
 		{
-			ent_states->unset(id);
+			dense_ents.swap_and_pop(target_idx);
+			data.swap_and_pop(target_idx);
+			sparse_ents.set_unsafe(target_idx, INVALID_ENTITY.id);
+			--entity_count;
 		}
-
-		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to unset a component on a dead entity, however, it was permitted. Are you sure you want to do that? Ent ID: %zu", id);
+		else
+		{
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+		}
 	}
 
-	void comp_unset_unchecked(Entity ent)
-	{
-		w->internal_bitset_lookup(bitset_handle).unset(ent.id_extract(id_bits));
-	}
-
-	bool comp_has(Entity ent)
-	{
-		vds::Bitset32<Size> * ent_states = w->internal_bitset_lookup(bitset_handle);
-		u64 id = ent.id_extract(id_bits);
-		bool alive = ent_states->is_set(id);
-		bool valid = w->ent_valid(ent);
-
-		return (alive && valid);
-	}
 };
 
 }
