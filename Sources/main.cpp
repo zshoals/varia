@@ -95,7 +95,15 @@ int kickstart(int argc, char** argv)
 	pos.add(ent3);
 	pos.remove(ent);
 	pos.remove(ent);
-	pos.get(ent);
+	pos.remove(ent2);
+	pos.remove(ent3);
+	pos.remove(ent3);
+	pos.remove(ent3);
+	pos.remove(ent3);
+	pos.add(ent3);
+	pos.add(ent3);
+	pos.remove(ent3);
+	pos.add(ent2);
 	VARIA_LOG_UINT(pos.entity_count);
 
 	Position * elem = pos.get_mut(ent2);

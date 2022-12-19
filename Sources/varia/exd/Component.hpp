@@ -20,6 +20,7 @@ struct Component
 	Component(void)
 	{
 		VARIA_ZERO_INIT(this);
+		sparse_ents.set_all(INVALID_ENTITY.id);
 	}
 
 	bool has(Entity ent)
@@ -67,7 +68,7 @@ struct Component
 	{
 		u64 id = ent.id_extract();
 
-		if (*sparse_ents.get_unsafe(id) == INVALID_ENTITY.id)
+		if (*sparse_ents.get_unsafe(id) != INVALID_ENTITY.id)
 		{
 			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to push an entity into this component, but it already exists. ID (no generation): %zu", ent.id_extract());
 			return;
@@ -81,8 +82,18 @@ struct Component
 
 	void remove(Entity ent)
 	{
+		if (entity_count < 1)
+		{
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			return;
+		}
+
 		size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
-		if (target_idx == INVALID_ENTITY.id) return;
+		if (target_idx == INVALID_ENTITY.id) 
+		{
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			return;
+		};
 
 		Entity dense_ent = *dense_ents.get_unsafe(target_idx);
 		bool valid = ent.matches(dense_ent);
@@ -90,7 +101,14 @@ struct Component
 		{
 			dense_ents.swap_and_pop(target_idx);
 			data.swap_and_pop(target_idx);
-			sparse_ents.set_unsafe(target_idx, INVALID_ENTITY.id);
+			Entity reciprocal = *dense_ents.get(target_idx);
+
+			//Note(zshoals Dec-19-2022):> Order is important here, if the element is the final one
+			//in the array, reciprocal and ent id resolve to the same thing. So set INVALID_ENTITY.id
+			//second
+			sparse_ents.set_unsafe(reciprocal.id_extract(), target_idx);
+			sparse_ents.set_unsafe(ent.id_extract(), INVALID_ENTITY.id);
+
 			--entity_count;
 		}
 		else
