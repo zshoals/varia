@@ -49,6 +49,16 @@ struct StaticArray
 	StaticArrayIterator begin(void) /*const*/ { return StaticArrayIterator( &this->data[0] ); }
 	StaticArrayIterator end(void) /*const*/ { return StaticArrayIterator( &this->data[this->push_idx] ); }
 
+	size_t front(void)
+	{
+		return 0;
+	}
+
+	size_t back(void)
+	{
+		return push_idx - 1;
+	}
+
 	void push(T value)
 	{
 		DEBUG_ENSURE_UINT_LT(push_idx, Size, "Attempted element push of full StaticArray");
@@ -57,9 +67,16 @@ struct StaticArray
 		++this->push_idx;
 	}
 
+	void push_without_data(void)
+	{
+		DEBUG_ENSURE_UINT_LT(push_idx, Size, "Attempted element push of full StaticArray");
+
+		++this->push_idx;
+	}
+
 	T pop(void)
 	{
-		ENSURE_UINT_GTE(push_idx, 1, "Attempted element pop of empty StaticArray.");
+		DEBUG_ENSURE_UINT_GTE(push_idx, 1, "Attempted element pop of empty StaticArray.");
 
 		--this->push_idx;
 		return this->data[this->push_idx];
@@ -156,6 +173,12 @@ struct StaticArray
 		T temp = this->data[index_a];
 		this->data[index_a] = this->data[index_b];
 		this->data[index_b] = temp;
+	}
+
+	T swap_and_pop(size_t index)
+	{
+		swap(index, back());
+		return pop();
 	}
 
 	void sort_stackmode(void)
