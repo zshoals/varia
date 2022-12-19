@@ -85,76 +85,31 @@ int kickstart(int argc, char** argv)
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
 
+
+
+
+
 	using exd::World;
 	using exd::Component;
 	using exd::Entity;
 
 	World<8192> * w = new World<8192>();
-	Entity ent = w->ent_create();
-	Position * pos = w->positions_0.comp_set(ent);
-	pos->x = 100;
-	pos->y = 200;
-
-	Position const * pos_edit = w->positions_0.comp_get(ent);
-	VARIA_LOG_INT(pos_edit->x);
-	VARIA_LOG_INT(pos_edit->y);
-
 	vds::StaticArray<Entity, 4000> cont = {};
 
 	Elapsed timer = {};
-	timer.begin();
-	for_range(4000)
-	{
-		cont.push(w->ent_create());
-	}
-	timer.end();
-	VARIA_LOG_FLOAT(timer.dt());
-
-	timer.reset();
-	timer.begin();
-	for_range_var(i, 4000)
-	{
-		Entity ent = *cont.get_mut(i);
-		Position * pos = w->positions_0.comp_set_unchecked(ent);
-		pos->x = 100;
-		pos->y = 99999;
-	}
-	timer.end();
-
-	VARIA_LOG_FLOAT(timer.dt());
-
-	timer.reset();
-	timer.begin();
-	for_range(4000)
-	{
-		w->ent_kill(cont.pop());
-	}
-	timer.end();
-	VARIA_LOG_FLOAT(timer.dt());
+	Entity ent = w->ent_create();
+	w->ent_kill(ent);
+	ent = w->ent_create();
+	w->ent_kill(ent);
+	ent = w->ent_create();
+	w->ent_kill(ent);
+	ent = w->ent_create();
+	w->ent_kill(ent);
+	ent = w->ent_create();
 
 
 
-	for_range_var(i, 5)
-	{
-		Entity temp = w->ent_create();
-		Position * poss = w->positions_0.comp_set(temp);
-		poss->x = (int)i;
-		poss->y = (int)i;
-	}
 
-	#define COMP(TYPE) Component<TYPE, 8192>
-
-	exd::Query<8192> q = { w };
-	q.include(&w->positions_0);
-	q.compile();
-
-	for(Entity & ent : q)
-	{
-		Position const * possy = w->positions_0.comp_get(ent);
-		VARIA_QLOG("We somehow made it here");
-		VARIA_LOG_INT(possy->x);
-		VARIA_LOG_INT(possy->y);
-	}
 
 
 	kinc_start();

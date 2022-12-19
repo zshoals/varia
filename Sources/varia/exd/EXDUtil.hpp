@@ -15,7 +15,7 @@ namespace EXDUtil
 
 		//Note(zshoals Dec-12-2022): The shift value is used for bitmasking
 		//This value should result in 
-		return shift - 1;
+		return shift;
 	}
 }
 
