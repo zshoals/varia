@@ -42,8 +42,7 @@ struct Component
 		if (has(ent))
 		{
 			size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
-			Entity target_ent = *dense_ents.get_unsafe(target_idx);
-			return data.get_unsafe(target_ent.id_extract());
+			return data.get_unsafe(target_idx);
 		}
 		ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
 
@@ -55,8 +54,7 @@ struct Component
 		if (has(ent))
 		{
 			size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
-			Entity target_ent = *dense_ents.get_unsafe(target_idx);
-			return data.get_mut_unsafe(target_ent.id_extract());
+			return data.get_mut_unsafe(target_idx);
 		}
 		ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
 

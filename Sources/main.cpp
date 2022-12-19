@@ -110,6 +110,12 @@ int kickstart(int argc, char** argv)
 	elem->x = 100;
 	elem->y = 200;
 
+	for(Position const & element : pos.data)
+	{
+		VARIA_LOG_INT(element.x);
+		VARIA_LOG_INT(element.y);
+	}
+
 	Position const * elem2 = pos.get(ent2);
 	VARIA_LOG_INT(elem2->x);
 
