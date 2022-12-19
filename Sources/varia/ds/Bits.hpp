@@ -65,12 +65,12 @@ struct Bits32
 		//Clear the lower bits and work only with the upper bits of the value
 		Bits32 shifted_upper = *this;
 		{
-			shifted_upper.rotate_right(pivot + 1);
+			shifted_upper.rotate_right(pivot);
 			
 			assert( (1ULL << (31 - pivot + 1)) && "Upper range bit overflow.");
 
 			++(shifted_upper.storage);
-			shifted_upper.rotate_left(pivot + 1);
+			shifted_upper.rotate_left(pivot);
 		}
 
 		//Clear the upper bits and work with the lower bits of the value
@@ -227,12 +227,12 @@ struct Bits64
 		//Clear the lower bits and work only with the upper bits of the value
 		Bits64 shifted_upper = *this;
 		{
-			shifted_upper.rotate_right(pivot + 1);
+			shifted_upper.rotate_right(pivot);
 			
 			assert( (1ULL << (63 - pivot + 1)) && "Upper range bit overflow.");
 
 			shifted_upper.storage += 1;
-			shifted_upper.rotate_left(pivot + 1);
+			shifted_upper.rotate_left(pivot);
 		}
 
 		//Clear the upper bits and work with the lower bits of the value
