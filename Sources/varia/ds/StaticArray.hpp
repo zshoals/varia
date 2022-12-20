@@ -59,6 +59,16 @@ struct StaticArray
 		return push_idx - 1;
 	}
 
+	bool is_populated(void)
+	{
+		return push_idx > 0;
+	}
+
+	bool is_empty(void)
+	{
+		return !is_populated();
+	}
+
 	void push(T value)
 	{
 		DEBUG_ENSURE_UINT_LT(push_idx, Size, "Attempted element push of full StaticArray");
