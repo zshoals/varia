@@ -19,7 +19,7 @@ struct Component
 
 	Component(void)
 	{
-		VARIA_ZERO_INIT(this);
+		entity_count = 0;
 		sparse_ents.set_all(INVALID_ENTITY.id);
 	}
 
@@ -68,7 +68,7 @@ struct Component
 
 		if (*sparse_ents.get_unsafe(id) != INVALID_ENTITY.id)
 		{
-			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to push an entity into this component, but it already exists. ID (no generation): %zu", ent.id_extract());
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to add an entity into this component, but it already exists. ID (no generation): %zu", ent.id_extract());
 			return;
 		}
 
@@ -82,18 +82,19 @@ struct Component
 	{
 		if (entity_count < 1)
 		{
-			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 			return;
 		}
 
 		size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
 		if (target_idx == INVALID_ENTITY.id) 
 		{
-			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 			return;
 		};
 
 		Entity dense_ent = *dense_ents.get_unsafe(target_idx);
+
 		bool valid = ent.matches(dense_ent);
 		if (valid)
 		{
@@ -111,7 +112,7 @@ struct Component
 		}
 		else
 		{
-			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 		}
 	}
 
