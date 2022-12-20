@@ -12,61 +12,53 @@
 namespace exd
 {
 
-template <int Size>
 struct EntityManifest
 {
-	vds::StaticArray<Entity, Size> manifest;
+	vds::StaticArray<Entity, Constants::exd_max_entities> manifest;
+	vds::StaticArray<u64, Constants::exd_max_entities> freelist;
 	// vds::StaticArray<exd::Entity, 10> manifest;
-	vds::Bitset32<Size> bitset;
 
-	void init(void)
+	EntityManifest(void)
 	{
-		for_range_var(i, Size)
+		for_range_var(i, Constants::exd_max_entities)
 		{
 			manifest.get_mut(i)->id = i;
+			freelist.push(Constants::exd_max_entities - i - 1);
 		}
-
-		//Entity 0 is an INVALID_ENTITY. It is always set.
-		//Some special care has to be used when working with slot 0 of the manifest and bitset
-		bitset.set(0);
 	}
 
-	bool entity_valid(exd::Entity ent)
+	bool valid(Entity ent)
 	{
-		u64 idx = ent.id_extract(Constants::exd_id_shift);
-		bool is_alive = bitset.is_set(idx);
-		bool generation_matches = (ent.id == this->manifest.get_unsafe(idx)->id);
-
-		return (is_alive && generation_matches);
+		return ent.matches(*manifest.get(ent.id));
 	}
-
-	exd::Entity entity_get_free(void)
+	
+	Entity get_free(void)
 	{
-		vds::Result<size_t> idx = bitset.find_first_unset();
-		if (idx.valid)
+		if (freelist.is_empty())
 		{
-			bitset.set(idx.value);
-			return manifest.data[idx.value];
+			ENSURE_UNREACHABLE("Exhausted all available entities.");
 		}
 
-		//Out of entities...
-		//Should we try and handle this more gracefully or what?
-		ENSURE_UNREACHABLE("Depleted all available entities.");
-		return INVALID_ENTITY;
+		u64 ent_id = freelist.pop();
+		return *manifest.get(ent_id);
 	}
 
-	void entity_release(exd::Entity ent)
+	bool release(Entity ent)
 	{
-		DEBUG_ENSURE_UINT_GT_ZERO(ent.id, "Tried to release an INVALID_ENTITY");
-		DEBUG_ENSURE_UINT_LT(ent.id_extract(Constants::exd_id_shift), Size, "Tried to release an entity id exceeding the maximum entity count.");
+		u64 ent_id = ent.id_extract();
+		Entity * target_ent = manifest.get_mut(ent_id);
 
-		bool valid = this->entity_valid(Constants::exd_id_shift);
-		
-		DEBUG_ENSURE_TRUE(valid, "Tried to kill an entity that is already out of date.");
-
-		size_t idx = ent.id_extract(Constants::exd_id_shift);
-		bitset.unset(idx);
-		manifest.data[idx].generation_increment(Constants::exd_id_shift);
+		if (ent.matches(*target_ent))
+		{
+			freelist.push(ent_id);
+			target_ent->generation_increment();
+			return true;
+		}
+		else
+		{
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "EntityManifest tried to release a mismatched entity. Entity: %zu", ent.id);
+			return false;
+		}
 	}
 
 };
