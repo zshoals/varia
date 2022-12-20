@@ -82,14 +82,14 @@ struct Component
 	{
 		if (entity_count < 1)
 		{
-			// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 			return;
 		}
 
 		size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
 		if (target_idx == INVALID_ENTITY.id) 
 		{
-			// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 			return;
 		};
 
@@ -112,7 +112,7 @@ struct Component
 		}
 		else
 		{
-			// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 		}
 	}
 
