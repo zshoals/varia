@@ -12,6 +12,8 @@
 
 
 #include "varia/exd/Component.hpp"
+#include "varia/exd/World.hpp"
+#include "varia/exd/EntityManifest.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
@@ -83,41 +85,45 @@ int kickstart(int argc, char** argv)
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
 
+	using exd::Component;
+	using exd::World;
+	using exd::Entity;
 
+	World * w = new World{};
 
-	exd::Component<Position> pos;
-	exd::Entity ent = {1};
-	exd::Entity ent2 = {5};
-	exd::Entity ent3 = {9};
+	vds::StaticArray<Entity, 8192> arr;
 
-	pos.add(ent);
-	pos.add(ent2);
-	pos.add(ent3);
-	pos.remove(ent);
-	pos.remove(ent);
-	pos.remove(ent2);
-	pos.remove(ent3);
-	pos.remove(ent3);
-	pos.remove(ent3);
-	pos.remove(ent3);
-	pos.add(ent3);
-	pos.add(ent3);
-	pos.remove(ent3);
-	pos.add(ent2);
-	VARIA_LOG_UINT(pos.entity_count);
-
-	Position * elem = pos.get_mut(ent2);
-	elem->x = 100;
-	elem->y = 200;
-
-	for(Position const & element : pos.data)
+	Elapsed t;
+	t.begin();
+	for_range_var(i, 7000)
 	{
-		VARIA_LOG_INT(element.x);
-		VARIA_LOG_INT(element.y);
+		Entity ent = w->ent_create();
+		arr.push(ent);
+		w->positions_0.add(ent);
+
+		if (i == 3000)
+		{
+			w->positions_0.get_mut(ent)->x = 100;
+		}
+	}
+	t.end_and_log();
+
+	{
+		Elapsed b;
+		for(Position const & pos : w->positions_0.data)
+		{
+			if (pos.x == 100) VARIA_LOG_INT(100000);
+		}
 	}
 
-	Position const * elem2 = pos.get(ent2);
-	VARIA_LOG_INT(elem2->x);
+	t.reset();
+	t.begin();
+	while(arr.is_populated())
+	{
+		w->ent_kill(arr.pop());
+	}
+	t.end_and_log();
+
 
 	kinc_start();
 
