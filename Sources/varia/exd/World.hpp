@@ -20,17 +20,28 @@ struct World
 	size_t active_entities;
 	//Component arrays
 	//Tag arrays
+	#pragma warning(push)
+	#pragma warning(disable: 4005)
+
 	#define EXD_TAG(TYPE, FIELD_NAME) Tag<TYPE> FIELD_NAME;
 	#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) exd::Component<TYPE> FIELD_NAME = {&this->ent_comps_bitset};
 	#include "ComponentData.def"
+
+	#pragma warning(pop)
 
 	World(void)
 	{
 		active_entities = 0;
 
 		size_t counter = 0;
+		#pragma warning(push)
+		#pragma warning(disable: 4005)
+
 		#define EXD_TAG(TYPE, FIELD_NAME) Tag<TYPE> FIELD_NAME.internal_setUID(static_cast<ComponentIdentifiers_e>(counter)); ++counter;
 		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) FIELD_NAME.internal_setUID(static_cast<ComponentIdentifiers_e>(counter)); ++counter;
+		#include "ComponentData.def"
+
+		#pragma warning(pop)
 	}
 
 	Entity ent_create(void)
@@ -75,12 +86,17 @@ struct World
 
 			switch (idx)
 			{
+				#pragma warning(push)
+				#pragma warning(disable: 4005)
+
 				#define EXD_TAG(TYPE, FIELD_NAME)
 				#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME)\
 					case ComponentIdentifiers_e::FIELD_NAME:\
 					FIELD_NAME.remove(ent);\
 					break;
 				#include "ComponentData.def"
+
+				#pragma warning(pop)
 
 				default: ENSURE_UNREACHABLE("Should not have hit a default case.");
 			}
