@@ -3,6 +3,7 @@
 #include "EntityManifest.hpp"
 #include "Entity.hpp"
 #include "Component.hpp"
+#include "ComponentIdentifiers.hpp"
 
 #define EXD_IMPORT_COMPONENT_INCLUDES
 	#include "ComponentData.def"
@@ -15,16 +16,21 @@ struct World
 {
 	//Entity manifest
 	EntityManifest manifest;
+	vds::StaticArray<vds::Bitset32<Constants::exd_max_components>, Constants::exd_max_entities> ent_comps_bitset;
 	size_t active_entities;
 	//Component arrays
 	//Tag arrays
 	#define EXD_TAG(TYPE, FIELD_NAME) Tag<TYPE> FIELD_NAME;
-	#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) exd::Component<TYPE> FIELD_NAME;
+	#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) exd::Component<TYPE> FIELD_NAME = {&this->ent_comps_bitset};
 	#include "ComponentData.def"
 
 	World(void)
 	{
 		active_entities = 0;
+
+		size_t counter = 0;
+		#define EXD_TAG(TYPE, FIELD_NAME) Tag<TYPE> FIELD_NAME.internal_setUID(static_cast<ComponentIdentifiers_e>(counter)); ++counter;
+		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) FIELD_NAME.internal_setUID(static_cast<ComponentIdentifiers_e>(counter)); ++counter;
 	}
 
 	Entity ent_create(void)
@@ -53,12 +59,33 @@ struct World
 
 	void internal_ent_remove_from_components(Entity ent)
 	{
-		//TODO(zshoals Dec-20-2022):>
-		//Moronically try and remove this ent from every array for now
-		//Replace with switch case and generated list of targets to remove from
-		#define EXD_TAG(TYPE, FIELD_NAME)
-		#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME) FIELD_NAME.remove(ent);
-		#include "ComponentData.def"
+		vds::Bitset32<Constants::exd_max_components> * comp_bitset = ent_comps_bitset.get_mut(ent.id_extract());
+		vds::StaticArray<u64, Constants::exd_max_components> indices;
+
+		for_range_var(i, Constants::exd_max_components)
+		{
+			if (comp_bitset->is_set(i))
+			{
+				indices.push(i);
+			}
+		}
+
+		for(u64 const & idx : indices)
+		{
+
+			switch (idx)
+			{
+				#define EXD_TAG(TYPE, FIELD_NAME)
+				#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME)\
+					case ComponentIdentifiers_e::FIELD_NAME:\
+					FIELD_NAME.remove(ent);\
+					break;
+				#include "ComponentData.def"
+
+				default: ENSURE_UNREACHABLE("Should not have hit a default case.");
+			}
+		}
+
 	}
 
 	//funcs

@@ -101,7 +101,7 @@ int kickstart(int argc, char** argv)
 		arr.push(ent);
 		w->positions_0.add(ent);
 
-		if (i == 3000)
+		if (i == 100)
 		{
 			w->positions_0.get_mut(ent)->x = 100;
 		}
