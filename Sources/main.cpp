@@ -100,6 +100,11 @@ int kickstart(int argc, char** argv)
 		Entity ent = w->ent_create();
 		arr.push(ent);
 		w->positions_0.add(ent);
+		w->positions_1.add(ent);
+		w->positions_2.add(ent);
+		w->positions_3.add(ent);
+		w->positions_4.add(ent);
+		w->positions_5.add(ent);
 
 		if (i == 100)
 		{

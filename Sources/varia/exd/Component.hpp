@@ -37,7 +37,7 @@ struct Component
 
 	void internal_setUID(size_t UID)
 	{
-		this->UID = UID;
+		this->UID = static_cast<ComponentIdentifiers_e>(UID);
 	}
 
 	void internal_remove_this_comp_from_entset(u64 entity_id)
@@ -112,7 +112,7 @@ struct Component
 	{
 		if (entity_count < 1)
 		{
-			// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 			return;
 		}
 
@@ -121,7 +121,7 @@ struct Component
 		size_t target_idx = *sparse_ents.get_unsafe(id);
 		if (target_idx == INVALID_ENTITY.id) 
 		{
-			// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 			return;
 		};
 
@@ -132,7 +132,7 @@ struct Component
 		{
 			dense_ents.swap_and_pop(target_idx);
 			data.swap_and_pop(target_idx);
-			Entity reciprocal = *dense_ents.get(target_idx);
+			Entity reciprocal = *dense_ents.get_unsafe(target_idx);
 
 			//Note(zshoals Dec-19-2022):> Order is important here, if the element is the final one
 			//in the array, reciprocal and ent id resolve to the same thing. So set INVALID_ENTITY.id
@@ -146,7 +146,7 @@ struct Component
 		}
 		else
 		{
-			// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+			VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 		}
 	}
 
