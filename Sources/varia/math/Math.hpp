@@ -54,6 +54,16 @@ constexpr inline int max(int a, int b)
 	return (a > b) ? a : b;
 }
 
+constexpr inline size_t minST(size_t a, size_t b)
+{
+	return (a < b) ? a : b;
+}
+
+constexpr inline size_t maxST(size_t a, size_t b)
+{
+	return (a > b) ? a : b;
+}
+
 constexpr inline float clampF(float value, float lower, float upper)
 {
 	if (value < lower) value = lower;
