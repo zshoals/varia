@@ -11,6 +11,8 @@
 #include "varia/util/Elapsed.hpp"
 
 #include "varia/exd/EXDConstants.hpp"
+#include "varia/systems/PositionUpdater.hpp"
+#include "varia/systems/PositionReader.hpp"
 
 #include "varia/exd/Component.hpp"
 #include "varia/exd/World.hpp"
@@ -117,15 +119,23 @@ int kickstart(int argc, char** argv)
 		{
 			w->positions_7.add(ent);
 			w->positions_0.get_mut(ent)->x = 100;
+			w->positions_0.get_mut(ent)->y = 200;
 		}
 	}
 	t.end_and_log();
 
+	t.reset();
+	t.begin();
+	PositionUpdate syst = {&w->positions_0, &w->positions_7};
+	syst.run();
+	t.end_and_log();
 
-	size_t len = exd::Helpers::shortest_length(&w->positions_0);
-	VARIA_LOG_UINT(len);
-	VARIA_LOG_UINT(len);
-	VARIA_LOG_UINT(len);
+
+	t.reset();
+	t.begin();
+	PositionReader syst2 = {&w->positions_0, &w->positions_7};
+	syst2.run();
+	t.end_and_log();
 
 
 	{
@@ -150,14 +160,4 @@ int kickstart(int argc, char** argv)
 	return 0;
 }
 
-inline void processor(exd::Entity ent)
-{
-}
-
-void systemthingy(exd::Component<Position> * pos, exd::Component<Position> * pos2)
-{
-	EXD_INCLUDE(pos, pos2)
-	EXD_EXCLUDE(pos)
-	EXD_ITERATE(processor)
-}
 
