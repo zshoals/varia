@@ -10,10 +10,12 @@
 #include "varia/math/Math.hpp"
 #include "varia/util/Elapsed.hpp"
 
+#include "varia/exd/EXDConstants.hpp"
 
 #include "varia/exd/Component.hpp"
 #include "varia/exd/World.hpp"
 #include "varia/exd/EntityManifest.hpp"
+#include "varia/exd/Helpers.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
@@ -24,6 +26,11 @@
 #include <stdio.h>
 
 using namespace Varia;
+
+void testsystem(exd::Entity ent)
+{
+
+}
 
 int kickstart(int argc, char** argv) 
 {
@@ -91,11 +98,11 @@ int kickstart(int argc, char** argv)
 
 	World * w = new World{};
 
-	vds::StaticArray<Entity, 8192> arr;
+	vds::StaticArray<Entity, 8001> arr;
 
 	Elapsed t;
 	t.begin();
-	for_range_var(i, 7000)
+	for_range_var(i, 8000)
 	{
 		Entity ent = w->ent_create();
 		arr.push(ent);
@@ -108,10 +115,21 @@ int kickstart(int argc, char** argv)
 
 		if (i == 100)
 		{
+			w->positions_7.add(ent);
 			w->positions_0.get_mut(ent)->x = 100;
 		}
 	}
 	t.end_and_log();
+
+	EXD_ITERATE(testsystem, &w->positions_0, &w->positions_100, &w->positions_103)
+	vds::StaticArray<Entity, exd::Constants::exd_max_entities> * ents = &(&w->positions_0)->dense_ents;
+
+
+	size_t len = exd::Helpers::shortest_length(&w->positions_0);
+	VARIA_LOG_UINT(len);
+	VARIA_LOG_UINT(len);
+	VARIA_LOG_UINT(len);
+
 
 	{
 		Elapsed b;
