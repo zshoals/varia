@@ -121,9 +121,6 @@ int kickstart(int argc, char** argv)
 	}
 	t.end_and_log();
 
-	EXD_ITERATE(testsystem, &w->positions_0, &w->positions_100, &w->positions_103)
-	vds::StaticArray<Entity, exd::Constants::exd_max_entities> * ents = &(&w->positions_0)->dense_ents;
-
 
 	size_t len = exd::Helpers::shortest_length(&w->positions_0);
 	VARIA_LOG_UINT(len);
@@ -151,5 +148,16 @@ int kickstart(int argc, char** argv)
 	kinc_start();
 
 	return 0;
+}
+
+inline void processor(exd::Entity ent)
+{
+}
+
+void systemthingy(exd::Component<Position> * pos, exd::Component<Position> * pos2)
+{
+	EXD_INCLUDE(pos, pos2)
+	EXD_EXCLUDE(pos)
+	EXD_ITERATE(processor)
 }
 
