@@ -193,20 +193,20 @@ for (exd::Entity & ent : (A)->dense_ents)\
 EXD_EXPAND(EXD_INTERNAL_GET_ITERATE(__VA_ARGS__, EXD_ITER_8, EXD_ITER_7, EXD_ITER_6, EXD_ITER_5, EXD_ITER_4, EXD_ITER_3, EXD_ITER_2, EXD_ITER_1)(FUNC, __VA_ARGS__))
 
 #define EXD_EXCL_4(A, B, C, D)\
-	if ((A)->has(ent) || (B)->has(ent) || (C)->has(ent) || (D)->has(ent)) continue;
+	if ((A)->has(ent) || (B)->has(ent) || (C)->has(ent) || (D)->has(ent)) return
 
 #define EXD_EXCL_3(A, B, C)\
-	if ((A)->has(ent) || (B)->has(ent) || (C)->has(ent)) continue;
+	if ((A)->has(ent) || (B)->has(ent) || (C)->has(ent)) return
 
 #define EXD_EXCL_2(A, B)\
-	if ((A)->has(ent) || (B)->has(ent)) continue;
+	if ((A)->has(ent) || (B)->has(ent)) return
 
 #define EXD_EXCL_1(A)\
-	if ((A)->has(ent)) continue;
+	if ((A)->has(ent)) return
 
 #define EXD_INTERNAL_GET_EXCLUDE(_1, _2, _3, _4, NAME, ...) NAME
 #define EXD_EXCLUDE(...)\
-EXD_EXPAND(EXD_INTERNAL_GET_EXCLUDE(__VA_ARGS__, EXD_EXCL_4, EXD_EXCL_3, EXD_EXCL_2, EXD_EXCL_1)(__VA_ARGS__)
+EXD_EXPAND(EXD_INTERNAL_GET_EXCLUDE(__VA_ARGS__, EXD_EXCL_4, EXD_EXCL_3, EXD_EXCL_2, EXD_EXCL_1))(__VA_ARGS__)
 
 
 }
