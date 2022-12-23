@@ -16,11 +16,15 @@ struct PositionReader
 		pos2 = posb;
 	}
 
-	void processor(exd::Entity ent)
+	inline void processor(exd::Entity ent)
 	{
+		EXD_EXCLUDE(pos1);
 		Position const * p = pos1->get(ent);
 		VARIA_LOG_INT(p->x);
-		VARIA_LOG_INT(p->y);
+		VARIA_LOG_INT(p->x);
+		VARIA_LOG_INT(p->x);
+		VARIA_LOG_INT(p->x);
+		VARIA_LOG_INT(p->x);
 	}
 
 	void run(void)

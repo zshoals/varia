@@ -29,11 +29,6 @@
 
 using namespace Varia;
 
-void testsystem(exd::Entity ent)
-{
-
-}
-
 int kickstart(int argc, char** argv) 
 {
 	//=======RUN ALL TESTS======
