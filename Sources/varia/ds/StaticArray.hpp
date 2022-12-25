@@ -59,6 +59,11 @@ struct StaticArray
 		return push_idx - 1;
 	}
 
+	size_t capacity(void)
+	{
+		return Size;
+	}
+
 	bool is_populated(void)
 	{
 		return push_idx > 0;
