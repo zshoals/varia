@@ -3,7 +3,7 @@
 namespace vds
 {
 
-#define allocator_malloc(ALLOC_PTR, TYPE, COUNT) ALLOC_PTR->allocate_aligned(sizeof(TYPE) * (COUNT), alignof(TYPE))
+#define allocator_malloc(ALLOC_PTR, TYPE, COUNT) static_cast<TYPE *>(ALLOC_PTR->allocate_aligned(sizeof(TYPE) * (COUNT), alignof(TYPE)))
 
 struct Allocator
 {

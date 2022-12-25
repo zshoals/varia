@@ -13,7 +13,7 @@ void * vds::Allocator::allocate_aligned(size_t size, size_t alignment)
 
 	uintptr_t base_addr = reinterpret_cast<uintptr_t>(data);  
 	uintptr_t misalign = base_addr % alignment;
-	uintptr_t target_address = base_addr + misalign;
+	uintptr_t target_address = base_addr + (alignment - misalign);
 	size_t offset_advance_amount = misalign + size;
 
 	DEBUG_ENSURE_UINT_LT(this->current_offset + offset_advance_amount, this->buffer_len, "Allocator OOM");
