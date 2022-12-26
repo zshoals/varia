@@ -29,6 +29,8 @@ struct EntityManifest
 
 	bool valid(Entity ent)
 	{
+		//Note(zshoals Dec-25-2022):>
+		//Isn't this supposed to be ent.id_extract? 
 		return ent.matches(*manifest.get(ent.id));
 	}
 	

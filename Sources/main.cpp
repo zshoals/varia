@@ -9,15 +9,14 @@
 #include "varia/ds/Bitset.hpp"
 #include "varia/math/Math.hpp"
 #include "varia/util/Elapsed.hpp"
-
-#include "varia/exd/EXDConstants.hpp"
-#include "varia/systems/PositionUpdater.hpp"
-#include "varia/systems/PositionReader.hpp"
+#include "varia/ds/Allocator.hpp"
+#include "varia/util/Memory.hpp"
 
 #include "varia/exd/Component.hpp"
 #include "varia/exd/World.hpp"
-#include "varia/exd/EntityManifest.hpp"
-#include "varia/exd/Helpers.hpp"
+#include "varia/exd/Entity.hpp"
+
+#include "varia/comps/Position.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
@@ -89,65 +88,23 @@ int kickstart(int argc, char** argv)
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
 
+
 	using exd::Component;
 	using exd::World;
 	using exd::Entity;
+	using vds::Allocator;
 
-	World * w = new World{};
+	size_t mem_size = Varia::Memory::megabytes_to_bytes(128);
+	void * mem = static_cast<void *>(malloc(mem_size));
+	Allocator gmem = {mem, mem_size}; 
 
-	vds::StaticArray<Entity, 8001> arr;
+	World w = {&gmem};
 
-	Elapsed t;
-	t.begin();
-	for_range_var(i, 8000)
-	{
-		Entity ent = w->ent_create();
-		arr.push(ent);
-		w->positions_0.add(ent);
-		w->positions_1.add(ent);
-		w->positions_2.add(ent);
-		w->positions_3.add(ent);
-		w->positions_4.add(ent);
-		w->positions_5.add(ent);
+	w.comp_register(sizeof(Position));
 
-		if (i == 100)
-		{
-			w->positions_7.add(ent);
-			w->positions_0.get_mut(ent)->x = 100;
-			w->positions_0.get_mut(ent)->y = 200;
-		}
-	}
-	t.end_and_log();
+	Entity ent = w.ent_create();
 
-	t.reset();
-	t.begin();
-	PositionUpdate syst = {&w->positions_0, &w->positions_7};
-	syst.run();
-	t.end_and_log();
-
-
-	t.reset();
-	t.begin();
-	PositionReader syst2 = {&w->positions_0, &w->positions_7};
-	syst2.run();
-	t.end_and_log();
-
-
-	{
-		Elapsed b;
-		for(Position const & pos : w->positions_0.data)
-		{
-			if (pos.x == 100) VARIA_LOG_INT(100000);
-		}
-	}
-
-	t.reset();
-	t.begin();
-	while(arr.is_populated())
-	{
-		w->ent_kill(arr.pop());
-	}
-	t.end_and_log();
+	VARIA_LOG_UINT(w.ent_valid(ent));
 
 
 	kinc_start();
