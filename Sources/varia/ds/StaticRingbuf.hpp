@@ -39,8 +39,8 @@ struct StaticRingbuf
 //VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
 
 	T data[Size];
-	size_t rear = 0;
-	size_t count = 0;
+	size_t rear;
+	size_t count;
 
 	// StaticRingbuf(void)
 	// {

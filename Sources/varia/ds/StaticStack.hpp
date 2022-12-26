@@ -10,7 +10,7 @@ template<typename T, int Size>
 struct StaticStack
 {
 	T data[Size];
-	size_t push_idx = 0;
+	size_t push_idx;
 
 	// StaticStack(void)
 	// {
