@@ -56,8 +56,6 @@ bool exd::World::ent_valid(exd::Entity ent)
 void exd::World::comp_register(size_t element_size)
 {
 	void * mem = this->allocator->allocate_aligned_count(element_size, exd::Constants::exd_max_entities, Varia::Memory::default_alignment);
-	mem = this->allocator->allocate_aligned_count(element_size, exd::Constants::exd_max_entities, Varia::Memory::default_alignment);
-	mem = this->allocator->allocate_aligned_count(element_size, exd::Constants::exd_max_entities, Varia::Memory::default_alignment);
 	size_t current_slot = this->UUID_generator;
 	++this->UUID_generator;
 
