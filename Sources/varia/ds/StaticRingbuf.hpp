@@ -42,7 +42,12 @@ struct StaticRingbuf
 	size_t rear = 0;
 	size_t count = 0;
 
-	StaticRingbuf(void)
+	// StaticRingbuf(void)
+	// {
+	// 	this->initialize();
+	// }
+
+	void initialize(void)
 	{
 		VARIA_ZERO_INIT(this);
 	}

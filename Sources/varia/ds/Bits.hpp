@@ -11,8 +11,8 @@ struct Bits32
 {
 	u32 storage = 0;
 
-	constexpr Bits32(u32 value) : storage{value} {}
-	constexpr Bits32(void) {}
+	// constexpr Bits32(u32 value) : storage{value} {}
+	// constexpr Bits32(void) {}
 
 	constexpr void and(Bits32 other) { this->storage &= other.storage; }
 	constexpr void or(Bits32 other) { this->storage |= other.storage; }
@@ -175,8 +175,8 @@ struct Bits64
 {
 	u64 storage = 0;
 
-	constexpr Bits64(u64 value) : storage{value}{}
-	constexpr Bits64(void){}
+	// constexpr Bits64(u64 value) : storage{value}{}
+	// constexpr Bits64(void){}
 
 	constexpr void and(Bits64 other) { this->storage &= other.storage; }
 	constexpr void or(Bits64 other) { this->storage |= other.storage; }
@@ -243,7 +243,9 @@ struct Bits64
 		this->mask_deny(lomask);
 
 		//Note(zshoals Dec-19-2022):> Unsafe, value might exceed the lower range
-		this->or(value);
+		Bits64 toBits;
+		toBits.storage = value;
+		this->or(toBits);
 	}
 
 	constexpr void increment_upper(u8 pivot)

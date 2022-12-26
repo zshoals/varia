@@ -12,7 +12,12 @@ struct StaticStack
 	T data[Size];
 	size_t push_idx = 0;
 
-	StaticStack(void)
+	// StaticStack(void)
+	// {
+	// 	this->initialize();
+	// }
+
+	void initialize(void)
 	{
 		VARIA_ZERO_INIT(this);
 	}

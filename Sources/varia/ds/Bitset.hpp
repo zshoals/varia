@@ -43,7 +43,12 @@ struct Bitset32
 	//Note(zshoals): We ceil our total size up to the next full u32 block
 	vds::Bits32 data[Bitset32Util::true_size(Size)];
 
-	Bitset32(void)
+	// Bitset32(void)
+	// {
+	// 	this->initialize();
+	// }
+
+	void initialize(void)
 	{
 		VARIA_ZERO_INIT(this);
 	}

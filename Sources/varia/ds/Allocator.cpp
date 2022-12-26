@@ -4,8 +4,17 @@
 #include <inttypes.h>
 #include <string.h>
 
-vds::Allocator::Allocator(void * memory, size_t buffer_size) : 
-	data{memory}, buffer_len{buffer_size}, current_offset{0}{}
+// vds::Allocator::Allocator(void * memory, size_t buffer_size) : 
+// 	data{memory}, buffer_len{buffer_size}, current_offset{0}{}
+
+void vds::Allocator::initialize(void * memory, size_t buffer_size)
+{
+	this->data = memory;
+	this->buffer_len = buffer_size;
+	this->current_offset = 0;
+
+	memset(this->data, 255, this->buffer_len);
+}
 
 void * vds::Allocator::allocate_aligned(size_t size, size_t alignment)
 {

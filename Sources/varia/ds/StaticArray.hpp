@@ -39,7 +39,12 @@ struct StaticArray
 	T data[Size];
 	size_t push_idx;
 
-	StaticArray(void)
+	// StaticArray(void)
+	// {
+	// 	this->initialize();
+	// }
+
+	void initialize(void)
 	{
 		VARIA_ZERO_INIT(this);
 	}

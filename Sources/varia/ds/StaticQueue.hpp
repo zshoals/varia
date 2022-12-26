@@ -14,7 +14,12 @@ struct StaticQueue
 {
 	vds::StaticRingbuf<T, Size> ring;
 
-	StaticQueue(void)
+	// StaticQueue(void)
+	// {
+	// 	this->initialize();
+	// }
+
+	void initialize(void)
 	{
 		VARIA_ZERO_INIT(this);
 	}
