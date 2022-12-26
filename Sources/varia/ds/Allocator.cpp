@@ -4,8 +4,8 @@
 #include <inttypes.h>
 #include <string.h>
 
-vds::Allocator::Allocator(void * memory, size_t buffer_size, size_t element_sz) : 
-	data{memory}, buffer_len{buffer_size}, element_size{element_sz}, current_offset{0}{}
+vds::Allocator::Allocator(void * memory, size_t buffer_size) : 
+	data{memory}, buffer_len{buffer_size}, current_offset{0}{}
 
 void * vds::Allocator::allocate_aligned(size_t size, size_t alignment)
 {
@@ -23,7 +23,12 @@ void * vds::Allocator::allocate_aligned(size_t size, size_t alignment)
 	return reinterpret_cast<void *>(target_address);
 }
 
-void * vds::Allocator::free_all(void)
+void * vds::Allocator::allocate_aligned_count(size_t elem_size, size_t count, size_t alignment)
+{
+	return allocate_aligned(elem_size * count, alignment);
+}
+
+void vds::Allocator::free_all(void)
 {
 	current_offset = 0;
 }
