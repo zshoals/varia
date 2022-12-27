@@ -28,7 +28,7 @@ typedef unsigned int uint;
 #define VARIA_NO_OPERATION() ((void)0)
 
 #define VARIA_ZERO_INIT(THIS_PTR) memset((THIS_PTR), 0, (sizeof(*THIS_PTR)))
-#define VARIA_ZERO_INIT_SIZE(THIS_PTR, SIZE) memset((THIS_PTR), 0, SIZE)
+#define VARIA_ZERO_INIT_SIZE(PTR, SIZE) memset((PTR), 0, SIZE)
 
 //Note: For now, only support positive values
 #define for_range(STOP)\
