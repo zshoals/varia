@@ -96,15 +96,41 @@ int kickstart(int argc, char** argv)
 
 	size_t mem_size = Varia::Memory::megabytes_to_bytes(128);
 	void * mem = static_cast<void *>(malloc(mem_size));
-	Allocator gmem = {mem, mem_size}; 
+	Allocator arena;
+	arena.initialize(mem, mem_size);
 
-	World w = {&gmem};
+	World * w = allocator_malloc(&arena, World, 1);
+	w->initialize(&arena);
+	w->comp_register(sizeof(Position));
 
-	w.comp_register(sizeof(Position));
+	vds::StaticArray<Entity, 4000> arr;
+	arr.initialize();
 
-	Entity ent = w.ent_create();
+	for_range_var(i, 4000)
+	{
+		Entity ent = w->ent_create();
+		arr.push(ent);
+		Component * positions = &w->components[0];
+		positions->entity_add(ent);
 
-	VARIA_LOG_UINT(w.ent_valid(ent));
+		Position * p = static_cast<Position *>(positions->get_untyped_mutable(ent));
+
+		p->x = i;
+		p->y = 4000 + i;
+	}
+
+	for(Entity const & ent : arr)
+	{
+		Component * positions = &w->components[0];
+
+		Position const  * p = static_cast<Position const *>(positions->get_untyped(ent));
+
+		if (positions->has(ent))
+		{
+			VARIA_LOG_INT(p->x);
+			VARIA_LOG_INT(p->y);
+		}
+	}
 
 
 	kinc_start();

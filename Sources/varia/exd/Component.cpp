@@ -8,7 +8,7 @@
 #include "varia/util/Memory.hpp"
 #include <inttypes.h>
 
-exd::Component::Component(void) {}
+// exd::Component::Component(void) {}
 
 void exd::Component::initialize(void * mem, size_t element_size, size_t element_count, size_t UUID)
 {
@@ -18,6 +18,8 @@ void exd::Component::initialize(void * mem, size_t element_size, size_t element_
 	this->UUID = UUID;
 
 	sparse_ents.set_all(INVALID_ENTITY.id);
+
+	this->memory_usage_in_bytes = (element_size * element_count) + sizeof(*this);
 }
 
 void * exd::Component::calc_element_address(Entity ent)
