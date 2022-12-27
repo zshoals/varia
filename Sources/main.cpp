@@ -128,45 +128,33 @@ int kickstart(int argc, char** argv)
 	w->comp_register(sizeof(struct Position), exd::ComponentTypeID::Position_e);
 	w->comp_register(sizeof(struct Flammable), exd::ComponentTypeID::Flammable_e);
 
-	vds::StaticArray<Entity, 8192> entlist;
+	vds::StaticArray<Entity, 81920> entlist;
 	entlist.initialize();
 
 	#define COMP_SET(ENT, TYPE) w->comp_set((ENT), (exd::ComponentTypeID::VARIA_CONCAT(TYPE, _e)))
 
+	Elapsed a;
+	a.begin();
 	{
 		VARIA_LOG_STRING("Entity creation");
 		Elapsed t;
-		for_range(8000)
+		for_range(80000)
 		{
 			Entity ent = w->ent_create();
 			COMP_SET(ent, Position);
-			COMP_SET(ent, Flammable);
+			entlist.push(ent);
 		}
 	}
 
-	exd::View v = {};
 	{
-		VARIA_LOG_STRING("View creation");
+		VARIA_LOG_STRING("Entity deletion");
 		Elapsed t;
-		v.initialize();
-		v.include(&w->components[0]);
-		v.include(&w->components[1]);
-		v.compile();
+		for(Entity const & ent : entlist)
+		{
+			w->ent_kill(ent);
+		}
 	}
-
-	{
-		VARIA_LOG_STRING("Position update");
-		Elapsed t;
-		ITERATE_VIEW(&v, pos_system);
-	}
-
-	{
-		VARIA_LOG_STRING("Print out");
-		Elapsed t;
-		ITERATE_VIEW(&v, print_system);
-	}
-
-
+	a.end_and_log();
 
 
 
