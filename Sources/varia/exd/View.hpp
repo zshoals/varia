@@ -32,16 +32,21 @@ struct View
 	void * comp_get_mutable(Entity ent, ComponentTypeID type);
 
 	#define ITERATE_VIEW(VIEW_PTR, PROCESSOR_FUNC)\
-		assert((VIEW_PTR)->finalized);\
-		for_range_var(i, (VIEW_PTR)->shortest_dataset->dense_ents.length())\
+		do\
 		{\
-			Entity ent = *(VIEW_PTR)->shortest_dataset->dense_ents.get_unsafe(i);\
-			if ((VIEW_PTR)->internal_target_matches_query(ent))\
+			assert((VIEW_PTR)->finalized);\
+			size_t const len = (VIEW_PTR)->shortest_dataset->dense_ents.length();\
+			for_range_var(i, len)\
 			{\
-				PROCESSOR_FUNC((VIEW_PTR), ent);\
+				Entity ent = *(VIEW_PTR)->shortest_dataset->dense_ents.get_unsafe(i);\
+				if ((VIEW_PTR)->internal_target_matches_query(ent))\
+				{\
+					PROCESSOR_FUNC((VIEW_PTR), ent);\
+				}\
 			}\
-		}
-		
+		}\
+		while (0)
+			
 	bool internal_target_matches_query(Entity ent);
 
 };
