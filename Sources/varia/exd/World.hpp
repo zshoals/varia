@@ -17,14 +17,15 @@ struct World
 
 	Component components[exd::Constants::exd_max_components];
 
-	size_t UUID_generator = 0;
-	size_t active_entities = 0;
+	size_t UUID_generator;
+	size_t active_entities;
 
 
 
 
-	World(vds::Allocator * allocator);
+	// World(vds::Allocator * allocator);
 
+	void initialize(vds::Allocator * allocator);
 	Entity ent_create(void);
 	bool ent_kill(Entity ent);
 	bool ent_valid(Entity ent);
