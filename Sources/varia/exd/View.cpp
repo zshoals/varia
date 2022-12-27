@@ -44,6 +44,17 @@ void exd::View::compile(void)
 
 void const * exd::View::comp_get(Entity ent, ComponentTypeID type)
 {
+	//Note(zshoals Dec-27-2022):> Findget is mostly useful in debug
+	//We take a noteworthy performance hit (~20% slowdown?) from using that path
+	//Considering the slowdown, this is worth ifdefing out
+
+	#ifdef NDEBUG
+
+	Component * comp = *comp_include.get_unsafe(ComponentTypeID_to_raw(type));
+	return comp->get_untyped_unchecked(ent);
+
+	#else
+
 	vds::SearchResult<ComponentTypeID> res = comp_type_indices.find_get(&type);
 	DEBUG_ENSURE_TRUE(res.was_found, "Tried to access a non-existent component in a view.");
 	
@@ -54,10 +65,19 @@ void const * exd::View::comp_get(Entity ent, ComponentTypeID type)
 	}
 
 	return nullptr;
+
+	#endif
 }
 
 void * exd::View::comp_get_mutable(Entity ent, ComponentTypeID type)
 {
+	#ifdef NDEBUG
+
+	Component * comp = *comp_include.get_unsafe(ComponentTypeID_to_raw(type));
+	return comp->get_untyped_mutable_unchecked(ent);
+
+	#else
+
 	vds::SearchResult<ComponentTypeID> res = comp_type_indices.find_get(&type);
 	DEBUG_ENSURE_TRUE(res.was_found, "Tried to access a non-existent component in a view.");
 	
@@ -68,6 +88,8 @@ void * exd::View::comp_get_mutable(Entity ent, ComponentTypeID type)
 	}
 
 	return nullptr;
+
+	#endif
 }
 
 

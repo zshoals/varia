@@ -32,7 +32,7 @@
 
 using namespace Varia;
 
-void pos_system(exd::View * v, exd::Entity ent)
+inline void pos_system(exd::View * v, exd::Entity ent)
 {
 	Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
 	Flammable * f = static_cast<Flammable *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Flammable_e));
@@ -40,14 +40,15 @@ void pos_system(exd::View * v, exd::Entity ent)
 	p->y = ent.generation_extract();
 }
 
-void print_system(exd::View * v, exd::Entity ent)
+inline void print_system(exd::View * v, exd::Entity ent)
 {
-	Position const * p = static_cast<Position const *>(v->comp_get(ent, exd::ComponentTypeID::Position_e));
+	Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
 
 	if (ent.id_extract() == 5000)
 	{
-		VARIA_LOG_INT(p->x);
-		VARIA_LOG_INT(p->y);
+		// VARIA_LOG_INT(p->x);
+		// VARIA_LOG_INT(p->y);
+		p->x += 1;
 	}
 }
 
