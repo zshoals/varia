@@ -1,6 +1,7 @@
 #include "World.hpp"
 #include "Entity.hpp"
 #include "EXDConstants.hpp"
+#include "ComponentTypes.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/util/Memory.hpp"
@@ -24,7 +25,6 @@ void exd::World::initialize(vds::Allocator * allocator)
 	//Note(zshoals Dec-26-2022):> Components are registered on demand, so just zero 
 	//to start with but do not actually register components
 	VARIA_ZERO_INIT_SIZE(&this->components, sizeof(this->components));
-	this->UUID_generator = 0;
 	this->active_entities = 0;
 
 	for_range_var(i, Constants::exd_max_entities)
@@ -59,6 +59,8 @@ bool exd::World::ent_kill(exd::Entity ent)
 		freelist.push(ent_id);
 		target_ent->generation_increment();
 
+		internal_ent_remove_from_components(ent);
+
 		return true;
 	}
 	else
@@ -73,19 +75,43 @@ bool exd::World::ent_valid(exd::Entity ent)
 	return ent.matches(*manifest.get(ent.id_extract()));
 }
 
-void exd::World::comp_register(size_t element_size)
+void exd::World::comp_register(size_t element_size, ComponentTypeID type)
 {
-	DEBUG_ENSURE_UINT_LT(this->UUID_generator, Constants::exd_max_components, "No component slots available to register a new component.");
-
 	void * storage_mem = this->allocator->allocate_aligned_count(element_size, exd::Constants::exd_max_entities, Varia::Memory::default_alignment);
-	size_t current_slot = this->UUID_generator;
-	++this->UUID_generator;
 
-	Component * comp = &this->components[current_slot];
-	comp->initialize(storage_mem, element_size, exd::Constants::exd_max_entities, current_slot);
+	size_t idx = ComponentTypeID_to_raw(type);
+	Component * comp = &this->components[idx];
+	comp->initialize(storage_mem, element_size, exd::Constants::exd_max_entities, type);
 }
+
+void const * exd::World::comp_get(Entity ent, ComponentTypeID type)
+{
+	return components[ComponentTypeID_to_raw(type)].get_untyped(ent);
+}
+
+void * exd::World::comp_get_mutable(Entity ent, ComponentTypeID type)
+{
+	return components[ComponentTypeID_to_raw(type)].get_untyped_mutable(ent);
+}
+
+void * exd::World::comp_set(Entity ent, ComponentTypeID type)
+{
+	Component * comp = &components[ComponentTypeID_to_raw(type)];
+	if (ent.matches(*manifest.get_unsafe(ent.id_extract())))
+	{
+		comp->entity_add(ent);
+		return comp->get_untyped_mutable(ent);
+	}
+
+	return nullptr;
+}
+
 
 void exd::World::internal_ent_remove_from_components(exd::Entity ent)
 {
-	ENSURE_UNIMPLEMENTED();
+	//Note(zshoals Dec-27-2022):> We'll only complicate this further if dumb removal
+	//becomes a serious time issue
+	#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME)\
+	components[ComponentTypeID_to_raw(ComponentTypeID::VARIA_CONCAT(TYPE, _e))].entity_remove(ent);
+	#include "ComponentData.def"
 }

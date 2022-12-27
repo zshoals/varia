@@ -26,7 +26,7 @@ struct Entity
 	{
 		vds::Bits64 bitmode = {};
 		bitmode.storage = this->id;
-		bitmode.rotate_right(Constants::exd_id_shift + 1);
+		bitmode.rotate_right(Constants::exd_id_shift);
 
 		return bitmode.storage;
 	}
@@ -45,6 +45,14 @@ struct Entity
 	}
 
 	inline bool matches(Entity other) { return this->id == other.id; }
+
+	inline bool matches_or_exceeds(Entity other)
+	{
+		bool genOK = this->generation_extract() >= other.generation_extract();
+		bool idOK = this->id_extract() == other.id_extract();
+
+		return (genOK && idOK);
+	}
 };
 
 static Entity const INVALID_ENTITY = {SIZE_MAX};

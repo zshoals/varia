@@ -16,7 +16,11 @@
 #include "varia/exd/World.hpp"
 #include "varia/exd/Entity.hpp"
 
+#include "varia/exd/View.hpp"
+
+#include "varia/comps/Flammable.hpp"
 #include "varia/comps/Position.hpp"
+#include "varia/exd/ComponentTypes.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/ds/Bits.hpp"
@@ -27,6 +31,25 @@
 #include <stdio.h>
 
 using namespace Varia;
+
+void pos_system(exd::View * v, exd::Entity ent)
+{
+	Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
+	Flammable * f = static_cast<Flammable *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Flammable_e));
+	p->x = ent.id_extract();
+	p->y = ent.generation_extract();
+}
+
+void print_system(exd::View * v, exd::Entity ent)
+{
+	Position const * p = static_cast<Position const *>(v->comp_get(ent, exd::ComponentTypeID::Position_e));
+
+	if (ent.id_extract() == 5000)
+	{
+		VARIA_LOG_INT(p->x);
+		VARIA_LOG_INT(p->y);
+	}
+}
 
 int kickstart(int argc, char** argv) 
 {
@@ -101,36 +124,49 @@ int kickstart(int argc, char** argv)
 
 	World * w = allocator_malloc(&arena, World, 1);
 	w->initialize(&arena);
-	w->comp_register(sizeof(Position));
+	w->comp_register(sizeof(struct Position), exd::ComponentTypeID::Position_e);
+	w->comp_register(sizeof(struct Flammable), exd::ComponentTypeID::Flammable_e);
 
-	vds::StaticArray<Entity, 4000> arr;
-	arr.initialize();
+	vds::StaticArray<Entity, 8192> entlist;
+	entlist.initialize();
 
-	for_range_var(i, 4000)
+	#define COMP_SET(ENT, TYPE) w->comp_set((ENT), (exd::ComponentTypeID::VARIA_CONCAT(TYPE, _e)))
+
 	{
-		Entity ent = w->ent_create();
-		arr.push(ent);
-		Component * positions = &w->components[0];
-		positions->entity_add(ent);
-
-		Position * p = static_cast<Position *>(positions->get_untyped_mutable(ent));
-
-		p->x = i;
-		p->y = 4000 + i;
-	}
-
-	for(Entity const & ent : arr)
-	{
-		Component * positions = &w->components[0];
-
-		Position const  * p = static_cast<Position const *>(positions->get_untyped(ent));
-
-		if (positions->has(ent))
+		VARIA_LOG_STRING("Entity creation");
+		Elapsed t;
+		for_range(8000)
 		{
-			VARIA_LOG_INT(p->x);
-			VARIA_LOG_INT(p->y);
+			Entity ent = w->ent_create();
+			COMP_SET(ent, Position);
+			COMP_SET(ent, Flammable);
 		}
 	}
+
+	exd::View v = {};
+	{
+		VARIA_LOG_STRING("View creation");
+		Elapsed t;
+		v.initialize();
+		v.include(&w->components[0]);
+		v.include(&w->components[1]);
+		v.compile();
+	}
+
+	{
+		VARIA_LOG_STRING("Position update");
+		Elapsed t;
+		ITERATE_VIEW(&v, pos_system);
+	}
+
+	{
+		VARIA_LOG_STRING("Print out");
+		Elapsed t;
+		ITERATE_VIEW(&v, print_system);
+	}
+
+
+
 
 
 	kinc_start();

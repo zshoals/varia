@@ -1,4 +1,5 @@
 #include "Component.hpp"
+#include "ComponentTypes.hpp"
 #include "Entity.hpp"
 
 #include "varia/vcommon.hpp"
@@ -10,7 +11,7 @@
 
 // exd::Component::Component(void) {}
 
-void exd::Component::initialize(void * mem, size_t element_size, size_t element_count, size_t UUID)
+void exd::Component::initialize(void * mem, size_t element_size, size_t element_count, ComponentTypeID UUID)
 {
 	this->data = mem;
 	this->per_element_size = element_size;
@@ -68,7 +69,7 @@ void exd::Component::push_comp_without_data(void)
 	++this->push_idx;
 }
 
-void exd::Component::pop_and_swap_comp(size_t idx)
+void exd::Component::swap_and_pop_comp(size_t idx)
 {
 	DEBUG_ENSURE_INT_GT_ZERO(this->push_idx, "Component array had no entities!");
 	void * removal_target = calc_element_address_raw(idx);
@@ -102,7 +103,7 @@ void const * exd::Component::get_untyped(Entity ent)
 		size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
 		return calc_element_address_raw(target_idx);
 	}
-	ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
+	// ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
 
 	return nullptr;
 }
@@ -114,13 +115,29 @@ void * exd::Component::get_untyped_mutable(Entity ent)
 		size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
 		return calc_element_address_raw(target_idx);
 	}
-	ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
+	// ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
 
 	return nullptr;
 }
 
+void const * exd::Component::get_untyped_unchecked(Entity ent)
+{
+	return calc_element_address(ent);
+}
+
+void * exd::Component::get_untyped_mutable_unchecked(Entity ent)
+{
+	return calc_element_address(ent);
+}
+
 void exd::Component::entity_add(Entity ent)
 {
+
+	//TODO(zshoals Dec-27-2022):> There's a problem; if we try and add a STORED entity to a component
+	//and that entity is out of date, addition should be an error. We actually need to check while
+	//adding if the entity is the newest version according to the world manifest, I think
+	//Which means we need to mirror the generation on the sparse ent slot I believe
+	//NOTE(zshoals Dec-27-2022):> Fixed in world comp_set???? maybe??? 
 	u64 id = ent.id_extract();
 
 	if (*sparse_ents.get_unsafe(id) != INVALID_ENTITY.id)
@@ -139,12 +156,14 @@ void exd::Component::entity_add(Entity ent)
 	++active_entities;
 }
 
-void exd::Component::entity_remove(Entity ent)
+//Note(zshoals Dec-27-2022):> Iterating and removing entities at the same time = recipe for disaster
+//Bulk remove or something? wut do? 
+bool exd::Component::entity_remove(Entity ent)
 {
 	if (active_entities < 1)
 	{
 		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
-		return;
+		return false;
 	}
 
 	u64 id = ent.id_extract();
@@ -153,7 +172,7 @@ void exd::Component::entity_remove(Entity ent)
 	if (target_idx == INVALID_ENTITY.id) 
 	{
 		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
-		return;
+		return false;
 	};
 
 	Entity dense_ent = *dense_ents.get_unsafe(target_idx);
@@ -162,7 +181,7 @@ void exd::Component::entity_remove(Entity ent)
 	if (valid)
 	{
 		dense_ents.swap_and_pop(target_idx);
-		this->pop_and_swap_comp(target_idx);
+		this->swap_and_pop_comp(target_idx);
 
 		Entity reciprocal = *dense_ents.get_unsafe(target_idx);
 
@@ -176,10 +195,13 @@ void exd::Component::entity_remove(Entity ent)
 		// internal_remove_this_comp_from_entset(id);
 
 		--active_entities;
-		}
+
+		return true;
+	}
 	else
 	{
 		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+		return false;
 	}
 }
 
