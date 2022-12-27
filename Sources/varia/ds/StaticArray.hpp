@@ -64,6 +64,11 @@ struct StaticArray
 		return push_idx - 1;
 	}
 
+	size_t length(void)
+	{
+		return push_idx;
+	}
+
 	size_t capacity(void)
 	{
 		return Size;
