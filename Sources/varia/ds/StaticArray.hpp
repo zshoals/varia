@@ -151,6 +151,21 @@ struct StaticArray
 		return &this->data[index];
 	}
 
+	size_t index_of(T const * value)
+	{
+		for_range_var(i, this->push_idx)
+		{
+			T const * target = this->get(i);
+
+			if (*value == *target)
+			{
+				return i;
+			}
+		}
+
+		return SIZE_MAX;
+	}
+
 	vds::SearchResult<T> find_get(T const * value)
 	{
 		vds::SearchResult<T> result;
