@@ -28,24 +28,43 @@ struct View
 	void exclude(Component * comp);
 	void compile(void);
 
+	// void iterate_forwards(void (*cb)(View * v, Entity ent));
+	//Located in the header for (hopefully) inlining purposes
+
+	template<typename T>
+	void iterate_forwards_single(void (*cb)(T * element))
+	{
+		DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
+		//Note(zshoals Dec-28-2822):> We add one here as one include is removed for optimization purposes
+		//this is a safe check as compiling the view checks for a genuinely empty include list
+		//This does not apply to exclude, which we do not modify at all
+		DEBUG_ENSURE_UINT_EQUALS(this->comp_include.length() + 1, 1, "Tried to iterate a single element, however, multiple components were included.");
+		DEBUG_ENSURE_UINT_EQUALS(this->comp_exclude.length(), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
+
+		Component * comp = this->shortest_dataset;
+		for_range_var(i, comp->length())
+		{
+			cb(static_cast<T *>(comp->get_untyped_mutable_direct(i)));
+		}
+	}
+
+	void iterate_forwards(void (*cb)(View * v, Entity ent))
+	{
+		DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
+
+		size_t const len = this->shortest_dataset->dense_ents.length();
+		for_range_var(i, len)
+		{
+			Entity e = *this->shortest_dataset->dense_ents.get_unsafe(i);
+			if (this->internal_target_matches_query(e))
+			{
+				cb(this, e);
+			}
+		}
+	}
+
 	void const * comp_get(Entity ent, ComponentTypeID type);
 	void * comp_get_mutable(Entity ent, ComponentTypeID type);
-
-	#define ITERATE_VIEW(VIEW_PTR, PROCESSOR_FUNC)\
-		do\
-		{\
-			assert((VIEW_PTR)->finalized);\
-			size_t const len = (VIEW_PTR)->shortest_dataset->dense_ents.length();\
-			for_range_var(i, len)\
-			{\
-				Entity ent = *(VIEW_PTR)->shortest_dataset->dense_ents.get_unsafe(i);\
-				if ((VIEW_PTR)->internal_target_matches_query(ent))\
-				{\
-					PROCESSOR_FUNC((VIEW_PTR), ent);\
-				}\
-			}\
-		}\
-		while (0)
 			
 	bool internal_target_matches_query(Entity ent);
 
