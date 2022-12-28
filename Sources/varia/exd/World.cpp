@@ -24,7 +24,7 @@ void exd::World::initialize(vds::Allocator * allocator)
 
 	//Note(zshoals Dec-26-2022):> Components are registered on demand, so just zero 
 	//to start with but do not actually register components
-	VARIA_ZERO_INIT_SIZE(&this->components, sizeof(this->components));
+	VARIA_ZERO_INIT_SIZE(&this->components[0], sizeof(this->components));
 	this->active_entities = 0;
 
 	for_range_var(i, Constants::exd_max_entities)
