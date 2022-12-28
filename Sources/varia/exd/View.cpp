@@ -85,22 +85,6 @@ void * exd::View::comp_get_mutable(Entity ent, ComponentTypeID type)
 	return nullptr;
 }
 
-// void exd::View::iterate_forwards(void (*cb)(View * v, Entity ent))
-// {
-// 	DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
-
-// 	size_t const len = this->shortest_dataset->dense_ents.length();
-// 	for_range_var(i, len)
-// 	{
-// 		Entity e = *this->shortest_dataset->dense_ents.get_unsafe(i);
-// 		if (this->internal_target_matches_query(e))
-// 		{
-// 			cb(this, e);
-// 		}
-// 	}
-// }
-
-
 bool exd::View::internal_target_matches_query(Entity ent)
 {
 
