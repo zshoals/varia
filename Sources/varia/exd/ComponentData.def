@@ -13,6 +13,10 @@
 
 EXD_COMPONENT_DATA(Position, positions_0)
 EXD_COMPONENT_DATA(Flammable, flammables_0)
+EXD_COMPONENT_DATA(Foo, foos_0)
+EXD_COMPONENT_DATA(Bar, bars)
+EXD_COMPONENT_DATA(Degrees, degs)
+EXD_COMPONENT_DATA(Radians, rads)
 
 #undef EXD_TAG
 #undef EXD_COMPONENT_DATA

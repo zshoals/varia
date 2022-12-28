@@ -18,6 +18,7 @@
 
 #include "varia/exd/View.hpp"
 
+#include "varia/comps/Bundle.hpp"
 #include "varia/comps/Flammable.hpp"
 #include "varia/comps/Position.hpp"
 #include "varia/exd/ComponentTypes.hpp"
@@ -35,7 +36,6 @@ using namespace Varia;
 inline void pos_system(exd::View * v, exd::Entity ent)
 {
 	Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
-	Flammable * f = static_cast<Flammable *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Flammable_e));
 	p->x = ent.id_extract();
 	p->y = ent.generation_extract();
 }
@@ -44,10 +44,16 @@ inline void print_system(exd::View * v, exd::Entity ent)
 {
 	Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
 
-	if (ent.id_extract() == 5000)
+	if (ent.id_extract() == 1)
 	{
-		// VARIA_LOG_INT(p->x);
-		// VARIA_LOG_INT(p->y);
+		VARIA_LOG_INT(p->x);
+		VARIA_LOG_INT(p->y);
+		p->x += 4363;
+	}
+	if (ent.id_extract() == 5001)
+	{
+		VARIA_LOG_INT(p->x);
+		VARIA_LOG_INT(p->y);
 		p->x += 1;
 	}
 }
@@ -123,10 +129,16 @@ int kickstart(int argc, char** argv)
 	Allocator arena;
 	arena.initialize(mem, mem_size);
 
+	#define REGISTER(TYPE) w->comp_register(sizeof(struct TYPE), exd::ComponentTypeID::VARIA_CONCAT(TYPE, _e))
 	World * w = allocator_malloc(&arena, World, 1);
 	w->initialize(&arena);
 	w->comp_register(sizeof(struct Position), exd::ComponentTypeID::Position_e);
 	w->comp_register(sizeof(struct Flammable), exd::ComponentTypeID::Flammable_e);
+	REGISTER(Foo);
+	REGISTER(Bar);
+	REGISTER(Degrees);
+	REGISTER(Radians);
+
 
 	vds::StaticArray<Entity, 81920> entlist;
 	entlist.initialize();
@@ -142,10 +154,66 @@ int kickstart(int argc, char** argv)
 		{
 			Entity ent = w->ent_create();
 			COMP_SET(ent, Position);
+			COMP_SET(ent, Flammable);
+			COMP_SET(ent, Degrees);
+			COMP_SET(ent, Radians);
+			COMP_SET(ent, Foo);
+			COMP_SET(ent, Bar);
 			entlist.push(ent);
 		}
 	}
 
+	exd::View v = {};
+	v.initialize();
+	v.include(&w->components[0]);
+	v.include(&w->components[3]);
+	v.include(&w->components[2]);
+	v.compile();
+
+	{
+		VARIA_LOG_STRING("Iterate");
+		Elapsed t;
+		v.iterate_forwards(pos_system);
+		// v.iterate_forwards(print_system);
+
+		v.iterate_forwards([](exd::View * v, Entity ent)
+		{
+			Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
+
+			if (ent.id_extract() == 1)
+			{
+				VARIA_LOG_INT(p->x);
+				VARIA_LOG_INT(p->y);
+				p->x += 4363;
+			}
+			if (ent.id_extract() == 5001)
+			{
+				VARIA_LOG_INT(p->x);
+				VARIA_LOG_INT(p->y);
+				p->x += 1;
+			}
+		});
+	}
+
+	exd::View v2;
+	v2.initialize();
+	v2.include(&w->components[0]);
+	v2.compile();
+	{
+		Elapsed t;
+
+		v2.iterate_forwards_single<Position>([](Position * element)
+		{
+			if (element->x == 50000)
+			{
+				VARIA_LOG_INT(element->x);
+			}
+		});
+
+	}
+
+
+	//THIS SECTION DELETES THE ENTITIES
 	{
 		VARIA_LOG_STRING("Entity deletion");
 		Elapsed t;
@@ -155,7 +223,7 @@ int kickstart(int argc, char** argv)
 		}
 	}
 	a.end_and_log();
-
+	
 
 
 	kinc_start();
