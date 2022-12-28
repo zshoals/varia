@@ -17,10 +17,16 @@ void exd::Component::initialize(void * mem, size_t element_size, size_t element_
 	this->per_element_size = element_size;
 	this->element_count = element_count;
 	this->UUID = UUID;
+	this->push_idx = 0;
 
 	sparse_ents.set_all(INVALID_ENTITY.id);
 
 	this->memory_usage_in_bytes = (element_size * element_count) + sizeof(*this);
+}
+
+size_t exd::Component::length(void)
+{
+	return this->push_idx;
 }
 
 void * exd::Component::calc_element_address(Entity ent)
@@ -130,6 +136,16 @@ void * exd::Component::get_untyped_mutable_unchecked(Entity ent)
 	return calc_element_address(ent);
 }
 
+void const * exd::Component::get_untyped_direct(size_t idx)
+{
+	return calc_element_address_raw(idx);
+}
+
+void * exd::Component::get_untyped_mutable_direct(size_t idx)
+{
+	return calc_element_address_raw(idx);
+}
+
 void exd::Component::entity_add(Entity ent)
 {
 
@@ -162,7 +178,7 @@ bool exd::Component::entity_remove(Entity ent)
 {
 	if (active_entities < 1)
 	{
-		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+		// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 		return false;
 	}
 
@@ -171,7 +187,7 @@ bool exd::Component::entity_remove(Entity ent)
 	size_t target_idx = *sparse_ents.get_unsafe(id);
 	if (target_idx == INVALID_ENTITY.id) 
 	{
-		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+		// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 		return false;
 	};
 
@@ -200,7 +216,7 @@ bool exd::Component::entity_remove(Entity ent)
 	}
 	else
 	{
-		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
+		// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 		return false;
 	}
 }

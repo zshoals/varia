@@ -30,10 +30,14 @@ struct Component
 	// Component(void);
 	void initialize(void * mem, size_t element_size, size_t element_count, ComponentTypeID UUID);
 
+	size_t length(void);
+
 	void const * get_untyped(Entity ent);
 	void * get_untyped_mutable(Entity ent);
 	void const * get_untyped_unchecked(Entity ent);
 	void * get_untyped_mutable_unchecked(Entity ent);
+	void const * get_untyped_direct(size_t idx);
+	void * get_untyped_mutable_direct(size_t idx);
 	void entity_add(Entity ent);
 	bool entity_remove(Entity ent);
 	bool has(Entity ent);
