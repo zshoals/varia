@@ -37,6 +37,9 @@ typedef unsigned int uint;
 #define for_range_var(CAPTURE, STOP)\
 	assert(STOP >= 0);\
 	for (size_t (CAPTURE) = 0; (CAPTURE) < (STOP); ++(CAPTURE))
+#define for_reverse_range_var(CAPTURE, START)\
+	assert(START >= 0);\
+	for (size_t (CAPTURE) = (START) - 1; (CAPTURE) + 1 > 0; --(CAPTURE))
 #define for_range_var_slice(CAPTURE, START, STOP)\
 	assert(START >= 0 && STOP >= 0);\
 	for (size_t (CAPTURE) = START; (CAPTURE) < (STOP); ++(CAPTURE))
