@@ -1,26 +1,32 @@
 #include "View.hpp"
 
+#include "World.hpp"
+
 #include "varia/validation.hpp"
 
-void exd::View::initialize(void)
+void exd::View::initialize(World * w)
 {
 	this->comp_include.initialize();
 	this->comp_exclude.initialize();
 	this->comp_type_indices.initialize();
 	this->shortest_dataset = nullptr;
+	this->world_reference = w;
 	this->finalized = false;
 }
 
-void exd::View::include(Component * comp)
+void exd::View::include(ComponentTypeID type)
 {
 	if (finalized) ENSURE_UNREACHABLE("This view has already been finalized!");
+
+	Component * comp = &this->world_reference->components[ComponentTypeID_to_raw(type)];
 	comp_include.push(comp);
 	comp_type_indices.push(comp->UUID);
 }
 
-void exd::View::exclude(Component * comp)
+void exd::View::exclude(ComponentTypeID type)
 {
 	if (finalized) ENSURE_UNREACHABLE("This view has already been finalized!");
+	Component * comp = &this->world_reference->components[ComponentTypeID_to_raw(type)];
 	comp_exclude.push(comp);
 }
 

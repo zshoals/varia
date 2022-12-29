@@ -3,12 +3,16 @@
 #include "Entity.hpp"
 #include "Component.hpp"
 #include "ComponentTypes.hpp"
+#include "World.hpp"
 
 #include "varia/vcommon.hpp"
 #include "varia/ds/StaticArray.hpp"
 
+
 namespace exd
 {
+
+struct World;
 
 struct View
 {
@@ -16,16 +20,17 @@ struct View
 	vds::StaticArray<ComponentTypeID, 8> comp_type_indices;
 	vds::StaticArray<Component *, 8> comp_exclude;
 	Component * shortest_dataset;
+	World * world_reference;
 
 	bool finalized;
 
 
 
 
-	void initialize(void);
+	void initialize(World * w);
 
-	void include(Component * comp);
-	void exclude(Component * comp);
+	void include(ComponentTypeID type);
+	void exclude(ComponentTypeID type);
 	void compile(void);
 
 	// void iterate_forwards(void (*cb)(View * v, Entity ent));
@@ -60,6 +65,23 @@ struct View
 			{
 				cb(this, e);
 			}
+		}
+	}
+
+	template<typename T>
+	void iterate_backwards_single(void (*cb)(T * element))
+	{
+		DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
+		DEBUG_ENSURE_UINT_EQUALS(this->comp_include.length() + 1, 1, "Tried to iterate a single element, however, multiple components were included.");
+		DEBUG_ENSURE_UINT_EQUALS(this->comp_exclude.length(), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
+
+		Component * comp = this->shortest_dataset;
+		//Note(zshoals Dec-28-2022):> preload the length as we may remove elements while traversing backwards
+		//which would reduce the start value and cause untold havoc, probably
+		size_t const len = comp->length();
+		for_reverse_range_var(i, len)
+		{
+			cb(static_cast<T *>(comp->get_untyped_mutable_direct(i)));
 		}
 	}
 

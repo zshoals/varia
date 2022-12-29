@@ -164,10 +164,10 @@ int kickstart(int argc, char** argv)
 	}
 
 	exd::View v = {};
-	v.initialize();
-	v.include(&w->components[0]);
-	v.include(&w->components[3]);
-	v.include(&w->components[2]);
+	v.initialize(w);
+	v.include(exd::ComponentTypeID::Position_e);
+	v.include(exd::ComponentTypeID::Foo_e);
+	v.include(exd::ComponentTypeID::Flammable_e);
 	v.compile();
 
 	{
@@ -176,37 +176,39 @@ int kickstart(int argc, char** argv)
 		v.iterate_forwards(pos_system);
 		// v.iterate_forwards(print_system);
 
-		v.iterate_forwards([](exd::View * v, Entity ent)
-		{
-			Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
+		// v.iterate_forwards([](exd::View * v, Entity ent)
+		// {
+		// 	Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
 
-			if (ent.id_extract() == 1)
-			{
-				VARIA_LOG_INT(p->x);
-				VARIA_LOG_INT(p->y);
-				p->x += 4363;
-			}
-			if (ent.id_extract() == 5001)
-			{
-				VARIA_LOG_INT(p->x);
-				VARIA_LOG_INT(p->y);
-				p->x += 1;
-			}
-		});
+		// 	if (ent.id_extract() == 1)
+		// 	{
+		// 		VARIA_LOG_INT(p->x);
+		// 		VARIA_LOG_INT(p->y);
+		// 		p->x += 4363;
+		// 	}
+		// 	if (ent.id_extract() == 5001)
+		// 	{
+		// 		VARIA_LOG_INT(p->x);
+		// 		VARIA_LOG_INT(p->y);
+		// 		p->x += 1;
+		// 	}
+		// });
 	}
 
 	exd::View v2;
-	v2.initialize();
-	v2.include(&w->components[0]);
+	v2.initialize(w);
+	v2.include(exd::ComponentTypeID::Position_e);
 	v2.compile();
 	{
 		Elapsed t;
 
-		v2.iterate_forwards_single<Position>([](Position * element)
+		VARIA_QLOG("Backwards Iterate");
+
+		v2.iterate_backwards_single<Position>([](Position * element)
 		{
-			if (element->x == 50000)
+			if (element->x == 5000)
 			{
-				VARIA_LOG_INT(element->x);
+				VARIA_QLOG("Whoswho!");
 			}
 		});
 
