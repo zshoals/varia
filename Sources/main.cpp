@@ -163,8 +163,7 @@ int kickstart(int argc, char** argv)
 		}
 	}
 
-	exd::View v = {};
-	v.initialize(w);
+	exd::View v = w->view_create();
 	v.include(exd::ComponentTypeID::Position_e);
 	v.include(exd::ComponentTypeID::Foo_e);
 	v.include(exd::ComponentTypeID::Flammable_e);
@@ -195,8 +194,7 @@ int kickstart(int argc, char** argv)
 		// });
 	}
 
-	exd::View v2;
-	v2.initialize(w);
+	exd::View v2 = w->view_create();
 	v2.include(exd::ComponentTypeID::Position_e);
 	v2.compile();
 	{

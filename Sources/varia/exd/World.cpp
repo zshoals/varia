@@ -106,6 +106,13 @@ void * exd::World::comp_set(Entity ent, ComponentTypeID type)
 	return nullptr;
 }
 
+exd::View exd::World::view_create(void)
+{
+	exd::View v;
+	v.initialize(this);
+	return v;
+}
+
 
 void exd::World::internal_ent_remove_from_components(exd::Entity ent)
 {

@@ -10,6 +10,8 @@
 namespace exd
 {
 
+struct View;
+
 struct World
 {
 	vds::Allocator * allocator;
@@ -40,7 +42,7 @@ struct World
 	void * comp_get_mutable_unchecked(Entity ent, ComponentTypeID type);
 	void * comp_set(Entity ent, ComponentTypeID type);
 
-
+	exd::View view_create(void);
 
 
 	private:
