@@ -36,8 +36,8 @@ struct View
 	// void iterate_forwards(void (*cb)(View * v, Entity ent));
 	//Located in the header for (hopefully) inlining purposes
 
-	template<typename T>
-	void iterate_forwards_single(void (*cb)(T * element))
+	template<typename T, typename FUNC>
+	void iterate_forwards_single(FUNC cb)
 	{
 		DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
 		//Note(zshoals Dec-28-2822):> We add one here as one include is removed for optimization purposes
@@ -53,7 +53,8 @@ struct View
 		}
 	}
 
-	void iterate_forwards(void (*cb)(View * v, Entity ent))
+	template<typename FUNC>
+	void iterate_forwards(FUNC cb)
 	{
 		DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
 
@@ -68,8 +69,8 @@ struct View
 		}
 	}
 
-	template<typename T>
-	void iterate_backwards_single(void (*cb)(T * element))
+	template<typename T, typename FUNC>
+	void iterate_backwards_single(FUNC cb)
 	{
 		DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
 		DEBUG_ENSURE_UINT_EQUALS(this->comp_include.length() + 1, 1, "Tried to iterate a single element, however, multiple components were included.");
