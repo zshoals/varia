@@ -48,3 +48,14 @@ void vds::Allocator::zero(void)
 {
 	memset(this->data, 0, this->buffer_len);
 }
+
+void vds::Allocator::copy_to(vds::Allocator * other)
+{
+	DEBUG_ENSURE_UINT_EQUALS(other->buffer_len, this->buffer_len, "Allocator tried to copy data but sizes were mismatched.");
+	memcpy(other->data, this->data, other->buffer_len);
+	
+	if (this->current_offset > other->current_offset)
+	{
+		other->current_offset = this->current_offset;
+	}
+}

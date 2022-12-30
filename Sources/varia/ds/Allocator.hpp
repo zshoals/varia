@@ -17,6 +17,8 @@ struct Allocator
 	void * allocate_aligned_count(size_t elem_size, size_t count, size_t alignment);
 	void free_all(void);
 	void zero(void);
+
+	void copy_to(Allocator * other);
 };
 
 }
