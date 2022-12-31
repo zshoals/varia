@@ -5,6 +5,7 @@
 #include "varia/ds/StaticArray.hpp"
 #include "varia/ds/StaticRingbuf.hpp"
 #include "varia/ds/StaticQueue.hpp"
+#include "varia/ds/FillExecute.hpp"
 #include "varia/ds/Bits.hpp"
 #include "varia/ds/Bitset.hpp"
 #include "varia/math/Math.hpp"
@@ -150,7 +151,7 @@ int kickstart(int argc, char** argv)
 	{
 		VARIA_LOG_STRING("Entity creation");
 		Elapsed t;
-		for_range(80000)
+		for_range(8000)
 		{
 			Entity ent = w->ent_create();
 			COMP_SET(ent, Position);
@@ -173,6 +174,10 @@ int kickstart(int argc, char** argv)
 		VARIA_LOG_STRING("Iterate");
 		Elapsed t;
 		v.iterate_forwards(pos_system);
+		v.iterate_forwards([](exd::View * v, Entity ent)
+		{
+			"Say hi!";
+		});
 		// v.iterate_forwards(print_system);
 
 		// v.iterate_forwards([](exd::View * v, Entity ent)
@@ -223,8 +228,6 @@ int kickstart(int argc, char** argv)
 		}
 	}
 	a.end_and_log();
-	
-
 
 	kinc_start();
 
