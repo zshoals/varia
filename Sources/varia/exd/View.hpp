@@ -33,9 +33,11 @@ struct View
 	void exclude(ComponentTypeID type);
 	void compile(void);
 
+	void const * comp_get(Entity ent, ComponentTypeID type);
+	void * comp_get_mutable(Entity ent, ComponentTypeID type);
+
 	// void iterate_forwards(void (*cb)(View * v, Entity ent));
 	//Located in the header for (hopefully) inlining purposes
-
 	template<typename T, typename FUNC>
 	void iterate_forwards_single(FUNC cb)
 	{
@@ -86,9 +88,7 @@ struct View
 		}
 	}
 
-	void const * comp_get(Entity ent, ComponentTypeID type);
-	void * comp_get_mutable(Entity ent, ComponentTypeID type);
-			
+	private:
 	bool internal_target_matches_query(Entity ent);
 
 };

@@ -237,9 +237,6 @@ int kickstart(int argc, char** argv)
 	}
 	a.end_and_log();
 
-	vds::FillExecute<int, 1> ring;
-	ring.initialize(funky2);
-	ring.push(1);
 
 	kinc_start();
 

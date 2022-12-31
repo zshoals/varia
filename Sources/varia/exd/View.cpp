@@ -50,6 +50,19 @@ void exd::View::compile(void)
 		}
 	}
 
+	for_range_var(i, comp_type_indices.length())
+	{
+		ComponentTypeID id = *comp_type_indices.get(i);
+
+		for (Component * const & comp : comp_exclude)
+		{
+			if (comp->UUID == id)
+			{
+				DEBUG_ENSURE_KILL_NOW("This view included a component that was also excluded. That was probably unintended.");
+			}
+		}
+	}
+
 	//The shortest dataset already has all the entities that we're interested in
 	//so we remove this component array from our validity checks for speed
 	comp_include.swap_and_pop(to_remove);
