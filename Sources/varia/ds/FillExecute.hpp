@@ -26,13 +26,17 @@ struct FillExecuteContextual
 
 	void push(T element)
 	{
-		if (this->buffer.is_full())
+		if (this->buffer.is_almost_full())
 		{
+			this->buffer.push_back(element);
 			callback(this, &this->ctx);
 			this->buffer.clear();
 		}
+		else
+		{
+			this->buffer.push_back(element);
+		}
 
-		this->buffer.push_back(element);
 	}
 };
 
@@ -55,13 +59,17 @@ struct FillExecute
 
 	void push(T element)
 	{
-		if (this->buffer.is_full())
+		if (this->buffer.is_almost_full())
 		{
+			this->buffer.push_back(element);
 			callback(this);
 			this->buffer.clear();
 		}
+		else
+		{
+			this->buffer.push_back(element);
+		}
 
-		this->buffer.push_back(element);
 	}
 };
 

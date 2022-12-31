@@ -136,6 +136,11 @@ struct StaticRingbuf
 		return (count >= Size);
 	}
 
+	bool is_almost_full(void)
+	{
+		return (count + 1 == Size);
+	}
+
 	bool is_not_full(void)
 	{
 		return !this->is_full();
