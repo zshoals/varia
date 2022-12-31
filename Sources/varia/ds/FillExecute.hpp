@@ -8,6 +8,8 @@ namespace vds
 template <typename T, typename Context, int Size>
 struct FillExecuteContextual
 {
+	// static_assert(Size > 1, "A FillExecuteContextual construct must have at least 2 elements.");
+
 	vds::StaticRingbuf<T, Size> buffer;
 	void (*callback)(FillExecuteContextual<T, Context, Size> * self,  Context * ctx);
 	Context ctx;
@@ -36,13 +38,14 @@ struct FillExecuteContextual
 		{
 			this->buffer.push_back(element);
 		}
-
 	}
 };
 
 template <typename T, int Size>
 struct FillExecute
 {
+	// static_assert(Size > 1, "A FillExecute construct must have at least 2 elements.");
+
 	vds::StaticRingbuf<T, Size> buffer;
 	void (*callback)(vds::FillExecute<T, Size> * self);
 
@@ -59,6 +62,7 @@ struct FillExecute
 
 	void push(T element)
 	{
+
 		if (this->buffer.is_almost_full())
 		{
 			this->buffer.push_back(element);
@@ -69,7 +73,6 @@ struct FillExecute
 		{
 			this->buffer.push_back(element);
 		}
-
 	}
 };
 

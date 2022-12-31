@@ -59,6 +59,14 @@ inline void print_system(exd::View * v, exd::Entity ent)
 	}
 }
 
+void funky2(vds::FillExecute<int, 1> * self)
+{
+	for (int const & v : *self)
+	{
+		VARIA_LOG_INT(v);
+	}
+}
+
 int kickstart(int argc, char** argv) 
 {
 	//=======RUN ALL TESTS======
@@ -228,6 +236,10 @@ int kickstart(int argc, char** argv)
 		}
 	}
 	a.end_and_log();
+
+	vds::FillExecute<int, 1> ring;
+	ring.initialize(funky2);
+	ring.push(1);
 
 	kinc_start();
 
