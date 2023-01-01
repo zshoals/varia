@@ -10,6 +10,8 @@ namespace exd
 
 struct Component
 {
+	vds::StaticArray<size_t, Constants::exd_max_entities> sparse_ents;
+	vds::StaticArray<Entity, Constants::exd_max_entities> dense_ents;
 	void * data;
 
 	size_t element_count;
@@ -17,9 +19,6 @@ struct Component
 
 	ComponentTypeID UUID;
 	size_t active_entities;
-
-	vds::StaticArray<size_t, Constants::exd_max_entities> sparse_ents;
-	vds::StaticArray<Entity, Constants::exd_max_entities> dense_ents;
 
 	//Debug information
 	size_t memory_usage_in_bytes;
