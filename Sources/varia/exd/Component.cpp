@@ -17,7 +17,7 @@ void exd::Component::initialize(void * mem, size_t element_size, size_t element_
 	this->per_element_size = element_size;
 	this->element_count = element_count;
 	this->UUID = UUID;
-	this->push_idx = 0;
+	this->active_entities = 0;
 
 	sparse_ents.set_all(INVALID_ENTITY.id);
 
@@ -26,7 +26,7 @@ void exd::Component::initialize(void * mem, size_t element_size, size_t element_
 
 size_t exd::Component::length(void)
 {
-	return this->push_idx;
+	return this->active_entities;
 }
 
 void * exd::Component::calc_element_address(Entity ent)
@@ -54,7 +54,7 @@ void * exd::Component::calc_element_address_raw(size_t idx)
 
 size_t exd::Component::back(void)
 {
-	return this->push_idx - 1;
+	return this->active_entities - 1;
 }
 
 size_t exd::Component::front(void)
@@ -64,20 +64,20 @@ size_t exd::Component::front(void)
 
 void exd::Component::push_comp(void const * data)
 {
-	void * elem = calc_element_address_raw(this->push_idx);
+	void * elem = calc_element_address_raw(this->active_entities);
 	memcpy(elem, data, this->per_element_size);
 
-	++this->push_idx;
+	++this->active_entities;
 }
 
 void exd::Component::push_comp_without_data(void)
 {
-	++this->push_idx;
+	++this->active_entities;
 }
 
 void exd::Component::swap_and_pop_comp(size_t idx)
 {
-	DEBUG_ENSURE_INT_GT_ZERO(this->push_idx, "Component array had no entities!");
+	DEBUG_ENSURE_INT_GT_ZERO(this->active_entities, "Component array had no entities!");
 	void * removal_target = calc_element_address_raw(idx);
 	void * rear = calc_element_address_raw(back());
 
@@ -86,6 +86,8 @@ void exd::Component::swap_and_pop_comp(size_t idx)
 	//to the rear of the array
 	//Instead, only shift the rear into the removed slot and essentially duplicate the rear data.
 	memcpy(removal_target, rear, this->per_element_size);
+
+	--this->active_entities;
 }
 
 bool exd::Component::has(Entity ent)
@@ -169,7 +171,6 @@ void exd::Component::entity_add(Entity ent)
 	//TODO(zshoals Dec-24-2022):> No entset added yet. Do we still need one?
 	// internal_add_this_comp_to_entset(id);
 
-	++active_entities;
 }
 
 //Note(zshoals Dec-27-2022):> Iterating and removing entities at the same time = recipe for disaster
@@ -210,7 +211,6 @@ bool exd::Component::entity_remove(Entity ent)
 		//TODO(zshoals):>URGENT! FIXME!!!
 		// internal_remove_this_comp_from_entset(id);
 
-		--active_entities;
 
 		return true;
 	}
