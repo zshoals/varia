@@ -173,8 +173,6 @@ void exd::Component::entity_add(Entity ent)
 
 }
 
-//Note(zshoals Dec-27-2022):> Iterating and removing entities at the same time = recipe for disaster
-//Bulk remove or something? wut do? 
 bool exd::Component::entity_remove(Entity ent)
 {
 	if (active_entities < 1)
