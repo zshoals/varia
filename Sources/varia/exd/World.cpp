@@ -103,7 +103,31 @@ void * exd::World::comp_set(Entity ent, ComponentTypeID type)
 		return comp->get_untyped_mutable(ent);
 	}
 
+	ENSURE_UNREACHABLE("For now, let's stop duplicate setting of components. This might be changed in the future.");
 	return nullptr;
+}
+
+bool exd::World::comp_remove(exd::Entity ent, ComponentTypeID type)
+{
+	u64 ent_id = ent.id_extract();
+	Entity * target_ent = manifest.get_mut(ent_id);
+
+	//Note(zshoals 01-01-2023):> This might be duplicated work
+	//We kind of already check for entity validity in the component as well, but I think it's better off
+	//checked here. Is the redundant check in component->entity_remove necessary? not sure
+	//might not be possible for the component to go out of sync with the world's entities
+	if (ent.matches(*target_ent))
+	{
+		Component * comp = &this->components[ComponentTypeID_to_raw(type)];
+		comp->entity_remove(ent);
+
+		return true;
+	}
+	else
+	{
+		VARIA_LOG(LOG_WARNING | LOG_ECS, "EntityManifest tried to release a mismatched entity. Entity: %zu", ent.id);
+		return false;
+	}
 }
 
 exd::View exd::World::view_create(void)

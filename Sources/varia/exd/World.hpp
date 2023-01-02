@@ -41,6 +41,7 @@ struct World
 	void const * comp_get_unchecked(Entity ent, ComponentTypeID type);
 	void * comp_get_mutable_unchecked(Entity ent, ComponentTypeID type);
 	void * comp_set(Entity ent, ComponentTypeID type);
+	bool comp_remove(Entity ent, ComponentTypeID type);
 
 	exd::View view_create(void);
 
