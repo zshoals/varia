@@ -10,6 +10,8 @@ namespace vds
 template <typename T, int KeyRange, int ElementCount>
 struct StaticSparseSet
 {
+	static_assert(ElementCount <= KeyRange, "StaticSparseSet contains more elements than keys, making excess elements inaccessible.");
+
 	StaticArray<u32, KeyRange> sparse_keys;
 	StaticArray<u32, ElementCount> dense_keys;
 	StaticArray<T, ElementCount> data;
