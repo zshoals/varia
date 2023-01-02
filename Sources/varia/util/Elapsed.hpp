@@ -19,6 +19,8 @@ struct Elapsed
 	}
 	~Elapsed()
 	{
+		if (this->expired) return; 
+
 		this->m_end = kinc_time();
 		log_time();
 	}
@@ -39,6 +41,7 @@ struct Elapsed
 	void reset(void) { this->expired = false; }
 	void log_time(void) { VARIA_LOG_FLOAT(this->dt()); }
 	void log_time_message(char const * str) { VARIA_QLOG("%s :: %f", str, this->dt()); }
+	void begin_and_log(char const * msg) { VARIA_QLOG(msg); begin(); }
 	void end_and_log(void) { end(); log_time(); }
 };
 
