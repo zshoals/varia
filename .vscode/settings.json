@@ -18,6 +18,7 @@
 		"tuple": "cpp",
 		"xmemory": "cpp",
 		"xtr1common": "cpp",
-		"*.def": "cpp"
+		"*.def": "cpp",
+		"memory": "cpp"
 	}
 }

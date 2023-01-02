@@ -12,6 +12,7 @@
 #include "varia/util/Elapsed.hpp"
 #include "varia/ds/Allocator.hpp"
 #include "varia/util/Memory.hpp"
+#include "varia/ds/StaticSparseSet.hpp"
 
 #include "varia/exd/Component.hpp"
 #include "varia/exd/World.hpp"
@@ -159,7 +160,7 @@ int kickstart(int argc, char** argv)
 	{
 		VARIA_LOG_STRING("Entity creation");
 		Elapsed t;
-		for_range(8000)
+		for_range(80000)
 		{
 			Entity ent = w->ent_create();
 			COMP_SET(ent, Position);
@@ -172,11 +173,14 @@ int kickstart(int argc, char** argv)
 		}
 	}
 
+	Elapsed abc;
+	abc.begin_and_log("View instantiation");
 	exd::View v = w->view_create();
 	v.include(exd::ComponentTypeID::Position_e);
 	v.include(exd::ComponentTypeID::Foo_e);
 	v.include(exd::ComponentTypeID::Flammable_e);
 	v.compile();
+	abc.end_and_log();
 
 	{
 		VARIA_LOG_STRING("Iterate");
@@ -213,8 +217,7 @@ int kickstart(int argc, char** argv)
 	{
 		Elapsed t;
 
-		VARIA_QLOG("Backwards Iterate");
-
+		t.begin_and_log("Backwards iterate WARMUP");
 		v2.iterate_backwards_single<Position>([](Position * element)
 		{
 			if (element->x == 5000)
@@ -222,7 +225,7 @@ int kickstart(int argc, char** argv)
 				VARIA_QLOG("Whoswho!");
 			}
 		});
-
+		t.end_and_log();
 	}
 
 
@@ -230,13 +233,20 @@ int kickstart(int argc, char** argv)
 	{
 		VARIA_LOG_STRING("Entity deletion");
 		Elapsed t;
-		for(Entity const & ent : entlist)
-		{
-			w->ent_kill(ent);
-		}
+		v2.iterate_backwards_single_with_entity<Position>
+		(
+			[](exd::View * v, Position * elem, Entity ent)
+			{
+				v->ent_kill(ent);
+				if(ent.id_extract() == 40000)
+				{
+					char const * strname = exd::ComponentStringName(exd::ComponentTypeID::Position_e);
+					VARIA_QLOG(strname);
+				}
+			}
+		);
 	}
 	a.end_and_log();
-
 
 	kinc_start();
 
