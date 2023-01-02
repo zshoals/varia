@@ -33,8 +33,13 @@ struct View
 	void exclude(ComponentTypeID type);
 	void compile(void);
 
+	Entity ent_create(void);
+	bool ent_kill(Entity ent);
+
 	void const * comp_get(Entity ent, ComponentTypeID type);
 	void * comp_get_mutable(Entity ent, ComponentTypeID type);
+	void * comp_set(Entity ent, ComponentTypeID type);
+	bool comp_remove(Entity ent, ComponentTypeID type);
 
 	// void iterate_forwards(void (*cb)(View * v, Entity ent));
 	//Located in the header for (hopefully) inlining purposes
@@ -52,6 +57,24 @@ struct View
 		for_range_var(i, comp->length())
 		{
 			cb(static_cast<T *>(comp->get_untyped_mutable_direct(i)));
+		}
+	}
+
+	template<typename T, typename FUNC>
+	void iterate_forwards_single_with_entity(FUNC cb)
+	{
+		DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
+		//Note(zshoals Dec-28-2822):> We add one here as one include is removed for optimization purposes
+		//this is a safe check as compiling the view checks for a genuinely empty include list
+		//This does not apply to exclude, which we do not modify at all
+		DEBUG_ENSURE_UINT_EQUALS(this->comp_include.length() + 1, 1, "Tried to iterate a single element, however, multiple components were included.");
+		DEBUG_ENSURE_UINT_EQUALS(this->comp_exclude.length(), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
+
+		Component * comp = this->shortest_dataset;
+		for_range_var(i, comp->length())
+		{
+			Entity e = comp->dense_ents.get_unsafe(i);
+			cb(this, static_cast<T *>(comp->get_untyped_mutable_direct(i)), e);
 		}
 	}
 
@@ -85,6 +108,24 @@ struct View
 		for_reverse_range_var(i, len)
 		{
 			cb(static_cast<T *>(comp->get_untyped_mutable_direct(i)));
+		}
+	}
+
+	template<typename T, typename FUNC>
+	void iterate_backwards_single_with_entity(FUNC cb)
+	{
+		DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
+		DEBUG_ENSURE_UINT_EQUALS(this->comp_include.length() + 1, 1, "Tried to iterate a single element, however, multiple components were included.");
+		DEBUG_ENSURE_UINT_EQUALS(this->comp_exclude.length(), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
+
+		Component * comp = this->shortest_dataset;
+		//Note(zshoals Dec-28-2022):> preload the length as we may remove elements while traversing backwards
+		//which would reduce the start value and cause untold havoc, probably
+		size_t const len = comp->length();
+		for_reverse_range_var(i, len)
+		{
+			Entity ent = *comp->dense_ents.get_unsafe(i);
+			cb(this, static_cast<T *>(comp->get_untyped_mutable_direct(i)), ent);
 		}
 	}
 
