@@ -206,9 +206,6 @@ bool exd::Component::entity_remove(Entity ent)
 		sparse_ents.set_unsafe(reciprocal.id_extract(), target_idx);
 		sparse_ents.set_unsafe(ent.id_extract(), INVALID_ENTITY.id);
 
-		//TODO(zshoals):>URGENT! FIXME!!!
-		// internal_remove_this_comp_from_entset(id);
-
 
 		return true;
 	}
