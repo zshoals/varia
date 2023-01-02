@@ -41,7 +41,12 @@ struct View
 	void * comp_set(Entity ent, ComponentTypeID type);
 	bool comp_remove(Entity ent, ComponentTypeID type);
 
-	// void iterate_forwards(void (*cb)(View * v, Entity ent));
+
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+//||                   Forwards Iteration                                ||
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 	//Located in the header for (hopefully) inlining purposes
 	template<typename T, typename FUNC>
 	void iterate_forwards_single(FUNC cb)
@@ -54,7 +59,8 @@ struct View
 		DEBUG_ENSURE_UINT_EQUALS(this->comp_exclude.length(), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
 
 		Component * comp = this->shortest_dataset;
-		for_range_var(i, comp->length())
+		const size_t len = comp->length();
+		for_range_var(i, len)
 		{
 			cb(static_cast<T *>(comp->get_untyped_mutable_direct(i)));
 		}
@@ -71,7 +77,8 @@ struct View
 		DEBUG_ENSURE_UINT_EQUALS(this->comp_exclude.length(), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
 
 		Component * comp = this->shortest_dataset;
-		for_range_var(i, comp->length())
+		const size_t len = comp->length();
+		for_range_var(i, len)
 		{
 			Entity e = comp->dense_ents.get_unsafe(i);
 			cb(this, static_cast<T *>(comp->get_untyped_mutable_direct(i)), e);
@@ -94,6 +101,13 @@ struct View
 		}
 	}
 
+
+
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+//||                       Backwards Iteration                           ||
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 	template<typename T, typename FUNC>
 	void iterate_backwards_single(FUNC cb)
 	{
@@ -127,6 +141,23 @@ struct View
 			Entity ent = *comp->dense_ents.get_unsafe(i);
 			cb(this, static_cast<T *>(comp->get_untyped_mutable_direct(i)), ent);
 		}
+	}
+
+	template<typename FUNC>
+	void iterate_backwards(FUNC cb)
+	{
+		DEBUG_ENSURE_TRUE(this->finalized, "View was not finalized before usage.");
+
+		size_t const len = this->shortest_dataset->dense_ents.length();
+		for_reverse_range_var(i, len)
+		{
+			Entity e = *this->shortest_dataset->dense_ents.get_unsafe(i);
+			if (this->internal_target_matches_query(e))
+			{
+				cb(this, e);
+			}
+		}
+
 	}
 
 	private:
