@@ -2,71 +2,21 @@
 #include "kinc/system.h"
 #include "kinc/display.h"
 #include "kinc/log.h"
-#include "varia/ds/StaticArray.hpp"
-#include "varia/ds/StaticRingbuf.hpp"
-#include "varia/ds/StaticQueue.hpp"
-#include "varia/ds/FillExecute.hpp"
-#include "varia/ds/Bits.hpp"
-#include "varia/ds/Bitset.hpp"
-#include "varia/math/Math.hpp"
-#include "varia/util/Elapsed.hpp"
-#include "varia/ds/Allocator.hpp"
-#include "varia/util/Memory.hpp"
-#include "varia/ds/StaticSparseSet.hpp"
-
-#include "varia/exd/Component.hpp"
-#include "varia/exd/World.hpp"
-#include "varia/exd/Entity.hpp"
-
-#include "varia/exd/View.hpp"
-
-#include "varia/comps/Bundle.hpp"
-#include "varia/comps/Flammable.hpp"
-#include "varia/comps/Position.hpp"
-#include "varia/exd/ComponentTypes.hpp"
 
 #include "varia/logging.hpp"
-#include "varia/ds/Bits.hpp"
+#include "varia/util/Memory.hpp"
 #include "varia/comps/Position.hpp"
+#include "varia/util/Elapsed.hpp"
+
+#include "varia/ds/Allocator.hpp"
+#include "varia/exd/World.hpp"
+#include "varia/exd/Component.hpp"
+#include "varia/exd/View.hpp"
+#include "varia/exd/Entity.hpp"
 
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
-
-using namespace Varia;
-
-inline void pos_system(exd::View * v, exd::Entity ent)
-{
-	Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
-	p->x = ent.id_extract();
-	p->y = ent.generation_extract();
-}
-
-inline void print_system(exd::View * v, exd::Entity ent)
-{
-	Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
-
-	if (ent.id_extract() == 1)
-	{
-		VARIA_LOG_INT(p->x);
-		VARIA_LOG_INT(p->y);
-		p->x += 4363;
-	}
-	if (ent.id_extract() == 5001)
-	{
-		VARIA_LOG_INT(p->x);
-		VARIA_LOG_INT(p->y);
-		p->x += 1;
-	}
-}
-
-void funky2(vds::FillExecute<int, 1> * self)
-{
-	for (int const & v : *self)
-	{
-		VARIA_LOG_INT(v);
-	}
-}
 
 int kickstart(int argc, char** argv) 
 {
@@ -128,125 +78,28 @@ int kickstart(int argc, char** argv)
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
 
-
-	using exd::Component;
 	using exd::World;
+	using exd::View;
 	using exd::Entity;
+	using exd::Component;
+
 	using vds::Allocator;
 
-	size_t mem_size = Varia::Memory::megabytes_to_bytes(128);
-	void * mem = static_cast<void *>(malloc(mem_size));
 	Allocator arena;
-	arena.initialize(mem, mem_size);
+	size_t memsize = Varia::Memory::megabytes_to_bytes(128);
+	void * mem = static_cast<void *>(malloc(memsize));
+	arena.initialize(mem, memsize);
 
-	#define REGISTER(TYPE) w->comp_register(sizeof(struct TYPE), exd::ComponentTypeID::VARIA_CONCAT(TYPE, _e))
 	World * w = allocator_malloc(&arena, World, 1);
 	w->initialize(&arena);
 	w->comp_register(sizeof(struct Position), exd::ComponentTypeID::Position_e);
-	w->comp_register(sizeof(struct Flammable), exd::ComponentTypeID::Flammable_e);
-	REGISTER(Foo);
-	REGISTER(Bar);
-	REGISTER(Degrees);
-	REGISTER(Radians);
 
-
-	vds::StaticArray<Entity, 81920> entlist;
-	entlist.initialize();
-
-	#define COMP_SET(ENT, TYPE) w->comp_set((ENT), (exd::ComponentTypeID::VARIA_CONCAT(TYPE, _e)))
-
-	Elapsed a;
-	a.begin();
+	for_range(40000)
 	{
-		VARIA_LOG_STRING("Entity creation");
-		Elapsed t;
-		for_range(80000)
-		{
-			Entity ent = w->ent_create();
-			COMP_SET(ent, Position);
-			COMP_SET(ent, Flammable);
-			COMP_SET(ent, Degrees);
-			COMP_SET(ent, Radians);
-			COMP_SET(ent, Foo);
-			COMP_SET(ent, Bar);
-			entlist.push(ent);
-		}
+		Entity ent = w->ent_create();
+		w->comp_set(ent, exd::ComponentTypeID::Position_e);
 	}
 
-	Elapsed abc;
-	abc.begin_and_log("View instantiation");
-	exd::View v = w->view_create();
-	v.include(exd::ComponentTypeID::Position_e);
-	v.include(exd::ComponentTypeID::Foo_e);
-	v.include(exd::ComponentTypeID::Flammable_e);
-	v.compile();
-	abc.end_and_log();
-
-	{
-		VARIA_LOG_STRING("Iterate");
-		Elapsed t;
-		v.iterate_forwards(pos_system);
-		v.iterate_forwards([](exd::View * v, Entity ent)
-		{
-			"Say hi!";
-		});
-		// v.iterate_forwards(print_system);
-
-		// v.iterate_forwards([](exd::View * v, Entity ent)
-		// {
-		// 	Position * p = static_cast<Position *>(v->comp_get_mutable(ent, exd::ComponentTypeID::Position_e));
-
-		// 	if (ent.id_extract() == 1)
-		// 	{
-		// 		VARIA_LOG_INT(p->x);
-		// 		VARIA_LOG_INT(p->y);
-		// 		p->x += 4363;
-		// 	}
-		// 	if (ent.id_extract() == 5001)
-		// 	{
-		// 		VARIA_LOG_INT(p->x);
-		// 		VARIA_LOG_INT(p->y);
-		// 		p->x += 1;
-		// 	}
-		// });
-	}
-
-	exd::View v2 = w->view_create();
-	v2.include(exd::ComponentTypeID::Position_e);
-	v2.compile();
-	{
-		Elapsed t;
-
-		t.begin_and_log("Backwards iterate WARMUP");
-		v2.iterate_backwards_single<Position>([](Position * element)
-		{
-			if (element->x == 5000)
-			{
-				VARIA_QLOG("Whoswho!");
-			}
-		});
-		t.end_and_log();
-	}
-
-
-	//THIS SECTION DELETES THE ENTITIES
-	{
-		VARIA_LOG_STRING("Entity deletion");
-		Elapsed t;
-		v2.iterate_backwards_single_with_entity<Position>
-		(
-			[](exd::View * v, Position * elem, Entity ent)
-			{
-				v->ent_kill(ent);
-				if(ent.id_extract() == 40000)
-				{
-					char const * strname = exd::ComponentStringName(exd::ComponentTypeID::Position_e);
-					VARIA_QLOG(strname);
-				}
-			}
-		);
-	}
-	a.end_and_log();
 
 	kinc_start();
 

@@ -75,6 +75,7 @@ bool exd::World::ent_valid(exd::Entity ent)
 	return ent.matches(*manifest.get(ent.id_extract()));
 }
 
+//TODO(zshoals 01-01-2023):> Check for double registration? 
 void exd::World::comp_register(size_t element_size, ComponentTypeID type)
 {
 	void * storage_mem = this->allocator->allocate_aligned_count(element_size, exd::Constants::exd_max_entities, Varia::Memory::default_alignment);
@@ -94,6 +95,9 @@ void * exd::World::comp_get_mutable(Entity ent, ComponentTypeID type)
 	return components[ComponentTypeID_to_raw(type)].get_untyped_mutable(ent);
 }
 
+//TODO(zshoals 01-01-2023):> We aren't actually guaranteeing that this component exists before we set it
+//We need a validation step of some sort across the entire interface before we access a component,
+//at least for debugging where errors can happen easily
 void * exd::World::comp_set(Entity ent, ComponentTypeID type)
 {
 	Component * comp = &components[ComponentTypeID_to_raw(type)];
@@ -103,7 +107,7 @@ void * exd::World::comp_set(Entity ent, ComponentTypeID type)
 		return comp->get_untyped_mutable(ent);
 	}
 
-	ENSURE_UNREACHABLE("For now, let's stop duplicate setting of components. This might be changed in the future.");
+	ENSURE_UNREACHABLE("ERROR: Tried to set a component with an out of date entity.");
 	return nullptr;
 }
 

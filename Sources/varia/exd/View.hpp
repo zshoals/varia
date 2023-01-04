@@ -47,6 +47,10 @@ struct View
 //||                   Forwards Iteration                                ||
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+
+	//TODO(zshoals 01-03-2023):> For SIMD purposes we may want to make a 4step iteration
+	//mechanism.
+
 	//Located in the header for (hopefully) inlining purposes
 	template<typename T, typename FUNC>
 	void iterate_forwards_single(FUNC cb)
