@@ -19,6 +19,7 @@
 		"xmemory": "cpp",
 		"xtr1common": "cpp",
 		"*.def": "cpp",
-		"memory": "cpp"
+		"memory": "cpp",
+		"atomic": "cpp"
 	}
 }

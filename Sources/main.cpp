@@ -94,11 +94,18 @@ int kickstart(int argc, char** argv)
 	w->initialize(&arena);
 	w->comp_register(sizeof(struct Position), exd::ComponentTypeID::Position_e);
 
-	for_range(40000)
+
+	using Varia::Elapsed;
+
+	Elapsed e;
+
+	e.begin_and_log("Ent create and set");
+	for_range(80000)
 	{
 		Entity ent = w->ent_create();
 		w->comp_set(ent, exd::ComponentTypeID::Position_e);
 	}
+	e.end_and_log();
 
 
 	kinc_start();
