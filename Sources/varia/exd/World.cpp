@@ -103,7 +103,10 @@ void * exd::World::comp_set(Entity ent, ComponentTypeID type)
 	Component * comp = &components[ComponentTypeID_to_raw(type)];
 	if (ent.matches(*manifest.get_unsafe(ent.id_extract())))
 	{
-		comp->entity_add(ent);
+		//TODO(zshoals 01-07-2023):> We can add the component to the entity's entset here
+		//we've modified entity_add to return true on a successful addition of that component
+		//WARNING: Failure on duplicate entity component addition?
+		bool was_added = comp->entity_add(ent);
 		return comp->get_untyped_mutable(ent);
 	}
 
