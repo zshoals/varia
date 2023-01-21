@@ -148,7 +148,7 @@ void * exd::Component::get_untyped_mutable_direct(size_t idx)
 	return calc_element_address_raw(idx);
 }
 
-void exd::Component::entity_add(Entity ent)
+bool exd::Component::entity_add(Entity ent)
 {
 
 	//TODO(zshoals Dec-27-2022):> There's a problem; if we try and add a STORED entity to a component
@@ -161,16 +161,14 @@ void exd::Component::entity_add(Entity ent)
 	if (*sparse_ents.get_unsafe(id) != INVALID_ENTITY.id)
 	{
 		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to add an entity into this component, but it already exists. ID (no generation): %zu", ent.id_extract());
-		return;
+		return false;
 	}
 
 	dense_ents.push(ent);
 	sparse_ents.set_unsafe(id, dense_ents.back());
 	this->push_comp_without_data();
 
-	//TODO(zshoals Dec-24-2022):> No entset added yet. Do we still need one?
-	// internal_add_this_comp_to_entset(id);
-
+	return true;
 }
 
 bool exd::Component::entity_remove(Entity ent)

@@ -37,7 +37,7 @@ struct Component
 	void * get_untyped_mutable_unchecked(Entity ent);
 	void const * get_untyped_direct(size_t idx);
 	void * get_untyped_mutable_direct(size_t idx);
-	void entity_add(Entity ent);
+	bool entity_add(Entity ent);
 	bool entity_remove(Entity ent);
 	bool has(Entity ent);
 	void clear(void);
