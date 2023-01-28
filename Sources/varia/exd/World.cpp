@@ -17,6 +17,21 @@
 // 	}
 // }
 
+static inline exd_component_t * exd_world_unitlocal_component_select(exd_world_t * world, exd::ComponentTypeID type)
+{
+	return &world->components[ComponentTypeID_to_raw(type)];
+}
+
+static inline exd_entity_t exd_world_unitlocal_manifest_get_modern_entity_copy(exd_world_t * world, exd_entity_t ent)
+{
+	return *(vds_array_get_unsafe(&world->manifest, exd_entity_id_extract(ent)));
+}
+
+static inline exd_entity_t * exd_world_unitlocal_manifest_get_modern_entity_reference(exd_world_t * world, exd_entity_t ent)
+{
+	return vds_array_get_mut_unsafe(&world->manifest, exd_entity_id_extract(ent));
+}
+
 void exd_world_initialize(exd_world_t * world, vds::Allocator * allocator)
 {
 	world->allocator = allocator;
@@ -45,6 +60,8 @@ exd_entity_t exd_world_ent_create(exd_world_t * world)
 
 	++(world->active_entities);
 
+	//TODO(zshoals 01-28-2023):> Why are we using ent_id here instead of an exd_entity_t? Why does the freelist not use
+	//entities?
 	u64 ent_id = vds_array_pop(&world->freelist);
 	return *( vds_array_get(&world->manifest, ent_id) );
 }
@@ -52,7 +69,7 @@ exd_entity_t exd_world_ent_create(exd_world_t * world)
 bool exd_world_ent_kill(exd_world_t * world, exd_entity_t ent)
 {
 	u64 ent_id = exd_entity_id_extract(ent);
-	exd_entity_t * target_ent = vds_array_get_mut(&world->manifest, ent_id);
+	exd_entity_t * target_ent = exd_world_unitlocal_manifest_get_modern_entity_reference(world, ent);
 
 	if (exd_entity_matches(ent, *target_ent))
 	{
@@ -74,7 +91,8 @@ bool exd_world_ent_kill(exd_world_t * world, exd_entity_t ent)
 
 bool exd_world_ent_valid(exd_world_t * world, exd_entity_t ent)
 {
-	return exd_entity_matches(ent, *( vds_array_get(&world->manifest, ent.id_extract())) );
+	exd_entity_t manifest_entity_revision = exd_world_unitlocal_manifest_get_modern_entity_copy(world, ent);
+	return exd_entity_matches(ent, manifest_entity_revision);
 }
 
 //TODO(zshoals 01-01-2023):> Check for double registration? 
@@ -82,15 +100,17 @@ void exd_world_comp_register(exd_world_t * world, size_t element_size, exd::Comp
 {
 	void * storage_mem = world->allocator->allocate_aligned_count(element_size, exd::Constants::exd_max_entities, Varia::Memory::default_alignment);
 
-	size_t idx = ComponentTypeID_to_raw(type);
-	exd_component_t * comp = &world->components[idx];
+	//TODO(zshoals 01-28-2023):> Verify if this code is the same as the replacement in practice
+	// size_t idx = ComponentTypeID_to_raw(type);
+	// exd_component_t * comp = &world->components[idx];
+	exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
 	exd_component_initialize(comp, storage_mem, element_size, exd::Constants::exd_max_entities, type);
 }
 
 void const * exd_world_comp_get(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type)
 {
 
-	return exd_component_get_untyped(&world->components[ComponentTypeID_to_raw(type)], ent);
+	return exd_component_get_untyped(exd_world_unitlocal_component_select(world, type), ent);
 	
 	//This is what it should be equivalent to; left in due to unclear-ness
 	// return world->components[ComponentTypeID_to_raw(type)].get_untyped(ent);
@@ -98,7 +118,7 @@ void const * exd_world_comp_get(exd_world_t * world, exd_entity_t ent, exd::Comp
 
 void * exd_world_comp_get_mutable(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type)
 {
-	return exd_component_get_untyped_mutable(&world->components[ComponentTypeID_to_raw(type)], ent);
+	return exd_component_get_untyped_mutable(exd_world_unitlocal_component_select(world, type), ent);
 
 	//This is what it should be equivalent to; left in due to unclear-ness
 	// return world->components[ComponentTypeID_to_raw(type)].get_untyped_mutable(ent);
@@ -109,8 +129,8 @@ void * exd_world_comp_get_mutable(exd_world_t * world, exd_entity_t ent, exd::Co
 //at least for debugging where errors can happen easily
 void * exd_world_comp_set(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type)
 {
-	exd_component_t * comp = &world->components[ComponentTypeID_to_raw(type)];
-	if (exd_entity_matches(ent, *( vds_array_get_unsafe(&world->manifest, ent.id_extract()))));
+	exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
+	if (exd_world_ent_valid(world, ent))
 	{
 		//TODO(zshoals 01-07-2023):> We can add the component to the entity's entset here
 		//we've modified entity_add to return true on a successful addition of that component
@@ -125,8 +145,8 @@ void * exd_world_comp_set(exd_world_t * world, exd_entity_t ent, exd::ComponentT
 
 bool exd_world_comp_remove(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type)
 {
-	u64 ent_id = ent.id_extract();
-	exd_entity_t * target_ent = vds_array_get_mut(&world->manifest, ent_id);
+	u64 ent_id = exd_entity_id_extract(ent);
+	exd_entity_t * target_ent = exd_world_unitlocal_manifest_get_modern_entity_reference(world, ent);
 
 	//Note(zshoals 01-01-2023):> This might be duplicated work
 	//We kind of already check for entity validity in the component as well, but I think it's better off
@@ -134,7 +154,7 @@ bool exd_world_comp_remove(exd_world_t * world, exd_entity_t ent, exd::Component
 	//might not be possible for the component to go out of sync with the world's entities
 	if (exd_entity_matches(ent, *target_ent))
 	{
-		exd_component_t * comp = &world->components[ComponentTypeID_to_raw(type)];
+		exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
 		exd_component_entity_remove(comp, ent);
 
 		return true;
@@ -154,11 +174,16 @@ exd_view_t exd_world_create_view(exd_world_t * world)
 }
 
 
-void exd_internal_world_ent_remove_from_components(exd_world_t * world, exd_entity_t ent);
+void exd_internal_world_ent_remove_from_components(exd_world_t * world, exd_entity_t ent)
 {
 	//Note(zshoals Dec-27-2022):> We'll only complicate this further if dumb removal
 	//becomes a serious time issue
+
+	//Note(zshoals 01-28-2023):> Old version, keep around until verified working
+	// world->components[ComponentTypeID_to_raw(ComponentTypeID::VARIA_CONCAT(TYPE, _e))].entity_remove(ent);
+
 	#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME)\
-	world->components[ComponentTypeID_to_raw(ComponentTypeID::VARIA_CONCAT(TYPE, _e))].entity_remove(ent);
+	exd_component_entity_remove(&world->components[exd::ComponentTypeID_to_raw(exd::ComponentTypeID::VARIA_CONCAT(TYPE, _e))], ent);
+
 	#include "ComponentData.def"
 }

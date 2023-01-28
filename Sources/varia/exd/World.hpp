@@ -15,6 +15,7 @@ struct exd_world_t
 	vds::Allocator * allocator;
 
 	vds_array_t<exd_entity_t, exd::Constants::exd_max_entities> manifest;
+	//TODO(zshoals 01-28-2023):> Why are we storing u64 in the freelist instead of the entities themselves? 
 	vds_array_t<u64, exd::Constants::exd_max_entities> freelist;
 	exd_component_t components[exd::Constants::exd_max_components];
 
@@ -40,6 +41,6 @@ void * exd_world_comp_get_mutable(exd_world_t * world, exd_entity_t ent, exd::Co
 void * exd_world_comp_set(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type);
 bool exd_world_comp_remove(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type);
 
-exd::View exd_world_create_view(void);
+exd_view_t exd_world_create_view(exd_world_t * world);
 
 void exd_internal_world_ent_remove_from_components(exd_world_t * world, exd_entity_t ent);
