@@ -11,144 +11,153 @@
 
 // exd::Component::Component(void) {}
 
-void exd::Component::initialize(void * mem, size_t element_size, size_t element_count, ComponentTypeID UUID)
+void exd_component_initialize(exd_component_t * comp, void * mem, size_t element_size, size_t element_count, exd::ComponentTypeID UUID)
 {
-	this->data = mem;
-	this->per_element_size = element_size;
-	this->element_count = element_count;
-	this->UUID = UUID;
-	this->active_entities = 0;
+	comp->data = mem;
+	comp->per_element_size = element_size;
+	comp->element_count = element_count;
+	comp->UUID = UUID;
+	comp->active_entities = 0;
 
-	sparse_ents.set_all(INVALID_ENTITY.id);
+	vds_array_set_all(&comp->sparse_ents, exd::INVALID_ENTITY.id);
 
-	this->memory_usage_in_bytes = (element_size * element_count) + sizeof(*this);
+	comp->memory_usage_in_bytes = (element_size * element_count) + sizeof(*comp);
 }
 
-size_t exd::Component::length(void)
+size_t exd_component_length(exd_component_t * comp)
 {
-	return this->active_entities;
+	return comp->active_entities;
 }
 
-void * exd::Component::calc_element_address(Entity ent)
+void * exd_component_calc_element_address(exd_component_t * comp, exd_entity_t ent)
 {
-	u64 idx = ent.id_extract();
-	u64 target_offset = idx * per_element_size;
+	u64 idx = exd_entity_id_extract(ent);
+	u64 target_offset = idx * comp->per_element_size;
 
-	DEBUG_ENSURE_UINT_LT(target_offset, element_count * per_element_size, "Untyped component access overran buffer.");
+	DEBUG_ENSURE_UINT_LT(target_offset, comp->element_count * comp->per_element_size, "Untyped component access overran buffer.");
 
-	uintptr_t target_addr = reinterpret_cast<uintptr_t>(this->data) + target_offset;
+	uintptr_t target_addr = reinterpret_cast<uintptr_t>(comp->data) + target_offset;
 
 	return reinterpret_cast<void *>(target_addr);
 }
 
-void * exd::Component::calc_element_address_raw(size_t idx)
+void * exd_component_calc_element_address_raw(exd_component_t * comp, size_t idx)
 {
-	u64 target_offset = idx * per_element_size;
+	u64 target_offset = idx * comp->per_element_size;
 
-	DEBUG_ENSURE_UINT_LT(target_offset, element_count * per_element_size, "Untyped component access overran buffer.");
+	DEBUG_ENSURE_UINT_LT(target_offset, comp->element_count * comp->per_element_size, "Untyped component access overran buffer.");
 
-	uintptr_t target_addr = reinterpret_cast<uintptr_t>(this->data) + target_offset;
+	uintptr_t target_addr = reinterpret_cast<uintptr_t>(comp->data) + target_offset;
 
 	return reinterpret_cast<void *>(target_addr);
 }
 
-size_t exd::Component::back(void)
+size_t exd_component_back(exd_component_t * comp)
 {
-	return this->active_entities - 1;
+	return comp->active_entities - 1;
 }
 
-size_t exd::Component::front(void)
+size_t exd_component_front(exd_component_t * comp)
 {
 	return 0;
 }
 
-void exd::Component::push_comp(void const * data)
+void exd_component_push_comp(exd_component_t * comp, void const * data)
 {
-	void * elem = calc_element_address_raw(this->active_entities);
-	memcpy(elem, data, this->per_element_size);
+	//TODO(zshoals 01-27-2023):> Did component need to be passed in here or just the data?
+	void * elem = exd_component_calc_element_address_raw(comp, comp->active_entities);
+	memcpy(elem, data, comp->per_element_size);
 
-	++this->active_entities;
+	++comp->active_entities;
 }
 
-void exd::Component::push_comp_without_data(void)
+void exd_component_push_comp_without_data(exd_component_t * comp)
 {
-	++this->active_entities;
+	++comp->active_entities;
 }
 
-void exd::Component::swap_and_pop_comp(size_t idx)
+
+
+//TODO(zshoals 01-27-2023):> FINISH ME
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+//||        WE ARE WORKING FROM HERE AND CONTINUING TOMORROW             ||
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+void exd_component_swap_and_pop_comp(exd_component_t * comp, size_t idx)
 {
-	DEBUG_ENSURE_INT_GT_ZERO(this->active_entities, "Component array had no entities!");
-	void * removal_target = calc_element_address_raw(idx);
-	void * rear = calc_element_address_raw(back());
+	DEBUG_ENSURE_INT_GT_ZERO(comp->active_entities, "Component array had no entities!");
+	void * removal_target = exd_component_calc_element_address_raw(comp, idx);
+	void * rear = exd_component_calc_element_address_raw(comp, exd_component_back(comp));
 
 	//Note(zshoals Dec-25-2022):> We don't care about the target element once it's been removed
 	//from the data array, which means that we do not need to move the removed item
 	//to the rear of the array
 	//Instead, only shift the rear into the removed slot and essentially duplicate the rear data.
-	memcpy(removal_target, rear, this->per_element_size);
+	memcpy(removal_target, rear, comp->per_element_size);
 
-	--this->active_entities;
+	--comp->active_entities;
 }
 
-bool exd::Component::has(Entity ent)
+bool exd_component_has(exd_component_t * comp, exd_entity_t ent)
 {
-	u64 id = ent.id_extract();
-	size_t target_idx = *sparse_ents.get_unsafe(id);
+	u64 id = exd_entity_id_extract(ent);
+	size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, id));
 
-	if (target_idx != INVALID_ENTITY.id)
+	if (target_idx != exd::INVALID_ENTITY.id)
 	{
-		Entity other = *dense_ents.get_unsafe(target_idx);
-		return ent.matches(other);
+		exd_entity_t other = *(vds_array_get_unsafe(&comp->dense_ents, target_idx));
+		return exd_entity_matches(ent, other);
 	}
 
 	return false;
 }
 
-void const * exd::Component::get_untyped(Entity ent)
+void const * exd_component_get_untyped(exd_component_t * comp, exd_entity_t ent)
 {
-	if (has(ent))
+	if (exd_component_has(comp, ent))
 	{
-		size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
-		return calc_element_address_raw(target_idx);
+		size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, exd_entity_id_extract(ent)));
+		return exd_component_calc_element_address_raw(comp, target_idx);
 	}
 	// ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
 
 	return nullptr;
 }
 
-void * exd::Component::get_untyped_mutable(Entity ent)
+void * exd_component_get_untyped_mutable(exd_component_t * comp, exd_entity_t ent)
 {
-	if (has(ent))
+	if (exd_component_has(comp, ent))
 	{
-		size_t target_idx = *sparse_ents.get_unsafe(ent.id_extract());
-		return calc_element_address_raw(target_idx);
+		size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, exd_entity_id_extract(ent)));
+		return exd_component_calc_element_address_raw(comp, target_idx);
 	}
 	// ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
 
 	return nullptr;
 }
 
-void const * exd::Component::get_untyped_unchecked(Entity ent)
+void const * exd_component_get_untyped_unchecked(exd_component_t * comp, exd_entity_t ent)
 {
-	return calc_element_address(ent);
+	return exd_component_calc_element_address(comp, ent);
 }
 
-void * exd::Component::get_untyped_mutable_unchecked(Entity ent)
+void * exd_component_get_untyped_mutable_unchecked(exd_component_t * comp, exd_entity_t ent)
 {
-	return calc_element_address(ent);
+	return exd_component_calc_element_address(comp, ent);
 }
 
-void const * exd::Component::get_untyped_direct(size_t idx)
+void const * exd_component_get_untyped_direct(exd_component_t * comp, size_t idx)
 {
-	return calc_element_address_raw(idx);
+	return exd_component_calc_element_address_raw(comp, idx);
 }
 
-void * exd::Component::get_untyped_mutable_direct(size_t idx)
+void * exd_component_get_untyped_mutable_direct(exd_component_t * comp, size_t idx)
 {
-	return calc_element_address_raw(idx);
+	return exd_component_calc_element_address_raw(comp, idx);
 }
 
-bool exd::Component::entity_add(Entity ent)
+bool exd_component_entity_add(exd_component_t * comp, exd_entity_t ent)
 {
 
 	//TODO(zshoals Dec-27-2022):> There's a problem; if we try and add a STORED entity to a component
@@ -156,54 +165,56 @@ bool exd::Component::entity_add(Entity ent)
 	//adding if the entity is the newest version according to the world manifest, I think
 	//Which means we need to mirror the generation on the sparse ent slot I believe
 	//NOTE(zshoals Dec-27-2022):> Fixed in world comp_set???? maybe??? 
-	u64 id = ent.id_extract();
+	u64 id = exd_entity_id_extract(ent);
 
-	if (*sparse_ents.get_unsafe(id) != INVALID_ENTITY.id)
+	if ( *(vds_array_get_unsafe(&comp->sparse_ents, id)) != exd::INVALID_ENTITY.id)
 	{
-		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to add an entity into this component, but it already exists. ID (no generation): %zu", ent.id_extract());
+		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to add an entity into this component, but it already exists. ID (no generation): %zu", id);
 		return false;
 	}
 
-	dense_ents.push(ent);
-	sparse_ents.set_unsafe(id, dense_ents.back());
-	this->push_comp_without_data();
+	vds_array_push(&comp->dense_ents, ent);
+
+	//TODO(zshoals 01-28-2023):> These two lines are not resolved yet as exd_entity_t is not defined properly yet
+	// sparse_ents.set_unsafe(id, dense_ents.back());
+	vds_array_set_unsafe(&comp->sparse_ents, id, vds_array_back(&comp->dense_ents));
+	exd_component_push_comp_without_data(comp);
 
 	return true;
 }
 
-bool exd::Component::entity_remove(Entity ent)
+bool exd_component_entity_remove(exd_component_t * comp, exd_entity_t ent)
 {
-	if (active_entities < 1)
+	if (comp->active_entities < 1)
 	{
 		// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 		return false;
 	}
 
-	u64 id = ent.id_extract();
+	u64 id = exd_entity_id_extract(ent);
 
-	size_t target_idx = *sparse_ents.get_unsafe(id);
-	if (target_idx == INVALID_ENTITY.id) 
+	size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, id));
+	if (target_idx == exd::INVALID_ENTITY.id) 
 	{
 		// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 		return false;
 	};
 
-	Entity dense_ent = *dense_ents.get_unsafe(target_idx);
+	exd_entity_t dense_ent = *(vds_array_get_unsafe(&comp->dense_ents, target_idx));
 
-	bool valid = ent.matches(dense_ent);
+	bool valid = exd_entity_matches(ent, dense_ent);
 	if (valid)
 	{
-		dense_ents.swap_and_pop(target_idx);
-		this->swap_and_pop_comp(target_idx);
+		vds_array_swap_and_pop(&comp->dense_ents, target_idx);
+		exd_component_swap_and_pop_comp(comp, target_idx);
 
-		Entity reciprocal = *dense_ents.get_unsafe(target_idx);
+		exd_entity_t reciprocal = *(vds_array_get_unsafe(&comp->dense_ents, target_idx));
 
 		//Note(zshoals Dec-19-2022):> Order is important here, if the element is the final one
 		//in the array, reciprocal and ent id resolve to the same thing. So set INVALID_ENTITY.id
 		//second
-		sparse_ents.set_unsafe(reciprocal.id_extract(), target_idx);
-		sparse_ents.set_unsafe(ent.id_extract(), INVALID_ENTITY.id);
-
+		vds_array_set_unsafe(&comp->sparse_ents, exd_entity_id_extract(reciprocal), target_idx);
+		vds_array_set_unsafe(&comp->sparse_ents, exd_entity_id_extract(ent), exd::INVALID_ENTITY.id);
 
 		return true;
 	}
@@ -214,8 +225,8 @@ bool exd::Component::entity_remove(Entity ent)
 	}
 }
 
-void exd::Component::clear(void)
+void exd_component_clear(exd_component_t * comp)
 {
 	ENSURE_UNIMPLEMENTED();	
-	memset(this->data, 0, element_count * per_element_size);
+	memset(comp->data, 0, (comp->element_count * comp->per_element_size));
 }
