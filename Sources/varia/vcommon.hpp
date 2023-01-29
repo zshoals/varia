@@ -31,6 +31,16 @@ typedef unsigned int uint;
 #define VARIA_ZERO_INIT_SIZE(PTR, SIZE) memset((PTR), 0, SIZE)
 
 
+//Note(zshoals 01-24-2023):> Maybe too clunky to use in practice
+//taken from https://stackoverflow.com/questions/13842468/comma-in-c-c-macro
+//Actually should prefer "stacknew" vscode snippet, which generates this pattern without
+//relying on macro weirdness. Kept for posterity.
+#define VARIA_GROUP_ARGS(...) __VA_ARGS__
+#define VARIA_STACK_NEW(TYPE, HANDLE)\
+	TYPE VARIA_CONCAT(_trashme_, HANDLE);\
+	TYPE * HANDLE = &(VARIA_CONCAT(_trashme_, HANDLE))
+
+
 
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
