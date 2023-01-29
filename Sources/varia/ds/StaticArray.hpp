@@ -65,13 +65,13 @@ size_t vds_array_front(vds_array_t<T, Size> * arr)
 template <typename T, int Size>
 size_t vds_array_back(vds_array_t<T, Size> * arr)
 {
-	return push_idx - 1;
+	return arr->push_idx - 1;
 }
 
 template <typename T, int Size>
 size_t vds_array_length(vds_array_t<T, Size> * arr)
 {
-	return push_idx;
+	return arr->push_idx;
 }
 
 template <typename T, int Size>
@@ -83,7 +83,7 @@ size_t vds_array_capacity(vds_array_t<T, Size> * arr)
 template <typename T, int Size>
 bool vds_array_is_populated(vds_array_t<T, Size> * arr)
 {
-	return push_idx > 0;
+	return arr->push_idx > 0;
 }
 
 template <typename T, int Size>
@@ -95,7 +95,7 @@ bool vds_array_is_empty(vds_array_t<T, Size> * arr)
 template <typename T, int Size>
 void vds_array_push(vds_array_t<T, Size> * arr, T value)
 {
-	DEBUG_ENSURE_UINT_LT(push_idx, Size, "Attempted element push of full StaticArray");
+	DEBUG_ENSURE_UINT_LT(arr->push_idx, Size, "Attempted element push of full StaticArray");
 
 	arr->data[arr->push_idx] = value;
 	++arr->push_idx;
@@ -104,7 +104,7 @@ void vds_array_push(vds_array_t<T, Size> * arr, T value)
 template <typename T, int Size>
 void vds_array_push_without_data(vds_array_t<T, Size> * arr)
 {
-	DEBUG_ENSURE_UINT_LT(push_idx, Size, "Attempted element push of full StaticArray");
+	DEBUG_ENSURE_UINT_LT(arr->push_idx, Size, "Attempted element push of full StaticArray");
 
 	++arr->push_idx;
 }
@@ -112,7 +112,7 @@ void vds_array_push_without_data(vds_array_t<T, Size> * arr)
 template <typename T, int Size>
 T vds_array_pop(vds_array_t<T, Size> * arr)
 {
-	DEBUG_ENSURE_UINT_GTE(push_idx, 1, "Attempted element pop of empty StaticArray.");
+	DEBUG_ENSURE_UINT_GTE(arr->push_idx, 1, "Attempted element pop of empty StaticArray.");
 
 	--arr->push_idx;
 	return arr->data[arr->push_idx];

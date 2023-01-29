@@ -83,11 +83,6 @@ int kickstart(int argc, char** argv)
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
 
-	using exd::World;
-	using exd::View;
-	using exd::Entity;
-	using exd::Component;
-
 	using vds::Allocator;
 
 	Allocator arena;
@@ -95,9 +90,9 @@ int kickstart(int argc, char** argv)
 	void * mem = static_cast<void *>(malloc(memsize));
 	arena.initialize(mem, memsize);
 
-	World * w = allocator_malloc(&arena, World, 1);
-	w->initialize(&arena);
-	w->comp_register(sizeof(struct Position), exd::ComponentTypeID::Position_e);
+	exd_world_t * w = allocator_malloc(&arena, exd_world_t, 1);
+	exd_world_initialize(w, &arena);
+	exd_world_comp_register(w, sizeof(struct Position), exd::ComponentTypeID::Position_e);
 
 
 	using Varia::Elapsed;
@@ -107,11 +102,22 @@ int kickstart(int argc, char** argv)
 	e.begin_and_log("Ent create and set");
 	for_range(80000)
 	{
-		Entity ent = w->ent_create();
-		w->comp_set(ent, exd::ComponentTypeID::Position_e);
+		exd_entity_t ent = exd_world_ent_create(w);
+		exd_world_comp_set(w, ent, exd::ComponentTypeID::Position_e);
 	}
 	e.end_and_log();
 
+
+	exd_view_t v = exd_world_create_view(w);
+	exd_view_include(&v, exd::ComponentTypeID::Position_e);
+	exd_view_compile(&v);
+
+	exd_view_iterate_backwards_single<Position>(&v, [](Position * pos)
+	{
+		VARIA_QLOG("Hello.");
+	});
+
+	VARIA_QLOG("Complete");
 
 
 	kinc_start();
