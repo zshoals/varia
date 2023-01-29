@@ -4,57 +4,81 @@
 
 #include "varia/validation.hpp"
 
-void exd::View::initialize(World * w)
+
+
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+//||               Static Utility Func                                   ||
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+
+
+static inline exd_component_t * exd_view_unitlocal_component_select(exd_view_t * view, exd::ComponentTypeID type)
 {
-	this->comp_include.initialize();
-	this->comp_exclude.initialize();
-	this->comp_type_indices.initialize();
-	this->shortest_dataset = nullptr;
-	this->world_reference = w;
-	this->finalized = false;
+	return &view->world_reference->components[ComponentTypeID_to_raw(type)];
 }
 
-void exd::View::include(ComponentTypeID type)
-{
-	if (finalized) ENSURE_UNREACHABLE("This view has already been finalized!");
 
-	Component * comp = &this->world_reference->components[ComponentTypeID_to_raw(type)];
-	comp_include.push(comp);
-	comp_type_indices.push(comp->UUID);
+
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+//||              View Core API                                          ||
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+
+void exd_view_initialize(exd_view_t * self, exd_world_t * w)
+{
+	vds_array_initialize(&self->comp_include);
+	vds_array_initialize(&self->comp_exclude);
+	vds_array_initialize(&self->comp_type_indices);
+	self->shortest_dataset = nullptr;
+	self->world_reference = w;
+	self->finalized = false;
 }
 
-void exd::View::exclude(ComponentTypeID type)
+void exd_view_include(exd_view_t * self, exd::ComponentTypeID type)
 {
-	if (finalized) ENSURE_UNREACHABLE("This view has already been finalized!");
-	Component * comp = &this->world_reference->components[ComponentTypeID_to_raw(type)];
-	comp_exclude.push(comp);
+	if (self->finalized) ENSURE_UNREACHABLE("This view has already been finalized!");
+
+	exd_component_t * comp = exd_view_unitlocal_component_select(self, type);
+	vds_array_push(&self->comp_include, comp);
+	vds_array_push(&self->comp_type_indices, comp->UUID);
 }
 
-void exd::View::compile(void)
+void exd_view_exclude(exd_view_t * self, exd::ComponentTypeID type)
 {
-	finalized = true;
+	if (self->finalized) ENSURE_UNREACHABLE("This view has already been finalized!");
+	exd_component_t * comp = exd_view_unitlocal_component_select(self, type);
+	vds_array_push(&self->comp_exclude, comp);
+}
 
-	ENSURE_UINT_GT_ZERO(comp_include.length(), "This view did not include any components.");
+void exd_view_compile(exd_view_t * self)
+{
+	self->finalized = true;
+
+	ENSURE_UINT_GT_ZERO(vds_array_length(&self->comp_include), "This view did not include any components.");
 	//Note(zshoals Dec-27-2022):> Not having any exclusions is alright however
 
-	shortest_dataset = *comp_include.get_mut(0);
+	self->shortest_dataset = *(vds_array_get_mut(&self->comp_include, 0));
 
 	size_t to_remove = 0;
-	for_range_var(i, comp_include.length())
+	for_range_var(i, vds_array_length(&self->comp_include))
 	{
-		Component * comp = *comp_include.get_mut(i);
-		if (comp->active_entities <= shortest_dataset->active_entities)
+		exd_component_t * comp = *(vds_array_get_mut(&self->comp_include, i));
+		if (comp->active_entities <= self->shortest_dataset->active_entities)
 		{
-			shortest_dataset = comp;
+			self->shortest_dataset = comp;
 			to_remove = i;
 		}
 	}
 
-	for_range_var(i, comp_type_indices.length())
+	//Note(zshoals 01-29-2023):> Verify that we haven't got one component that is both included and excluded at the same time
+	//that would almost certainly be an error
+	for_range_var(i, vds_array_length(&self->comp_type_indices))
 	{
-		ComponentTypeID id = *comp_type_indices.get(i);
+		exd::ComponentTypeID id = *(vds_array_get(&self->comp_type_indices, i));
 
-		for (Component * const & comp : comp_exclude)
+		for (exd_component_t * const & comp : self->comp_exclude)
 		{
 			if (comp->UUID == id)
 			{
@@ -65,25 +89,25 @@ void exd::View::compile(void)
 
 	//The shortest dataset already has all the entities that we're interested in
 	//so we remove this component array from our validity checks for speed
-	comp_include.swap_and_pop(to_remove);
+	vds_array_swap_and_pop(&self->comp_include, to_remove);
 }
 
 
 
 
 
-exd::Entity exd::View::ent_create(void)
+exd_entity_t exd_view_ent_create(exd_view_t * self)
 {
-	return this->world_reference->ent_create();
+	return exd_world_ent_create(self->world_reference);
 }
 
-bool exd::View::ent_kill(exd::Entity ent)
+bool exd_view_ent_kill(exd_view_t * self, exd_entity_t ent)
 {
-	return this->world_reference->ent_kill(ent);
+	return exd_world_ent_kill(self->world_reference, ent);
 }
 
 
-void const * exd::View::comp_get(Entity ent, ComponentTypeID type)
+void const * exd_view_comp_get(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
 {
 	//Note(zshoals Dec-28-2022):> We can go faster by adding a field idx that
 	//directly selects the component in the view. We then grab the index_of the
@@ -93,40 +117,40 @@ void const * exd::View::comp_get(Entity ent, ComponentTypeID type)
 	//compared to this version of comp_get
 	//However, a lot more complicated and finnicky
 
-	vds::SearchResult<ComponentTypeID> res = comp_type_indices.find_get(&type);
+	vds::SearchResult<exd::ComponentTypeID> res = vds_array_find_get(&self->comp_type_indices, &type);
 	DEBUG_ENSURE_TRUE(res.was_found, "Tried to access a non-existent component in a view.");
 	
 	if (res.was_found)
 	{
-		Component * comp = *comp_include.get_unsafe(*res.value);
-		return comp->get_untyped_unchecked(ent);
+		exd_component_t * comp = *(vds_array_get_unsafe(&self->comp_include, *res.value));
+		return exd_component_get_untyped_unchecked(comp, ent);
 	}
 
 	return nullptr;
 }
 
-void * exd::View::comp_get_mutable(Entity ent, ComponentTypeID type)
+void * exd_view_comp_get_mutable(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
 {
-	vds::SearchResult<ComponentTypeID> res = comp_type_indices.find_get(&type);
+	vds::SearchResult<exd::ComponentTypeID> res = vds_array_find_get(&self->comp_type_indices, &type);
 	DEBUG_ENSURE_TRUE(res.was_found, "Tried to access a non-existent component in a view.");
 	
 	if (res.was_found)
 	{
-		Component * comp = *comp_include.get_unsafe(*res.value);
-		return comp->get_untyped_mutable_unchecked(ent);
+		exd_component_t * comp = *(vds_array_get_unsafe(&self->comp_include, *res.value));
+		return exd_component_get_untyped_mutable_unchecked(comp, ent);
 	}
 
 	return nullptr;
 }
 
-void * exd::View::comp_set(Entity ent, ComponentTypeID type)
+void * exd_view_comp_set(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
 {
-	return this->world_reference->comp_set(ent, type);
+	return exd_world_comp_set(self->world_reference, ent, type);
 }
 
-bool exd::View::comp_remove(Entity ent, ComponentTypeID type)
+bool exd_view_comp_remove(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
 {
-	return this->world_reference->comp_remove(ent, type);
+	return exd_world_comp_remove(self->world_reference, ent, type);
 }
 
 
@@ -139,22 +163,24 @@ bool exd::View::comp_remove(Entity ent, ComponentTypeID type)
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 
 
-bool exd::View::internal_target_matches_query(Entity ent)
+//TODO(zshoals 01-29-2023):> We don't currently have iterators on our new vds implementation
+//ffs
+bool exd_view_internal_target_matches_query(exd_view_t * self, exd_entity_t ent)
 {
 
 	//If the entity DOES NOT HAVE an inclusion target, no match
-	for (Component * const & comp : comp_include)
+	for (exd_component_t * const & included_comp : self->comp_include)
 	{
-		if (!comp->has(ent))
+		if (!exd_component_has(included_comp, ent))
 		{
 			return false;
 		}
 	}
 
 	//If the entity HAS an exclusion target, no match
-	for (Component * const & comp : comp_exclude)
+	for (exd_component_t * const & excluded_comp : self->comp_exclude)
 	{
-		if (comp->has(ent))
+		if (!exd_component_has(excluded_comp, ent))
 		{
 			return false;
 		}
