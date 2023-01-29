@@ -18,6 +18,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+void printdemo(int * val)
+{
+	//do something
+}
+
 int kickstart(int argc, char** argv) 
 {
 	//=======RUN ALL TESTS======
@@ -108,9 +113,8 @@ int kickstart(int argc, char** argv)
 	e.end_and_log();
 
 
+
 	kinc_start();
 
 	return 0;
 }
-
-
