@@ -9,14 +9,35 @@
 
 
 
+//VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+//        Iterator
+//VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
 
-
-
+//VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+//        End Iterator
+//VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
 template <typename T, int Size>
 struct vds_array_t
 {
 	T data[Size];
 	size_t push_idx;
+
+	struct vds_iterators_array_iter
+	{
+		private: 
+			T * ptr;
+
+		public: 
+			vds_iterators_array_iter(T * ptr) { this->ptr = ptr; }
+			vds_iterators_array_iter operator++() { ++this->ptr; return *this; }
+			bool operator!=(vds_iterators_array_iter const & other) const { return this->ptr != other.ptr; }
+			T & operator*() const { return *this->ptr; }
+			// T & operator*() { return *this->ptr; }
+
+	};
+
+	vds_iterators_array_iter begin(void) /*const*/ { return vds_iterators_array_iter( &this->data[0] ); }
+	vds_iterators_array_iter end(void) /*const*/ { return vds_iterators_array_iter( &this->data[this->push_idx] ); }
 };
 
 
