@@ -8,14 +8,33 @@
 #include "varia/logging.hpp"
 #include "varia/util/Memory.hpp"
 
-// exd::World::World(vds::Allocator * allocator) : allocator{allocator}
-// {
-// 	for_range_var(i, Constants::exd_max_entities)
-// 	{
-// 		manifest.get_mut(i)->id = i;
-// 		freelist.push(Constants::exd_max_entities - i - 1);
-// 	}
-// }
+
+//============
+//Init Convenience
+//============
+
+static inline void exd_world_unitlocal_manifest_init(exd_world_t * world)
+{
+	vds_array_initialize(&world->manifest);
+	for_range_var(i, exd::Constants::exd_max_entities)
+	{
+		vds_array_get_mut(&world->manifest, i)->id = i;
+	}
+}
+
+static inline void exd_world_unitlocal_freelist_init(exd_world_t * world)
+{
+	vds_array_initialize(&world->freelist);
+	for_range_var(i, exd::Constants::exd_max_entities)
+	{
+		vds_array_push(&world->freelist, exd::Constants::exd_max_entities - i - 1);
+	}
+}
+
+
+//============
+//Utility
+//============
 
 static inline exd_component_t * exd_world_unitlocal_component_select(exd_world_t * world, exd::ComponentTypeID type)
 {
@@ -32,28 +51,53 @@ static inline exd_entity_t * exd_world_unitlocal_manifest_get_modern_entity_refe
 	return vds_array_get_mut_unsafe(&world->manifest, exd_entity_id_extract(ent));
 }
 
+static inline bool exd_world_unitlocal_entity_is_up_to_date(exd_world_t * world, exd_entity_t ent)
+{
+	exd_entity_t modern_revision = exd_world_unitlocal_manifest_get_modern_entity_copy(world, ent);
+	return exd_entity_matches(ent, modern_revision);
+}
+
+
+//=============
+//Freelist manipulation
+//=============
+
+static inline void exd_world_unitlocal_freelist_entity_release(exd_world_t * world, u64 ent_id)
+{
+	vds_array_push(&world->freelist, ent_id);
+}
+
+static inline u64 exd_world_unitlocal_freelist_entity_acquire(exd_world_t * world)
+{
+	return vds_array_pop(&world->freelist);
+}
+
+static inline bool exd_world_unitlocal_freelist_is_empty(exd_world_t * world)
+{
+	return vds_array_is_empty(&world->freelist);
+}
+
+
+//===========
+//Core World API
+//===========
+
 void exd_world_initialize(exd_world_t * world, vds::Allocator * allocator)
 {
 	world->allocator = allocator;
+	world->active_entities = 0;
 
-	vds_array_initialize(&world->manifest);
-	vds_array_initialize(&world->freelist);
+	exd_world_unitlocal_manifest_init(world);
+	exd_world_unitlocal_freelist_init(world);
 
 	//Note(zshoals Dec-26-2022):> Components are registered on demand, so just zero 
 	//to start with but do not actually register components
 	VARIA_ZERO_INIT_SIZE(&world->components[0], sizeof(world->components));
-	world->active_entities = 0;
-
-	for_range_var(i, exd::Constants::exd_max_entities)
-	{
-		vds_array_get_mut(&world->manifest, i)->id = i;
-		vds_array_push(&world->freelist, exd::Constants::exd_max_entities - i - 1);
-	}
 }
 
 exd_entity_t exd_world_ent_create(exd_world_t * world)
 {
-	if (vds_array_is_empty(&world->freelist))
+	if (exd_world_unitlocal_freelist_is_empty(world))
 	{
 		ENSURE_UNREACHABLE("Exhausted all available entities.");
 	}
@@ -62,7 +106,7 @@ exd_entity_t exd_world_ent_create(exd_world_t * world)
 
 	//TODO(zshoals 01-28-2023):> Why are we using ent_id here instead of an exd_entity_t? Why does the freelist not use
 	//entities?
-	u64 ent_id = vds_array_pop(&world->freelist);
+	u64 ent_id = exd_world_unitlocal_freelist_entity_acquire(world);
 	return *( vds_array_get(&world->manifest, ent_id) );
 }
 
@@ -71,11 +115,13 @@ bool exd_world_ent_kill(exd_world_t * world, exd_entity_t ent)
 	u64 ent_id = exd_entity_id_extract(ent);
 	exd_entity_t * target_ent = exd_world_unitlocal_manifest_get_modern_entity_reference(world, ent);
 
-	if (exd_entity_matches(ent, *target_ent))
+	//Note(zshoals 01-29-2023):> This if condition might be slower than just doing a direct check on 
+	//ent and target_ent, as we access the same memory twice. 
+	if (exd_world_unitlocal_entity_is_up_to_date(world, ent))
 	{
 		--(world->active_entities);
 
-		vds_array_push(&world->freelist, ent_id);
+		exd_world_unitlocal_freelist_entity_release(world, ent_id);
 		exd_entity_generation_increment(target_ent);
 
 		exd_internal_world_ent_remove_from_components(world, ent);
@@ -91,8 +137,7 @@ bool exd_world_ent_kill(exd_world_t * world, exd_entity_t ent)
 
 bool exd_world_ent_valid(exd_world_t * world, exd_entity_t ent)
 {
-	exd_entity_t manifest_entity_revision = exd_world_unitlocal_manifest_get_modern_entity_copy(world, ent);
-	return exd_entity_matches(ent, manifest_entity_revision);
+	return exd_world_unitlocal_entity_is_up_to_date(world, ent);
 }
 
 //TODO(zshoals 01-01-2023):> Check for double registration? 
@@ -145,14 +190,11 @@ void * exd_world_comp_set(exd_world_t * world, exd_entity_t ent, exd::ComponentT
 
 bool exd_world_comp_remove(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type)
 {
-	u64 ent_id = exd_entity_id_extract(ent);
-	exd_entity_t * target_ent = exd_world_unitlocal_manifest_get_modern_entity_reference(world, ent);
-
 	//Note(zshoals 01-01-2023):> This might be duplicated work
 	//We kind of already check for entity validity in the component as well, but I think it's better off
 	//checked here. Is the redundant check in component->entity_remove necessary? not sure
 	//might not be possible for the component to go out of sync with the world's entities
-	if (exd_entity_matches(ent, *target_ent))
+	if (exd_world_unitlocal_entity_is_up_to_date(world, ent))
 	{
 		exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
 		exd_component_entity_remove(comp, ent);
