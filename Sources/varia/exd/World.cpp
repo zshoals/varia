@@ -107,6 +107,8 @@ exd_entity_t exd_world_ent_create(exd_world_t * world)
 	//TODO(zshoals 01-28-2023):> Why are we using ent_id here instead of an exd_entity_t? Why does the freelist not use
 	//entities?
 	u64 ent_id = exd_world_unitlocal_freelist_entity_acquire(world);
+	//Note(zshoals 01-29-2023):> One off corner case; usually we need an exd_entity_t but we
+	//don't have one here. Indicative of flawed API design with freelist?
 	return *( vds_array_get(&world->manifest, ent_id) );
 }
 
@@ -175,7 +177,7 @@ void * exd_world_comp_get_mutable(exd_world_t * world, exd_entity_t ent, exd::Co
 void * exd_world_comp_set(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type)
 {
 	exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
-	if (exd_world_ent_valid(world, ent))
+	if (exd_world_unitlocal_entity_is_up_to_date(world, ent))
 	{
 		//TODO(zshoals 01-07-2023):> We can add the component to the entity's entset here
 		//we've modified entity_add to return true on a successful addition of that component
