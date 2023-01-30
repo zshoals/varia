@@ -96,18 +96,18 @@ void exd_view_compile(exd_view_t * self)
 
 
 
-exd_entity_t exd_view_ent_create(exd_view_t * self)
+exd_entity_t exd_view_create_ent(exd_view_t * self)
 {
 	return exd_world_ent_create(self->world_reference);
 }
 
-bool exd_view_ent_kill(exd_view_t * self, exd_entity_t ent)
+bool exd_view_kill_ent(exd_view_t * self, exd_entity_t ent)
 {
 	return exd_world_ent_kill(self->world_reference, ent);
 }
 
 
-void const * exd_view_comp_get(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
+void const * exd_view_get_comp(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
 {
 	//Note(zshoals Dec-28-2022):> We can go faster by adding a field idx that
 	//directly selects the component in the view. We then grab the index_of the
@@ -129,7 +129,7 @@ void const * exd_view_comp_get(exd_view_t * self, exd_entity_t ent, exd::Compone
 	return nullptr;
 }
 
-void * exd_view_comp_get_mutable(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
+void * exd_view_get_comp_mutable(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
 {
 	vds::SearchResult<exd::ComponentTypeID> res = vds_array_find_get(&self->comp_type_indices, &type);
 	DEBUG_ENSURE_TRUE(res.was_found, "Tried to access a non-existent component in a view.");
@@ -143,48 +143,13 @@ void * exd_view_comp_get_mutable(exd_view_t * self, exd_entity_t ent, exd::Compo
 	return nullptr;
 }
 
-void * exd_view_comp_set(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
+void * exd_view_set_comp(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
 {
 	return exd_world_comp_set(self->world_reference, ent, type);
 }
 
-bool exd_view_comp_remove(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
+bool exd_view_remove_comp(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
 {
 	return exd_world_comp_remove(self->world_reference, ent, type);
 }
 
-
-
-
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-//||                      Internal usage only                            ||
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-
-
-//TODO(zshoals 01-29-2023):> We don't currently have iterators on our new vds implementation
-//ffs
-bool exd_view_internal_entity_matches_query_requirements(exd_view_t * self, exd_entity_t ent)
-{
-
-	//If the entity DOES NOT HAVE an inclusion target, no match
-	for (exd_component_t * const & included_comp : self->comp_include)
-	{
-		if (!exd_component_has(included_comp, ent))
-		{
-			return false;
-		}
-	}
-
-	//If the entity HAS an exclusion target, no match
-	for (exd_component_t * const & excluded_comp : self->comp_exclude)
-	{
-		if (!exd_component_has(excluded_comp, ent))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}

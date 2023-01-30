@@ -30,17 +30,40 @@ void exd_view_include(exd_view_t * self, exd::ComponentTypeID type);
 void exd_view_exclude(exd_view_t * self, exd::ComponentTypeID type);
 void exd_view_compile(exd_view_t * self);
 
-exd_entity_t exd_view_ent_create(exd_view_t * self);
-bool exd_view_ent_kill(exd_view_t * self, exd_entity_t ent);
+exd_entity_t exd_view_create_ent(exd_view_t * self);
+bool exd_view_kill_ent(exd_view_t * self, exd_entity_t ent);
 
-void const * exd_view_comp_get(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type);
-void * exd_view_comp_get_mutable(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type);
-void * exd_view_comp_set(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type);
-bool exd_view_comp_remove(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type);
+void const * exd_view_get_comp(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type);
+void * exd_view_get_comp_mutable(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type);
+void * exd_view_set_comp(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type);
+bool exd_view_remove_comp(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type);
 
-//TODO(zshoals 01-28-2023):> This should probably have its implementation in the header
-//This is a high performance segment, we should try and inline it
-bool exd_view_internal_entity_matches_query_requirements(exd_view_t * self, exd_entity_t ent);
+
+//Note(zshoals 01-30-2023):> This function is likely a hotspot so it's been moved to the header
+//for performance reasons (we're hoping for inlining here)
+inline bool exd_view_internal_entity_matches_query_requirements(exd_view_t * self, exd_entity_t ent)
+{
+
+	//If the entity DOES NOT HAVE an inclusion target, no match
+	for (exd_component_t * const & included_comp : self->comp_include)
+	{
+		if (!exd_component_has(included_comp, ent))
+		{
+			return false;
+		}
+	}
+
+	//If the entity HAS an exclusion target, no match
+	for (exd_component_t * const & excluded_comp : self->comp_exclude)
+	{
+		if (!exd_component_has(excluded_comp, ent))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
 
 
 //||_____________________________________________________________________||
