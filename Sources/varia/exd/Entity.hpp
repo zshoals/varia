@@ -10,12 +10,8 @@ struct exd_entity_t
 	u64 id;
 };
 
-//TODO(zshoals 01-28-2023):> Uh oh...where were these used in the codebase?
-// Entity(u64 value) : id{value} {}
-// Entity() : id{0} {}
 
-
-
+exd_entity_t constexpr EXD_ENTITY_INVALID_ENTITY = {SIZE_MAX};
 
 
 //TODO(zshoals 01-28-2023):> Needs massive rework...requires pointers everywhere or return values
@@ -62,10 +58,4 @@ inline bool exd_entity_matches_or_exceeds(exd_entity_t a, exd_entity_t b)
 	bool idOK = ( exd_entity_extract_id(a) == exd_entity_extract_id(b) );
 
 	return (genOK && idOK);
-}
-
-//TODO(zshoals 01-28-2023):> Temporary invalid entity location to keep things working
-namespace exd
-{
-	static exd_entity_t const INVALID_ENTITY = {SIZE_MAX};
 }

@@ -19,7 +19,7 @@ void exd_component_initialize(exd_component_t * comp, void * mem, size_t element
 	comp->UUID = UUID;
 	comp->active_entities = 0;
 
-	vds_array_set_all(&comp->sparse_ents, exd::INVALID_ENTITY.id);
+	vds_array_set_all(&comp->sparse_ents, EXD_ENTITY_INVALID_ENTITY.id);
 
 	comp->memory_usage_in_bytes = (element_size * element_count) + sizeof(*comp);
 }
@@ -91,12 +91,14 @@ void exd_component_swap_and_pop_comp(exd_component_t * comp, size_t idx)
 	--comp->active_entities;
 }
 
+//TODO(zshoals 01-30-2023):> We can encode the actual entity into the sparse array
+//That way we don't have to check the dense array too
 bool exd_component_has(exd_component_t * comp, exd_entity_t ent)
 {
 	u64 id = exd_entity_extract_id(ent);
 	size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, id));
 
-	if (target_idx != exd::INVALID_ENTITY.id)
+	if (target_idx != EXD_ENTITY_INVALID_ENTITY.id)
 	{
 		exd_entity_t other = *(vds_array_get_unsafe(&comp->dense_ents, target_idx));
 		return exd_entity_matches(ent, other);
@@ -159,7 +161,7 @@ bool exd_component_add_entity(exd_component_t * comp, exd_entity_t ent)
 	//NOTE(zshoals Dec-27-2022):> Fixed in world comp_set???? maybe??? 
 	u64 id = exd_entity_extract_id(ent);
 
-	if ( *(vds_array_get_unsafe(&comp->sparse_ents, id)) != exd::INVALID_ENTITY.id)
+	if ( *(vds_array_get_unsafe(&comp->sparse_ents, id)) != EXD_ENTITY_INVALID_ENTITY.id)
 	{
 		VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to add an entity into this component, but it already exists. ID (no generation): %zu", id);
 		return false;
@@ -167,8 +169,6 @@ bool exd_component_add_entity(exd_component_t * comp, exd_entity_t ent)
 
 	vds_array_push(&comp->dense_ents, ent);
 
-	//TODO(zshoals 01-28-2023):> These two lines are not resolved yet as exd_entity_t is not defined properly yet
-	// sparse_ents.set_unsafe(id, dense_ents.back());
 	vds_array_set_unsafe(&comp->sparse_ents, id, vds_array_back(&comp->dense_ents));
 	exd_component_push_comp_without_data(comp);
 
@@ -186,7 +186,7 @@ bool exd_component_remove_entity(exd_component_t * comp, exd_entity_t ent)
 	u64 id = exd_entity_extract_id(ent);
 
 	size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, id));
-	if (target_idx == exd::INVALID_ENTITY.id) 
+	if (target_idx == EXD_ENTITY_INVALID_ENTITY.id) 
 	{
 		// VARIA_LOG(LOG_WARNING | LOG_ECS, "Tried to remove an entity that doesn't exist in this component. ID (no generation): %zu", ent.id_extract());
 		return false;
@@ -206,7 +206,7 @@ bool exd_component_remove_entity(exd_component_t * comp, exd_entity_t ent)
 		//in the array, reciprocal and ent id resolve to the same thing. So set INVALID_ENTITY.id
 		//second
 		vds_array_set_unsafe(&comp->sparse_ents, exd_entity_extract_id(reciprocal), target_idx);
-		vds_array_set_unsafe(&comp->sparse_ents, exd_entity_extract_id(ent), exd::INVALID_ENTITY.id);
+		vds_array_set_unsafe(&comp->sparse_ents, exd_entity_extract_id(ent), EXD_ENTITY_INVALID_ENTITY.id);
 
 		return true;
 	}
