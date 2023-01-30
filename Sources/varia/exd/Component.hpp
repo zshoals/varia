@@ -7,8 +7,8 @@
 
 struct exd_component_t
 {
-	vds_array_t<size_t, exd::Constants::exd_max_entities> sparse_ents;
-	vds_array_t<exd_entity_t, exd::Constants::exd_max_entities> dense_ents;
+	vds_array_t<size_t, EXD_CONSTANTS_MAX_ENTITIES> sparse_ents;
+	vds_array_t<exd_entity_t, EXD_CONSTANTS_MAX_ENTITIES> dense_ents;
 	void * data;
 
 	size_t element_count;

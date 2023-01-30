@@ -16,7 +16,7 @@
 static inline void exd_world_unitlocal_manifest_init(exd_world_t * world)
 {
 	vds_array_initialize(&world->manifest);
-	for_range_var(i, exd::Constants::exd_max_entities)
+	for_range_var(i, EXD_CONSTANTS_MAX_ENTITIES)
 	{
 		vds_array_get_mut(&world->manifest, i)->id = i;
 	}
@@ -25,9 +25,9 @@ static inline void exd_world_unitlocal_manifest_init(exd_world_t * world)
 static inline void exd_world_unitlocal_freelist_init(exd_world_t * world)
 {
 	vds_array_initialize(&world->freelist);
-	for_range_var(i, exd::Constants::exd_max_entities)
+	for_range_var(i, EXD_CONSTANTS_MAX_ENTITIES)
 	{
-		vds_array_push(&world->freelist, exd::Constants::exd_max_entities - i - 1);
+		vds_array_push(&world->freelist, EXD_CONSTANTS_MAX_ENTITIES - i - 1);
 	}
 }
 
@@ -145,13 +145,13 @@ bool exd_world_ent_valid(exd_world_t * world, exd_entity_t ent)
 //TODO(zshoals 01-01-2023):> Check for double registration? 
 void exd_world_comp_register(exd_world_t * world, size_t element_size, exd::ComponentTypeID type)
 {
-	void * storage_mem = world->allocator->allocate_aligned_count(element_size, exd::Constants::exd_max_entities, Varia::Memory::default_alignment);
+	void * storage_mem = world->allocator->allocate_aligned_count(element_size, EXD_CONSTANTS_MAX_ENTITIES, Varia::Memory::default_alignment);
 
 	//TODO(zshoals 01-28-2023):> Verify if this code is the same as the replacement in practice
 	// size_t idx = ComponentTypeID_to_raw(type);
 	// exd_component_t * comp = &world->components[idx];
 	exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
-	exd_component_initialize(comp, storage_mem, element_size, exd::Constants::exd_max_entities, type);
+	exd_component_initialize(comp, storage_mem, element_size, EXD_CONSTANTS_MAX_ENTITIES, type);
 }
 
 void const * exd_world_comp_get(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type)

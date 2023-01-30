@@ -25,7 +25,7 @@ inline void exd_entity_generation_increment(exd_entity_t * ent)
 	//TODO(zshoals 01-28-2023):> God damnit, bits need reworked too :/
 	vds::Bits64 bitmode = {};
 	bitmode.storage = ent->id;
-	bitmode.increment_upper(exd::Constants::exd_id_shift);
+	bitmode.increment_upper(EXD_CONSTANTS_ID_SHIFT);
 	ent->id = bitmode.storage;
 }
 
@@ -33,7 +33,7 @@ inline u64 exd_entity_generation_extract(exd_entity_t ent)
 {
 	vds::Bits64 bitmode = {};
 	bitmode.storage = ent.id;
-	bitmode.rotate_right(exd::Constants::exd_id_shift);
+	bitmode.rotate_right(EXD_CONSTANTS_ID_SHIFT);
 
 	return bitmode.storage;
 }
@@ -44,7 +44,7 @@ inline u64 exd_entity_id_extract(exd_entity_t ent)
 	bitmode.storage = ent.id;
 
 	vds::Bits64 lo_mask = {};
-	lo_mask.generate_bitmask_lo(exd::Constants::exd_id_shift);
+	lo_mask.generate_bitmask_lo(EXD_CONSTANTS_ID_SHIFT);
 
 	bitmode.mask_allow(lo_mask);
 
