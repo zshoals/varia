@@ -53,9 +53,6 @@ void vds_array_initialize(vds_array_t<T, Size> * arr)
 	VARIA_ZERO_INIT(arr);
 }
 
-//TODO(zshoals): Figure out what const after the function parameters means, this doesn't with them present however
-//examples seem to use the const version without any issues
-
 template <typename T, int Size>
 size_t vds_array_front(vds_array_t<T, Size> * arr)
 {
