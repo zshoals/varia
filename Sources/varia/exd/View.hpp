@@ -40,7 +40,7 @@ bool exd_view_comp_remove(exd_view_t * self, exd_entity_t ent, exd::ComponentTyp
 
 //TODO(zshoals 01-28-2023):> This should probably have its implementation in the header
 //This is a high performance segment, we should try and inline it
-bool exd_view_internal_target_matches_query(exd_view_t * self, exd_entity_t ent);
+bool exd_view_internal_entity_matches_query_requirements(exd_view_t * self, exd_entity_t ent);
 
 
 //||_____________________________________________________________________||
@@ -112,7 +112,7 @@ void exd_view_iterate_forwards(exd_view_t * self, FUNC cb)
 	{
 		// exd_entity_t e = *self->shortest_dataset->dense_ents.get_unsafe(i);
 		exd_entity_t e = *(vds_array_get_unsafe(self->shortest_dataset, i));
-		if (exd_view_internal_target_matches_query(self, e))
+		if (exd_view_internal_entity_matches_query_requirements(self, e))
 		{
 			cb(self, e);
 		}
@@ -171,7 +171,7 @@ void exd_view_iterate_backwards(exd_view_t * self, FUNC cb)
 	{
 		exd_entity_t e = *self->shortest_dataset->dense_ents.get_unsafe(i);
 		exd_entity_t e = *(vds_get_unsafe(&self->shortest_dataset->dense_ents, i));
-		if (exd_view_internal_target_matches_query(self, e))
+		if (exd_view_internal_entity_matches_query_requirements(self, e))
 		{
 			cb(self, e);
 		}

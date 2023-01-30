@@ -165,7 +165,7 @@ bool exd_view_comp_remove(exd_view_t * self, exd_entity_t ent, exd::ComponentTyp
 
 //TODO(zshoals 01-29-2023):> We don't currently have iterators on our new vds implementation
 //ffs
-bool exd_view_internal_target_matches_query(exd_view_t * self, exd_entity_t ent)
+bool exd_view_internal_entity_matches_query_requirements(exd_view_t * self, exd_entity_t ent)
 {
 
 	//If the entity DOES NOT HAVE an inclusion target, no match
