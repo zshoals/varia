@@ -20,7 +20,7 @@ struct exd_entity_t
 
 //TODO(zshoals 01-28-2023):> Needs massive rework...requires pointers everywhere or return values
 //TODO(zshoals 01-28-2023):> Rename all "this" equivalent parameters to "self"
-inline void exd_entity_generation_increment(exd_entity_t * ent)
+inline void exd_entity_increment_generation(exd_entity_t * ent)
 {
 	//TODO(zshoals 01-28-2023):> God damnit, bits need reworked too :/
 	vds::Bits64 bitmode = {};
@@ -29,7 +29,7 @@ inline void exd_entity_generation_increment(exd_entity_t * ent)
 	ent->id = bitmode.storage;
 }
 
-inline u64 exd_entity_generation_extract(exd_entity_t ent)
+inline u64 exd_entity_extract_generation(exd_entity_t ent)
 {
 	vds::Bits64 bitmode = {};
 	bitmode.storage = ent.id;
@@ -38,7 +38,7 @@ inline u64 exd_entity_generation_extract(exd_entity_t ent)
 	return bitmode.storage;
 }
 
-inline u64 exd_entity_id_extract(exd_entity_t ent)
+inline u64 exd_entity_extract_id(exd_entity_t ent)
 {
 	vds::Bits64 bitmode = {};
 	bitmode.storage = ent.id;
@@ -58,8 +58,8 @@ inline bool exd_entity_matches(exd_entity_t a, exd_entity_t b)
 
 inline bool exd_entity_matches_or_exceeds(exd_entity_t a, exd_entity_t b)
 {
-	bool genOK = ( exd_entity_generation_extract(a) >= exd_entity_generation_extract(b) );
-	bool idOK = ( exd_entity_id_extract(a) == exd_entity_id_extract(b) );
+	bool genOK = ( exd_entity_extract_generation(a) >= exd_entity_extract_generation(b) );
+	bool idOK = ( exd_entity_extract_id(a) == exd_entity_extract_id(b) );
 
 	return (genOK && idOK);
 }

@@ -43,12 +43,12 @@ static inline exd_component_t * exd_world_unitlocal_component_select(exd_world_t
 
 static inline exd_entity_t exd_world_unitlocal_manifest_get_modern_entity_copy(exd_world_t * world, exd_entity_t ent)
 {
-	return *(vds_array_get_unsafe(&world->manifest, exd_entity_id_extract(ent)));
+	return *(vds_array_get_unsafe(&world->manifest, exd_entity_extract_id(ent)));
 }
 
 static inline exd_entity_t * exd_world_unitlocal_manifest_get_modern_entity_reference(exd_world_t * world, exd_entity_t ent)
 {
-	return vds_array_get_mut_unsafe(&world->manifest, exd_entity_id_extract(ent));
+	return vds_array_get_mut_unsafe(&world->manifest, exd_entity_extract_id(ent));
 }
 
 static inline bool exd_world_unitlocal_entity_is_up_to_date(exd_world_t * world, exd_entity_t ent)
@@ -114,7 +114,7 @@ exd_entity_t exd_world_ent_create(exd_world_t * world)
 
 bool exd_world_ent_kill(exd_world_t * world, exd_entity_t ent)
 {
-	u64 ent_id = exd_entity_id_extract(ent);
+	u64 ent_id = exd_entity_extract_id(ent);
 	exd_entity_t * target_ent = exd_world_unitlocal_manifest_get_modern_entity_reference(world, ent);
 
 	//Note(zshoals 01-29-2023):> This if condition might be slower than just doing a direct check on 
@@ -124,7 +124,7 @@ bool exd_world_ent_kill(exd_world_t * world, exd_entity_t ent)
 		--(world->active_entities);
 
 		exd_world_unitlocal_freelist_entity_release(world, ent_id);
-		exd_entity_generation_increment(target_ent);
+		exd_entity_increment_generation(target_ent);
 
 		exd_internal_world_ent_remove_from_components(world, ent);
 
@@ -182,7 +182,7 @@ void * exd_world_comp_set(exd_world_t * world, exd_entity_t ent, exd::ComponentT
 		//TODO(zshoals 01-07-2023):> We can add the component to the entity's entset here
 		//we've modified entity_add to return true on a successful addition of that component
 		//WARNING: Failure on duplicate entity component addition?
-		bool was_added = exd_component_entity_add(comp, ent);
+		bool was_added = exd_component_add_entity(comp, ent);
 		return exd_component_get_untyped_mutable(comp, ent);
 	}
 
@@ -199,7 +199,7 @@ bool exd_world_comp_remove(exd_world_t * world, exd_entity_t ent, exd::Component
 	if (exd_world_unitlocal_entity_is_up_to_date(world, ent))
 	{
 		exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
-		exd_component_entity_remove(comp, ent);
+		exd_component_remove_entity(comp, ent);
 
 		return true;
 	}
@@ -227,7 +227,7 @@ void exd_internal_world_ent_remove_from_components(exd_world_t * world, exd_enti
 	// world->components[ComponentTypeID_to_raw(ComponentTypeID::VARIA_CONCAT(TYPE, _e))].entity_remove(ent);
 
 	#define EXD_COMPONENT_DATA(TYPE, FIELD_NAME)\
-	exd_component_entity_remove(&world->components[exd::ComponentTypeID_to_raw(exd::ComponentTypeID::VARIA_CONCAT(TYPE, _e))], ent);
+	exd_component_remove_entity(&world->components[exd::ComponentTypeID_to_raw(exd::ComponentTypeID::VARIA_CONCAT(TYPE, _e))], ent);
 
 	#include "ComponentData.def"
 }

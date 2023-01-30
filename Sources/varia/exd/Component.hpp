@@ -32,8 +32,8 @@ void const * exd_component_get_untyped_unchecked(exd_component_t * comp, exd_ent
 void * exd_component_get_untyped_mutable_unchecked(exd_component_t * comp, exd_entity_t ent);
 void const * exd_component_get_untyped_direct(exd_component_t * comp, size_t idx);
 void * exd_component_get_untyped_mutable_direct(exd_component_t * comp, size_t idx);
-bool exd_component_entity_add(exd_component_t * comp, exd_entity_t ent);
-bool exd_component_entity_remove(exd_component_t * comp, exd_entity_t ent);
+bool exd_component_add_entity(exd_component_t * comp, exd_entity_t ent);
+bool exd_component_remove_entity(exd_component_t * comp, exd_entity_t ent);
 bool exd_component_has(exd_component_t * comp, exd_entity_t ent);
 void exd_component_clear(exd_component_t * comp);
 

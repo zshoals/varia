@@ -31,7 +31,7 @@ size_t exd_component_length(exd_component_t * comp)
 
 void * exd_component_calc_element_address(exd_component_t * comp, exd_entity_t ent)
 {
-	u64 idx = exd_entity_id_extract(ent);
+	u64 idx = exd_entity_extract_id(ent);
 	u64 target_offset = idx * comp->per_element_size;
 
 	DEBUG_ENSURE_UINT_LT(target_offset, comp->element_count * comp->per_element_size, "Untyped component access overran buffer.");
@@ -76,14 +76,6 @@ void exd_component_push_comp_without_data(exd_component_t * comp)
 	++comp->active_entities;
 }
 
-
-
-//TODO(zshoals 01-27-2023):> FINISH ME
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-//||        WE ARE WORKING FROM HERE AND CONTINUING TOMORROW             ||
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 void exd_component_swap_and_pop_comp(exd_component_t * comp, size_t idx)
 {
 	DEBUG_ENSURE_INT_GT_ZERO(comp->active_entities, "Component array had no entities!");
@@ -101,7 +93,7 @@ void exd_component_swap_and_pop_comp(exd_component_t * comp, size_t idx)
 
 bool exd_component_has(exd_component_t * comp, exd_entity_t ent)
 {
-	u64 id = exd_entity_id_extract(ent);
+	u64 id = exd_entity_extract_id(ent);
 	size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, id));
 
 	if (target_idx != exd::INVALID_ENTITY.id)
@@ -117,7 +109,7 @@ void const * exd_component_get_untyped(exd_component_t * comp, exd_entity_t ent)
 {
 	if (exd_component_has(comp, ent))
 	{
-		size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, exd_entity_id_extract(ent)));
+		size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, exd_entity_extract_id(ent)));
 		return exd_component_calc_element_address_raw(comp, target_idx);
 	}
 	// ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
@@ -129,7 +121,7 @@ void * exd_component_get_untyped_mutable(exd_component_t * comp, exd_entity_t en
 {
 	if (exd_component_has(comp, ent))
 	{
-		size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, exd_entity_id_extract(ent)));
+		size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, exd_entity_extract_id(ent)));
 		return exd_component_calc_element_address_raw(comp, target_idx);
 	}
 	// ENSURE_UNREACHABLE("This might be an error...should trying to get an ent that doesn't exist crash?");
@@ -157,7 +149,7 @@ void * exd_component_get_untyped_mutable_direct(exd_component_t * comp, size_t i
 	return exd_component_calc_element_address_raw(comp, idx);
 }
 
-bool exd_component_entity_add(exd_component_t * comp, exd_entity_t ent)
+bool exd_component_add_entity(exd_component_t * comp, exd_entity_t ent)
 {
 
 	//TODO(zshoals Dec-27-2022):> There's a problem; if we try and add a STORED entity to a component
@@ -165,7 +157,7 @@ bool exd_component_entity_add(exd_component_t * comp, exd_entity_t ent)
 	//adding if the entity is the newest version according to the world manifest, I think
 	//Which means we need to mirror the generation on the sparse ent slot I believe
 	//NOTE(zshoals Dec-27-2022):> Fixed in world comp_set???? maybe??? 
-	u64 id = exd_entity_id_extract(ent);
+	u64 id = exd_entity_extract_id(ent);
 
 	if ( *(vds_array_get_unsafe(&comp->sparse_ents, id)) != exd::INVALID_ENTITY.id)
 	{
@@ -183,7 +175,7 @@ bool exd_component_entity_add(exd_component_t * comp, exd_entity_t ent)
 	return true;
 }
 
-bool exd_component_entity_remove(exd_component_t * comp, exd_entity_t ent)
+bool exd_component_remove_entity(exd_component_t * comp, exd_entity_t ent)
 {
 	if (comp->active_entities < 1)
 	{
@@ -191,7 +183,7 @@ bool exd_component_entity_remove(exd_component_t * comp, exd_entity_t ent)
 		return false;
 	}
 
-	u64 id = exd_entity_id_extract(ent);
+	u64 id = exd_entity_extract_id(ent);
 
 	size_t target_idx = *(vds_array_get_unsafe(&comp->sparse_ents, id));
 	if (target_idx == exd::INVALID_ENTITY.id) 
@@ -213,8 +205,8 @@ bool exd_component_entity_remove(exd_component_t * comp, exd_entity_t ent)
 		//Note(zshoals Dec-19-2022):> Order is important here, if the element is the final one
 		//in the array, reciprocal and ent id resolve to the same thing. So set INVALID_ENTITY.id
 		//second
-		vds_array_set_unsafe(&comp->sparse_ents, exd_entity_id_extract(reciprocal), target_idx);
-		vds_array_set_unsafe(&comp->sparse_ents, exd_entity_id_extract(ent), exd::INVALID_ENTITY.id);
+		vds_array_set_unsafe(&comp->sparse_ents, exd_entity_extract_id(reciprocal), target_idx);
+		vds_array_set_unsafe(&comp->sparse_ents, exd_entity_extract_id(ent), exd::INVALID_ENTITY.id);
 
 		return true;
 	}
