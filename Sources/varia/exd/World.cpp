@@ -147,9 +147,6 @@ void exd_world_comp_register(exd_world_t * world, size_t element_size, exd::Comp
 {
 	void * storage_mem = world->allocator->allocate_aligned_count(element_size, EXD_CONSTANTS_MAX_ENTITIES, Varia::Memory::default_alignment);
 
-	//TODO(zshoals 01-28-2023):> Verify if this code is the same as the replacement in practice
-	// size_t idx = ComponentTypeID_to_raw(type);
-	// exd_component_t * comp = &world->components[idx];
 	exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
 	exd_component_initialize(comp, storage_mem, element_size, EXD_CONSTANTS_MAX_ENTITIES, type);
 }
@@ -171,9 +168,6 @@ void * exd_world_comp_get_mutable(exd_world_t * world, exd_entity_t ent, exd::Co
 	// return world->components[ComponentTypeID_to_raw(type)].get_untyped_mutable(ent);
 }
 
-//TODO(zshoals 01-01-2023):> We aren't actually guaranteeing that this component exists before we set it
-//We need a validation step of some sort across the entire interface before we access a component,
-//at least for debugging where errors can happen easily
 void * exd_world_comp_set(exd_world_t * world, exd_entity_t ent, exd::ComponentTypeID type)
 {
 	exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
