@@ -52,14 +52,6 @@ bool exd_view_internal_entity_matches_query_requirements(exd_view_t * self, exd_
 //TODO(zshoals 01-03-2023):> For SIMD purposes we may want to make a 4step iteration
 //mechanism.
 
-
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-//||                TODO WE HAVE TO FIX ALL OF THIS                      ||
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-
-
 //Located in the header for (hopefully) inlining purposes
 template<typename T, typename FUNC>
 void exd_view_iterate_forwards_single(exd_view_t * self, FUNC cb)
@@ -72,6 +64,9 @@ void exd_view_iterate_forwards_single(exd_view_t * self, FUNC cb)
 	DEBUG_ENSURE_UINT_EQUALS(vds_array_length(&self->comp_exclude), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
 
 	exd_component_t * comp = self->shortest_dataset;
+
+	DEBUG_ENSURE_UINT_EQUALS(self->shortest_dataset->per_element_size, sizeof(T), "Created a view that is trying to use a type that is not equivalent to the target component array.");
+
 	const size_t len = exd_component_length(comp);
 	for_range_var(i, len)
 	{
@@ -91,6 +86,9 @@ void exd_view_iterate_forwards_single_with_entity(exd_view_t * self, FUNC cb)
 	DEBUG_ENSURE_UINT_EQUALS(vds_array_length(&self->comp_exclude), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
 
 	exd_component_t * comp = self->shortest_dataset;
+
+	DEBUG_ENSURE_UINT_EQUALS(self->shortest_dataset->per_element_size, sizeof(T), "Created a view that is trying to use a type that is not equivalent to the target component array.");
+
 	const size_t len = exd_component_length(comp);
 	for_range_var(i, len)
 	{
@@ -134,6 +132,8 @@ void exd_view_iterate_backwards_single(exd_view_t * self, FUNC cb)
 	DEBUG_ENSURE_UINT_EQUALS(vds_array_length(&self->comp_exclude), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
 
 	exd_component_t * comp = self->shortest_dataset;
+
+	DEBUG_ENSURE_UINT_EQUALS(self->shortest_dataset->per_element_size, sizeof(T), "Created a view that is trying to use a type that is not equivalent to the target component array.");
 	//Note(zshoals Dec-28-2022):> preload the length as we may remove elements while traversing backwards
 	//which would reduce the start value and cause untold havoc, probably
 	size_t const len = exd_component_length(comp);
@@ -151,6 +151,8 @@ void exd_view_iterate_backwards_single_with_entity(exd_view_t * self, FUNC cb)
 	DEBUG_ENSURE_UINT_EQUALS(vds_array_length(&self->comp_exclude), 0, "Tried to iterate a single element, however, exclusions were added (not allowed).");
 
 	exd_component_t * comp = self->shortest_dataset;
+
+	DEBUG_ENSURE_UINT_EQUALS(self->shortest_dataset->per_element_size, sizeof(T), "Created a view that is trying to use a type that is not equivalent to the target component array.");
 	//Note(zshoals Dec-28-2022):> preload the length as we may remove elements while traversing backwards
 	//which would reduce the start value and cause untold havoc, probably
 	size_t const len = component_length(comp);
@@ -169,7 +171,6 @@ void exd_view_iterate_backwards(exd_view_t * self, FUNC cb)
 	size_t const len = vds_array_length(&self->shortest_dataset->dense_ents);
 	for_reverse_range_var(i, len)
 	{
-		exd_entity_t e = *self->shortest_dataset->dense_ents.get_unsafe(i);
 		exd_entity_t e = *(vds_get_unsafe(&self->shortest_dataset->dense_ents, i));
 		if (exd_view_internal_entity_matches_query_requirements(self, e))
 		{
