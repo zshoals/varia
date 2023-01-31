@@ -15,18 +15,18 @@
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 
 
-constexpr static size_t vds_bitset32_unitlocal_ceil_next_nearest(size_t value, size_t target_multiple)
+constexpr static inline size_t vds_bitset32_unitlocal_ceil_next_nearest(size_t value, size_t target_multiple)
 {
 	bool round_up = (value % target_multiple == 0) ? false : true;
 	return (((target_multiple - (value % target_multiple)) * round_up) + value);
 }
 
-constexpr static size_t vds_bitset32_unitlocal_bit_width(void)
+constexpr static inline size_t vds_bitset32_unitlocal_bit_width(void)
 {
 	return 32;
 }
 
-constexpr static size_t vds_bitset32_unitlocal_true_size(size_t size)
+constexpr static inline size_t vds_bitset32_unitlocal_true_size(size_t size)
 {
 	size_t bitwidth = vds_bitset32_unitlocal_bit_width();
 	//Note(zshoals 01-31-2023):> No, the double bitwidth is not an error. Read it carefully.
