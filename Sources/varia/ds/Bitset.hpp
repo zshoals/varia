@@ -141,7 +141,7 @@ void vds_bitset32_set_all(vds_bitset32_t<Size> * self)
 template<int Size>
 void vds_bitset32_unset_all(vds_bitset32_t<Size> * self)
 {
-	for_range_var(i, Bitset32Util::true_size(Size))
+	for_range_var(i, vds_bitset32_unitlocal_true_size(Size))
 	{
 		self->data[i] = vds_bits32_unset_all(0);
 	}
