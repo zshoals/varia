@@ -4,62 +4,59 @@
 
 #include "varia/vcommon.hpp"
 
-namespace vds
-{
-
 template <typename T, int KeyRange, int ElementCount>
-struct StaticSparseSet
+struct vds_sparse_set_t
 {
 	static_assert(ElementCount <= KeyRange, "StaticSparseSet contains more elements than keys, making excess elements inaccessible.");
 
-	StaticArray<u32, KeyRange> sparse_keys;
-	StaticArray<u32, ElementCount> dense_keys;
-	StaticArray<T, ElementCount> data;
+	vds_array_t<u32, KeyRange> sparse_keys;
+	vds_array_t<u32, ElementCount> dense_keys;
+	vds_array_t<T, ElementCount> data;
 	u32 push_idx;
-
 
 	auto begin(void) { return data.begin(); }
 	auto end(void) { return data.end(); }
-
-	void initialize(void)
-	{
-		this->data.initialize();
-		this->dense_keys.initialize();
-
-		this->sparse_keys.initialize();
-		this->sparse_keys.set_all(UINT32_MAX);
-
-		this->push_idx = 0;
-	}
-
-	bool has(u32 key)
-	{
-		return (*sparse_keys.get(key) != UINT32_MAX);
-	}
-
-	void add(u32 key, T value)
-	{
-		if (has(key)) return;
-
-		dense_keys.push(key);
-		sparse_keys.set(key, this->push_idx);
-		++this->push_idx;
-		data.push(value);
-	}
-
-	void remove(u32 key)
-	{
-		if (!has(key)) return;
-
-		u32 idx_of_dense_ent = *sparse_keys.get(key);
-		sparse_keys.set(key, UINT32_MAX);
-
-		dense_keys.swap_and_pop(idx_of_dense_ent);
-		data.swap_and_pop(idx_of_dense_ent);
-
-		--this->push_idx;
-	}
-
 };
 
+template <typename T, int KeyRange, int ElementCount>
+void vds_sparse_set_initialize(vds_sparse_set_t<T, KeyRange, ElementCount> * self)
+{
+	vds_array_initialize(&self->data);
+	vds_array_initialize(&self->dense_keys);
+	vds_array_initialize(&self->sparse_keys);
+
+	vds_array_set_all(&self->sparse_keys, UINT32_MAX);
+
+	self->push_idx = 0;
+}
+
+template <typename T, int KeyRange, int ElementCount>
+bool vds_sparse_set_has(vds_sparse_set_t<T, KeyRange, ElementCount> * self, u32 key)
+{
+	return ( (*vds_array_get(&self->sparse_keys, key)) != UINT32_MAX );
+}
+
+template <typename T, int KeyRange, int ElementCount>
+void vds_sparse_set_add(vds_sparse_set_t<T, KeyRange, ElementCount> * self, u32 key, T value)
+{
+	if (vds_sparse_set_has(self, key)) return;
+
+	vds_array_push(&self->dense_keys, key);
+	vds_array_set(&self->sparse_keys, key, self->push_idx);
+	++self->push_idx;
+	vds_array_push(&self->data, value);
+}
+
+template <typename T, int KeyRange, int ElementCount>
+void vds_sparse_set_remove(vds_sparse_set_t<T, KeyRange, ElementCount> * self, u32 key)
+{
+	if (!vds_sparse_set_has(self, key)) return;
+
+	u32 idx_of_dense_ent = *vds_array_get(&self->sparse_keys, key);
+	vds_array_set(&self->sparse_keys, key, UINT32_MAX);
+
+	vds_array_swap_and_pop(&self->dense_keys, idx_of_dense_ent);
+	vds_array_swap_and_pop(&self->data, idx_of_dense_ent);
+
+	--self->push_idx;
 }

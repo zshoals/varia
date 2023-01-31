@@ -4,11 +4,8 @@
 #include "varia/validation.hpp"
 #include "kinc/log.h"
 
-namespace vds
-{
-
 template<typename T, int Size>
-struct StaticRingbuf
+struct vds_ringbuf_t
 {
 
 //VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
@@ -47,11 +44,6 @@ struct StaticRingbuf
 	// 	this->initialize();
 	// }
 
-	void initialize(void)
-	{
-		VARIA_ZERO_INIT(this);
-	}
-
 	StaticRingbufIterator begin(void)
 	{
 		return StaticRingbufIterator(&this->data[0], rear, count);
@@ -62,90 +54,108 @@ struct StaticRingbuf
 		//Note(zshoals): Only the count matters in this instance
 		return StaticRingbufIterator(&this->data[rear], rear, 0);
 	}
-
-	void push_back(T value)
-	{
-		size_t target_idx = (count + rear) % Size;
-		data[target_idx] = value;
-
-		DEBUG_ENSURE_UINT_LTE(count, Size, "Ringbuf design error; count exceeded Size, which shouldn't occur.");
-		bool overfilled = (count >= Size);
-		rear = (rear + overfilled) % Size;
-		count += overfilled ^ (1ULL << 0); //Invert overfilled;
-	}
-
-	T pop_back(void)
-	{
-		ENSURE_UINT_GTE(count, 1, "Attempted element removal of empty StaticRingbuf.");
-
-		--count;
-		size_t target_idx = (count + rear) % Size;
-		return data[target_idx];
-	}
-
-	T pop_back_unsafe(void)
-	{
-		DEBUG_ENSURE_UINT_GTE(count, 1, "Attempted element removal of empty StaticRingbuf.");
-
-		--count;
-		size_t target_idx = (count + rear) % Size;
-		return data[target_idx];
-	}
-
-	T pop_front(void)
-	{
-		ENSURE_UINT_GTE(count, 1, "Attempted element removal of empty StaticRingbuf.");
-
-		size_t target_idx = rear % Size;
-		--count;
-		++rear;
-
-		return data[target_idx];
-	}
-
-	T pop_front_unsafe(void)
-	{
-		DEBUG_ENSURE_UINT_GTE(count, 1, "Attempted element removal of empty StaticRingbuf.");
-
-		size_t target_idx = rear % Size;
-		--count;
-		++rear;
-
-		return data[target_idx];
-	}
-
-	void clear(void)
-	{
-		this->rear = 0;
-		this->count = 0;
-	}
-
-	bool is_populated(void)
-	{
-		return (count > 0);
-	}
-
-	bool is_empty(void)
-	{
-		return !is_populated();
-	}
-
-	bool is_full(void)
-	{
-		DEBUG_ENSURE_UINT_LTE(count, Size, "Ringbuf design error; count exceeded Size, which shouldn't occur.");
-		return (count >= Size);
-	}
-
-	bool is_almost_full(void)
-	{
-		return (count + 1 == Size);
-	}
-
-	bool is_not_full(void)
-	{
-		return !this->is_full();
-	}
-
 };
 
+
+
+
+
+template<typename T, int Size>
+void vds_ringbuf_initialize(vds_ringbuf_t<T, Size> * self)
+{
+	VARIA_ZERO_INIT(self);
+}
+
+template<typename T, int Size>
+void vds_ringbuf_push_back(vds_ringbuf_t<T, Size> * self, T value)
+{
+	size_t target_idx = (self->count + self->rear) % Size;
+	self->data[target_idx] = value;
+
+	DEBUG_ENSURE_UINT_LTE(self->count, Size, "Ringbuf design error; count exceeded Size, which shouldn't occur.");
+	bool overfilled = (self->count >= Size);
+	self->rear = (self->rear + overfilled) % Size;
+	self->count += overfilled ^ (1ULL << 0); //Invert overfilled;
+}
+
+template<typename T, int Size>
+T vds_ringbuf_pop_back(vds_ringbuf_t<T, Size> * self)
+{
+	ENSURE_UINT_GTE(self->count, 1, "Attempted element removal of empty StaticRingbuf.");
+
+	--self->count;
+	size_t target_idx = (self->count + self->rear) % Size;
+	return self->data[target_idx];
+}
+
+template<typename T, int Size>
+T vds_ringbuf_pop_back_unsafe(vds_ringbuf_t<T, Size> * self)
+{
+	DEBUG_ENSURE_UINT_GTE(self->count, 1, "Attempted element removal of empty StaticRingbuf.");
+
+	--self->count;
+	size_t target_idx = (self->count + self->rear) % Size;
+	return self->data[target_idx];
+}
+
+template<typename T, int Size>
+T vds_ringbuf_pop_front(vds_ringbuf_t<T, Size> * self)
+{
+	ENSURE_UINT_GTE(self->count, 1, "Attempted element removal of empty StaticRingbuf.");
+
+	size_t target_idx = self->rear % Size;
+	--self->count;
+	++self->rear;
+
+	return self->data[target_idx];
+}
+
+template<typename T, int Size>
+T vds_ringbuf_pop_front_unsafe(vds_ringbuf_t<T, Size> * self)
+{
+	DEBUG_ENSURE_UINT_GTE(self->count, 1, "Attempted element removal of empty StaticRingbuf.");
+
+	size_t target_idx = self->rear % Size;
+	--self->count;
+	++self->rear;
+
+	return self->data[target_idx];
+}
+
+template<typename T, int Size>
+void vds_ringbuf_clear(vds_ringbuf_t<T, Size> * self)
+{
+	self->rear = 0;
+	self->count = 0;
+}
+
+template<typename T, int Size>
+bool vds_ringbuf_is_populated(vds_ringbuf_t<T, Size> * self)
+{
+	return (self->count > 0);
+}
+
+template<typename T, int Size>
+bool vds_ringbuf_is_empty(vds_ringbuf_t<T, Size> * self)
+{
+	return !vds_ringbuf_is_populated(self);
+}
+
+template<typename T, int Size>
+bool vds_ringbuf_is_full(vds_ringbuf_t<T, Size> * self)
+{
+	DEBUG_ENSURE_UINT_LTE(self->count, Size, "Ringbuf design error; count exceeded Size, which shouldn't occur.");
+	return (self->count >= Size);
+}
+
+template<typename T, int Size>
+bool vds_ringbuf_is_almost_full(vds_ringbuf_t<T, Size> * self)
+{
+	return (self->count + 1 == Size);
+}
+
+template<typename T, int Size>
+bool vds_ringbuf_is_not_full(vds_ringbuf_t<T, Size> * self)
+{
+	return !vds_ringbuf_is_full(self);
 }

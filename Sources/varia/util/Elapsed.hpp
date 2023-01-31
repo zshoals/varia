@@ -4,6 +4,7 @@
 #include "varia/validation.hpp"
 #include "kinc/system.h"
 
+
 struct varia_elapsed_t
 {
 	double m_start = 0.0;
@@ -19,7 +20,7 @@ struct varia_elapsed_t
 		if (this->expired) return; 
 
 		this->m_end = kinc_time();
-		varia_elapsed_log_time(this);
+		VARIA_LOG_FLOAT(m_end - m_start);
 	}
 };
 
