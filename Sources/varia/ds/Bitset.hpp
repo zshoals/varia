@@ -241,11 +241,11 @@ vds_result_t<size_t> vds_bitset32_find_first_unset(vds_bitset32_t<Size> * self)
 template<int Size>
 size_t vds_bitset32_compute_block_index(size_t target_bit)
 {
-	DEBUG_ENSURE_UINT_LT((target_bit / 32), Bitset32Util::true_size(Size), "Out of range bit in Bitset.");
+	DEBUG_ENSURE_UINT_LT((target_bit / 32), vds_bitset32_unitlocal_true_size(Size), "Out of range bit in Bitset.");
 
 	//Note(zshoals Dec-11-2022): There's no guarantee that the bitset is a power of two,
 	//we don't enforce that. We have to use a simple division instead.
-	return target_bit / Bitset32Util::bit_width();
+	return target_bit / vds_bitset32_unitlocal_bit_width();
 }
 
 
@@ -257,6 +257,6 @@ u8 vds_bitset32_compute_bit_index(size_t target_bit)
 
 	//Note(zshoals Dec-11-2022): Equivalent to target_bit % bit_width, however, this is faster
 	//in debug builds
-	size_t shift = Bits32::pow2_to_bitshift_value(Bitset32Util::bit_width());
+	size_t shift = vds_bits32_pow2_to_bitshift_value(vds_bitset32_unitlocal_bit_width());
 	return target_bit & ( (1 << shift) - 1);
 }
