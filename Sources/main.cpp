@@ -91,18 +91,17 @@ int kickstart(int argc, char** argv)
 	exd_world_comp_register(w, sizeof(struct Position), exd::ComponentTypeID::Position_e);
 
 
-	using Varia::Elapsed;
 
-	Elapsed e;
+	varia_elapsed_t ___do_not_use_e;
+	varia_elapsed_t * p_timetrack = &___do_not_use_e;
 
-	e.begin_and_log("Ent create and set");
+	varia_elapsed_begin_and_log(p_timetrack, "Ent create and set");
 	for_range(80000)
 	{
 		exd_entity_t ent = exd_world_ent_create(w);
 		exd_world_comp_set(w, ent, exd::ComponentTypeID::Position_e);
 	}
-	e.end_and_log();
-
+	varia_elapsed_end_and_log(p_timetrack);
 
 	exd_view_t v = exd_world_create_view(w);
 	exd_view_include(&v, exd::ComponentTypeID::Position_e);
