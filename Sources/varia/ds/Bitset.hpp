@@ -200,7 +200,7 @@ vds_result_t<size_t> vds_bitset32_find_first_set(vds_bitset32_t<Size> * self)
 		}
 	}
 
-	res.valid = VDS_RESULT_STATUS_FAILURE_E;;
+	res.valid = VDS_RESULT_STATUS_FAILURE_E;
 	res.value = 0;
 
 	return res;
