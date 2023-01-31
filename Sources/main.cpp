@@ -82,7 +82,7 @@ int kickstart(int argc, char** argv)
 	using vds::Allocator;
 
 	Allocator arena;
-	size_t memsize = Varia::Memory::megabytes_to_bytes(128);
+	size_t memsize = varia_memory_megabytes_to_bytes(128);
 	void * mem = static_cast<void *>(malloc(memsize));
 	arena.initialize(mem, memsize);
 
