@@ -117,7 +117,7 @@ void const * exd_view_get_comp(exd_view_t * self, exd_entity_t ent, exd::Compone
 	//compared to this version of comp_get
 	//However, a lot more complicated and finnicky
 
-	vds::SearchResult<exd::ComponentTypeID> res = vds_array_find_get(&self->comp_type_indices, &type);
+	vds_search_result_t<exd::ComponentTypeID> res = vds_array_find_get(&self->comp_type_indices, &type);
 	DEBUG_ENSURE_TRUE(res.was_found, "Tried to access a non-existent component in a view.");
 	
 	if (res.was_found)
@@ -131,7 +131,7 @@ void const * exd_view_get_comp(exd_view_t * self, exd_entity_t ent, exd::Compone
 
 void * exd_view_get_comp_mutable(exd_view_t * self, exd_entity_t ent, exd::ComponentTypeID type)
 {
-	vds::SearchResult<exd::ComponentTypeID> res = vds_array_find_get(&self->comp_type_indices, &type);
+	vds_search_result_t<exd::ComponentTypeID> res = vds_array_find_get(&self->comp_type_indices, &type);
 	DEBUG_ENSURE_TRUE(res.was_found, "Tried to access a non-existent component in a view.");
 	
 	if (res.was_found)

@@ -183,9 +183,9 @@ size_t vds_array_index_of(vds_array_t<T, Size> * arr, T const * value)
 }
 
 template <typename T, int Size>
-vds::SearchResult<T> vds_array_find_get(vds_array_t<T, Size> * arr, T const * value)
+vds_search_result_t<T> vds_array_find_get(vds_array_t<T, Size> * arr, T const * value)
 {
-	vds::SearchResult<T> result;
+	vds_search_result_t<T> result;
 
 	for_range_var(i, arr->push_idx)
 	{
@@ -194,20 +194,20 @@ vds::SearchResult<T> vds_array_find_get(vds_array_t<T, Size> * arr, T const * va
 		if (*value == *target)
 		{
 			result.value = target;
-			result.was_found = vds::SearchResultStatus_e::Found;
+			result.was_found = VDS_SEARCH_RESULT_STATUS_FOUND_E;
 			return result;
 		}
 	}
 
 	result.value = nullptr;
-	result.was_found = vds::SearchResultStatus_e::Missing;
+	result.was_found = VDS_SEARCH_RESULT_STATUS_MISSING_E;
 	return result;
 }
 
 template <typename T, int Size>
-vds::SearchResultMut<T> vds_array_find_get_mut(vds_array_t<T, Size> * arr, T const * value)
+vds_search_result_mut_t<T> vds_array_find_get_mut(vds_array_t<T, Size> * arr, T const * value)
 {
-	vds::SearchResultMut<T> result;
+	vds_search_result_mut_t<T> result;
 
 	for_range_var(i, arr->push_idx)
 	{

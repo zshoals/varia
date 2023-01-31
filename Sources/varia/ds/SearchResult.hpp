@@ -1,27 +1,22 @@
 #pragma once
 
-namespace vds
+//TODO(zshoals 01-31-2023):> Make this an enum class
+enum vds_search_result_status_e
 {
-
-enum SearchResultStatus_e
-{
-	Missing,
-	Found
+	VDS_SEARCH_RESULT_STATUS_MISSING_E,
+	VDS_SEARCH_RESULT_STATUS_FOUND_E
 };
 
 template<typename T>
-struct SearchResult
+struct vds_search_result_t
 {
 	T const * value;
-	SearchResultStatus_e was_found;
+	vds_search_result_status_e was_found;
 };
 
 template<typename T>
-struct SearchResultMut
+struct vds_search_result_mut_t
 {
 	T * value;
-	SearchResultStatus_e was_found;
+	vds_search_result_status_e was_found;
 };
-
-
-}
