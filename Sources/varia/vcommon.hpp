@@ -41,6 +41,10 @@ typedef unsigned int uint;
 	TYPE * HANDLE = &(VARIA_CONCAT(_trashme_, HANDLE))
 
 
+#define VARIA_ITERATION_GUARD(ITERATION_VARIABLE, MAX_COUNT)\
+	if ((ITERATION_VARIABLE) > (MAX_COUNT)) { __debugbreak(); }
+
+
 
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
