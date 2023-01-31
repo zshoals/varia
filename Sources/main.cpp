@@ -79,14 +79,13 @@ int kickstart(int argc, char** argv)
 	kinc_init("Varia", 800, 600, NULL, NULL);
 	// kinc_set_update_callback(&mainloop);
 
-	using vds::Allocator;
 
-	Allocator arena;
+	vds_allocator_t arena;
 	size_t memsize = varia_memory_megabytes_to_bytes(128);
 	void * mem = static_cast<void *>(malloc(memsize));
-	arena.initialize(mem, memsize);
+	vds_allocator_initialize(&arena, mem, memsize);
 
-	exd_world_t * w = allocator_malloc(&arena, exd_world_t, 1);
+	exd_world_t * w = vds_allocator_malloc(&arena, exd_world_t, 1);
 	exd_world_initialize(w, &arena);
 	exd_world_comp_register(w, sizeof(struct Position), exd::ComponentTypeID::Position_e);
 

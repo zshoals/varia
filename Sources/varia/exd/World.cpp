@@ -82,7 +82,7 @@ static inline bool exd_world_unitlocal_freelist_is_empty(exd_world_t * world)
 //Core World API
 //===========
 
-void exd_world_initialize(exd_world_t * world, vds::Allocator * allocator)
+void exd_world_initialize(exd_world_t * world, vds_allocator_t * allocator)
 {
 	world->allocator = allocator;
 	world->active_entities = 0;
@@ -145,7 +145,7 @@ bool exd_world_ent_valid(exd_world_t * world, exd_entity_t ent)
 //TODO(zshoals 01-01-2023):> Check for double registration? 
 void exd_world_comp_register(exd_world_t * world, size_t element_size, exd::ComponentTypeID type)
 {
-	void * storage_mem = world->allocator->allocate_aligned_count(element_size, EXD_CONSTANTS_MAX_ENTITIES, VARIA_MEMORY_CONSTANTS_DEFAULT_ALIGNMENT);
+	void * storage_mem = vds_allocator_allocate_aligned_count(world->allocator, element_size, EXD_CONSTANTS_MAX_ENTITIES, VARIA_MEMORY_CONSTANTS_DEFAULT_ALIGNMENT);
 
 	exd_component_t * comp = exd_world_unitlocal_component_select(world, type);
 	exd_component_initialize(comp, storage_mem, element_size, EXD_CONSTANTS_MAX_ENTITIES, type);

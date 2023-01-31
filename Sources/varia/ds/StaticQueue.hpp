@@ -6,60 +6,60 @@
 #include "StaticRingbuf.hpp"
 #include "Result.hpp"
 
-namespace vds
-{
+
+
 
 template<typename T, int Size>
-struct StaticQueue
+struct vds_queue_t //Note(zshoals 01-31-2023):> Hey QT, winkyface ;)
 {
-	vds::StaticRingbuf<T, Size> ring;
-
-	// StaticQueue(void)
-	// {
-	// 	this->initialize();
-	// }
-
-	void initialize(void)
-	{
-		VARIA_ZERO_INIT(this);
-	}
-
-	//Tries to push a new value onto the queue. 
-	//If there was room to add the value, returns true, otherwise false
-	bool enqueue(T value)
-	{
-		bool has_room = ring.is_not_full();
-
-		if (has_room)
-		{
-			ring.push_back(value);
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	vds::Result<T> dequeue(void)
-	{
-		vds::Result<T> result;
-		bool has_elements = ring.is_populated();
-
-		if (has_elements)
-		{
-			result.valid = vds::ResultStatus_e::Success;
-			result.value = ring.pop_front();
-
-			return result;
-		}
-		else
-		{
-			result.valid = vds::ResultStatus_e::Failure;
-
-			return result;
-		}
-	}
+	vds_ringbuf_t<T, Size> ring;
 };
 
+
+
+
+
+template<typename T, int Size>
+void vds_queue_initialize(vds_queue_t<T, Size> * self)
+{
+	VARIA_ZERO_INIT(self);
+}
+
+//Tries to push a new value onto the queue. 
+//If there was room to add the value, returns true, otherwise false
+template<typename T, int Size>
+bool vds_queue_enqueue(vds_queue_t<T, Size> * self, T value)
+{
+	bool has_room = vds_ringbuf_is_not_full(&self->ring);
+
+	if (has_room)
+	{
+		vds_ringbuf_push_back(&self->ring, value);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+template<typename T, int Size>
+vds_result_t<T> vds_queue_dequeue(vds_queue_t<T, Size> * self)
+{
+	vds_result_t<T> result;
+	bool has_elements = vds_ringbuf_is_populated(&self->ring);
+
+	if (has_elements)
+	{
+		result.valid = VDS_RESULT_STATUS_SUCCESS_E;
+		result.value = vds_ringbuf_pop_front(&self->ring);
+
+		return result;
+	}
+	else
+	{
+		result.valid = VDS_RESULT_STATUS_FAILURE_E;
+
+		return result;
+	}
 }

@@ -12,7 +12,8 @@ struct exd_view_t;
 
 struct exd_world_t
 {
-	vds::Allocator * allocator;
+	//TODO(zshoals 01-31-2023):> Should a world store a custom allocator just for itself, or only a reference?
+	vds_allocator_t * allocator;
 
 	vds_array_t<exd_entity_t, EXD_CONSTANTS_MAX_ENTITIES> manifest;
 	//TODO(zshoals 01-28-2023):> Why are we storing u64 in the freelist instead of the entities themselves? 
@@ -28,7 +29,7 @@ struct exd_world_t
 
 // World(vds::Allocator * allocator);
 
-void exd_world_initialize(exd_world_t * world, vds::Allocator * allocator);
+void exd_world_initialize(exd_world_t * world, vds_allocator_t * allocator);
 exd_entity_t exd_world_ent_create(exd_world_t * world);
 bool exd_world_ent_kill(exd_world_t * world, exd_entity_t ent);
 bool exd_world_ent_valid(exd_world_t * world, exd_entity_t ent);
