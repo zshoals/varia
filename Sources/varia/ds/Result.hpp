@@ -1,19 +1,14 @@
 #pragma once
 
-namespace vds
+enum vds_result_status_e
 {
-
-enum ResultStatus_e
-{
-	Failure,
-	Success
+	VDS_RESULT_STATUS_FAILURE_E,
+	VDS_RESULT_STATUS_SUCCESS_E,
 };
 
 template<typename T>
-struct Result
+struct vds_result_t
 {
 	T value;
-	ResultStatus_e valid;
+	vds_result_status_e valid;
 };
-
-}

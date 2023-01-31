@@ -95,7 +95,7 @@ constexpr inline u32 vds_bits32_increment_upper(u32 bits, u8 pivot)
 	return vds_bits32_or(shifted_upper, shifted_lower);
 }
 
-constexpr inline vds::Result<u8> vds_bits32_find_first_set(u32 bits)
+constexpr inline vds_result_t<u8> vds_bits32_find_first_set(u32 bits)
 {
 	//Note(zshoals): Bit "Find First Set" implementation
 	//derived from wikipedia https://en.wikipedia.org/wiki/Find_first_set#FFS
@@ -126,14 +126,14 @@ constexpr inline vds::Result<u8> vds_bits32_find_first_set(u32 bits)
 
 	u32 first_set = r * zero_case_fixup;
 
-	vds::Result<u8> res = {};
-	res.valid = static_cast<vds::ResultStatus_e>(zero_case_fixup);
+	vds_result_t<u8> res = {};
+	res.valid = static_cast<vds_result_status_e>(zero_case_fixup);
 	res.value = first_set;
 
 	return res;
 }
 
-constexpr inline vds::Result<u8> vds_bits32_find_first_unset(u32 bits)
+constexpr inline vds_result_t<u8> vds_bits32_find_first_unset(u32 bits)
 {
 	u32 inverse = bits;
 	inverse = vds_bits32_not(inverse);
@@ -282,23 +282,23 @@ constexpr inline u64 vds_bits64_increment_upper(u64 bits, u8 pivot)
 	return vds_bits64_or(shifted_upper, shifted_lower);
 }
 
-constexpr inline vds::Result<u8> find_first_set(u64 bits)
+constexpr inline vds_result_t<u8> vds_bits64_find_first_set(u64 bits)
 {
-	vds::Result<u8> res = {};
+	vds_result_t<u8> res = {};
 
 	//TODO(zshoals): Update with Count Leading Zeroes version
 	for_range_var(i, 64)
 	{
 		if (vds_bits64_is_set(bits, static_cast<u8>(i)))
 		{
-			res.valid = vds::ResultStatus_e::Success;
+			res.valid = VDS_RESULT_STATUS_SUCCESS_E;
 			res.value = static_cast<u8>(i);
 
 			return res;
 		}
 	}
 
-	res.valid = vds::ResultStatus_e::Failure;
+	res.valid = VDS_RESULT_STATUS_FAILURE_E;
 	res.value = 0;
 
 	return res;
