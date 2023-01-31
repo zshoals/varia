@@ -18,10 +18,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-void printdemo(int * val)
-{
-	//do something
-}
 
 int kickstart(int argc, char** argv) 
 {
@@ -60,7 +56,7 @@ int kickstart(int argc, char** argv)
 	{
 		fbo.color_bits = 32;
 		fbo.depth_bits = 16;
-		fbo.frequency = 60; //Only useful in fullscreen mode, sets maximum refresh rate?
+		fbo.frequency = 60; //Only useful in exclusive fullscreen mode, sets maximum refresh rate?
 		fbo.samples_per_pixel = 1;
 		fbo.stencil_bits = 8;
 		fbo.vertical_sync = config_vsync;
