@@ -18,33 +18,17 @@ exd_entity_t constexpr EXD_ENTITY_INVALID_ENTITY = {SIZE_MAX};
 //TODO(zshoals 01-28-2023):> Rename all "this" equivalent parameters to "self"
 inline void exd_entity_increment_generation(exd_entity_t * ent)
 {
-	//TODO(zshoals 01-28-2023):> God damnit, bits need reworked too :/
-	vds::Bits64 bitmode = {};
-	bitmode.storage = ent->id;
-	bitmode.increment_upper(EXD_CONSTANTS_ID_SHIFT);
-	ent->id = bitmode.storage;
+	ent->id = vds_bits64_increment_upper(ent->id, EXD_CONSTANTS_ID_SHIFT);
 }
 
 inline u64 exd_entity_extract_generation(exd_entity_t ent)
 {
-	vds::Bits64 bitmode = {};
-	bitmode.storage = ent.id;
-	bitmode.rotate_right(EXD_CONSTANTS_ID_SHIFT);
-
-	return bitmode.storage;
+	return vds_bits64_rotate_right(ent.id, EXD_CONSTANTS_ID_SHIFT);
 }
 
 inline u64 exd_entity_extract_id(exd_entity_t ent)
 {
-	vds::Bits64 bitmode = {};
-	bitmode.storage = ent.id;
-
-	vds::Bits64 lo_mask = {};
-	lo_mask.generate_bitmask_lo(EXD_CONSTANTS_ID_SHIFT);
-
-	bitmode.mask_allow(lo_mask);
-
-	return bitmode.storage;
+	return vds_bits64_mask_allow(ent.id, vds_bits64_generate_bitmask_lo(EXD_CONSTANTS_ID_SHIFT));
 }
 
 inline bool exd_entity_matches(exd_entity_t a, exd_entity_t b) 

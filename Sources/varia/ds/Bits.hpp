@@ -24,27 +24,39 @@ constexpr inline u32 vds_bits32_toggle(u32 bits, u8 bit_index) { return bits ^= 
 constexpr inline bool vds_bits32_is_set(u32 bits, u8 bit_index) { return bits & (1 << bit_index); }
 constexpr inline bool vds_bits32_is_unset(u32 bits, u8 bit_index) { return !vds_bits32_is_set(bits, bit_index); }
 
-constexpr u32 vds_bits32_rotate_left(u32 bits, u8 shift)
+constexpr inline u32 vds_bits32_rotate_left(u32 bits, u8 shift)
 { 
 	assert(shift < 32 && "Exceeded bitwidth during shift.");
 
 	return bits <<= shift; 
 }
 
-constexpr u32 vds_bits32_rotate_right(u32 bits, u8 shift) 
+constexpr inline u32 vds_bits32_rotate_right(u32 bits, u8 shift) 
 { 
 	assert(shift < 32 && "Exceeded bitwidth during shift.");
 	return bits >>= shift; 
 }
 
-constexpr u32 vds_bits32_generate_bitmask_lo(u8 pivot)
+constexpr inline u32 vds_bits32_generate_bitmask_lo(u8 pivot)
 {
 	assert(pivot < 32 && "Exceeded bitwidth during shift.");
 
 	return ( (1 << pivot) - 1 );
 }
 
-constexpr u32 vds_bits32_generate_bitmask_hi(u8 pivot)
+constexpr inline u32 vds_bits32_mask_allow(u32 bits, u32 mask)
+{
+	return vds_bits32_and(bits, mask);
+}
+
+constexpr inline u32 vds_bits32_mask_deny(u32 bits, u32 mask)
+{
+	mask = vds_bits32_not(mask);
+	return vds_bits32_and(bits, mask);
+}
+
+
+constexpr inline u32 vds_bits32_generate_bitmask_hi(u8 pivot)
 {
 	assert(pivot < 32 && "Exceeded bitwidth during shift.");
 
@@ -54,7 +66,7 @@ constexpr u32 vds_bits32_generate_bitmask_hi(u8 pivot)
 	return vds_bits32_not(bitmask);
 }
 
-constexpr u32 vds_bits32_increment_upper(u32 bits, u8 pivot)
+constexpr inline u32 vds_bits32_increment_upper(u32 bits, u8 pivot)
 {
 	assert(pivot < 32 && "Exceeded bitwidth during shift.");
 
@@ -83,18 +95,7 @@ constexpr u32 vds_bits32_increment_upper(u32 bits, u8 pivot)
 	return vds_bits32_or(shifted_upper, shifted_lower);
 }
 
-constexpr u32 vds_bits32_mask_allow(u32 bits, u32 mask)
-{
-	return vds_bits32_and(bits, mask);
-}
-
-constexpr u32 vds_bits32_mask_deny(u32 bits, u32 mask)
-{
-	mask = vds_bits32_not(mask);
-	return vds_bits32_and(bits, mask);
-}
-
-constexpr vds::Result<u8> vds_bits32_find_first_set(u32 bits)
+constexpr inline vds::Result<u8> vds_bits32_find_first_set(u32 bits)
 {
 	//Note(zshoals): Bit "Find First Set" implementation
 	//derived from wikipedia https://en.wikipedia.org/wiki/Find_first_set#FFS
@@ -132,14 +133,14 @@ constexpr vds::Result<u8> vds_bits32_find_first_set(u32 bits)
 	return res;
 }
 
-constexpr vds::Result<u8> vds_bits32_find_first_unset(u32 bits)
+constexpr inline vds::Result<u8> vds_bits32_find_first_unset(u32 bits)
 {
 	u32 inverse = bits;
 	inverse = vds_bits32_not(inverse);
 	return vds_bits32_find_first_set(inverse);
 }	
 
-constexpr static u8 vds_bits32_pow2_to_bitshift_value(size_t pow2_value)
+constexpr inline static u8 vds_bits32_pow2_to_bitshift_value(size_t pow2_value)
 {
 	u8 shift = 0;
 	while (pow2_value > 1)
@@ -151,7 +152,7 @@ constexpr static u8 vds_bits32_pow2_to_bitshift_value(size_t pow2_value)
 	return shift;
 }
 
-constexpr static size_t vds_bits32_pow2_next_nearest(size_t value)
+constexpr inline static size_t vds_bits32_pow2_next_nearest(size_t value)
 {
 	--value;
 	value |= (value >> 1);
@@ -180,38 +181,37 @@ constexpr static size_t vds_bits32_pow2_next_nearest(size_t value)
 //||                        Bits 64                                      ||
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-
 constexpr inline u64 vds_bits64_and(u64 a, u64 b) { return a &= b; }
 constexpr inline u64 vds_bits64_or(u64 a, u64 b) { return a |= b; }
 constexpr inline u64 vds_bits64_not(u64 bits) { return ~bits; }
-constexpr inline u64 vds_bits64_unset(u64 bits, u8 bit_index) { return bits &= ~(1 << bit_index); }
+constexpr inline u64 vds_bits64_unset(u64 bits, u8 bit_index) { return bits &= ~(1ULL << bit_index); }
 constexpr inline u64 vds_bits64_unset_all(u64 bits) { return 0; }
-constexpr inline u64 vds_bits64_set(u64 bits, u8 bit_index) { return bits |= (1 << bit_index); }
+constexpr inline u64 vds_bits64_set(u64 bits, u8 bit_index) { return bits |= (1ULL << bit_index); }
 constexpr inline u64 vds_bits64_set_all(u64 bits) { return ~0; }
-constexpr inline u64 vds_bits64_toggle(u64 bits, u8 bit_index) { return bits ^= (1 << bit_index); }
+constexpr inline u64 vds_bits64_toggle(u64 bits, u8 bit_index) { return bits ^= (1ULL << bit_index); }
 
-constexpr inline bool vds_bits64_is_set(u64 bits, u8 bit_index) { return bits & (1 << bit_index); }
+constexpr inline bool vds_bits64_is_set(u64 bits, u8 bit_index) { return bits & (1ULL << bit_index); }
 constexpr inline bool vds_bits64_is_unset(u64 bits, u8 bit_index) { return !vds_bits64_is_set(bits, bit_index); }
 
-constexpr u64 vds_bits64_rotate_left(u64 bits, u8 shift)
+constexpr inline u64 vds_bits64_rotate_left(u64 bits, u8 shift)
 { 
 	assert(shift < 64 && "Exceeded bitwidth during shift.");
 	return bits <<= shift;
 }
 
-constexpr u64 vds_bits64_rotate_right(u64 bits, u8 shift) 
+constexpr inline u64 vds_bits64_rotate_right(u64 bits, u8 shift) 
 { 
 	assert(shift < 64 && "Exceeded bitwidth during shift.");
 	return bits >>= shift;
 }
 
-constexpr u64 vds_bits64_generate_bitmask_lo(u8 pivot)
+constexpr inline u64 vds_bits64_generate_bitmask_lo(u8 pivot)
 {
 	assert(pivot < 64 && "Exceeded bitwidth during shift.");
 	return ( (1 << pivot) - 1 );
 }
 
-constexpr u64 vds_bits64_generate_bitmask_hi(u8 pivot)
+constexpr inline u64 vds_bits64_generate_bitmask_hi(u8 pivot)
 {
 	assert(pivot < 64 && "Exceeded bitwidth during shift.");
 
@@ -221,8 +221,20 @@ constexpr u64 vds_bits64_generate_bitmask_hi(u8 pivot)
 	return vds_bits64_not(bitmask);
 }
 
+constexpr inline u64 vds_bits64_mask_allow(u64 bits, u64 mask)
+{
+	return vds_bits64_and(bits, mask);
+}
+
+constexpr inline u64 vds_bits64_mask_deny(u64 bits, u64 mask)
+{
+	u64 inverse_mask = vds_bits64_not(mask);
+	return vds_bits64_and(bits, mask);
+}
+
+
 //TODO(zshoals 01-31-2023):> This is currently 64bits only and not in the 32bit version, why? Lazy?
-constexpr u64 vds_bits64_set_upper(u64 bits, u64 new_upper_value, u8 pivot)
+constexpr inline u64 vds_bits64_set_upper(u64 bits, u64 new_upper_value, u8 pivot)
 {
 	assert(pivot < 64 && "Exceeded bitwidth during shift.");
 
@@ -232,7 +244,7 @@ constexpr u64 vds_bits64_set_upper(u64 bits, u64 new_upper_value, u8 pivot)
 	return vds_bits64_or(cleared_upper_bits, new_upper_value_rotated_left);
 }
 
-constexpr u64 vds_bits64_set_lower(u64 bits, u64 new_lower_value, u8 pivot)
+constexpr inline u64 vds_bits64_set_lower(u64 bits, u64 new_lower_value, u8 pivot)
 {
 	assert(pivot < 64 && "Exceeded bitwidth during shift.");
 	assert(new_lower_value < (1ULL << pivot) && "Setting lower value would overrun bitrange.");  
@@ -242,7 +254,7 @@ constexpr u64 vds_bits64_set_lower(u64 bits, u64 new_lower_value, u8 pivot)
 	return vds_bits64_or(cleared_lower_bits, new_lower_value);
 }
 
-constexpr u64 vds_bits64_increment_upper(u64 bits, u8 pivot)
+constexpr inline u64 vds_bits64_increment_upper(u64 bits, u8 pivot)
 {
 	assert(pivot < 64 && "Exceeded bitwidth during shift.");
 
@@ -270,18 +282,7 @@ constexpr u64 vds_bits64_increment_upper(u64 bits, u8 pivot)
 	return vds_bits64_or(shifted_upper, shifted_lower);
 }
 
-constexpr u64 vds_bits64_mask_allow(u64 bits, u64 mask)
-{
-	return vds_bits64_and(bits, mask);
-}
-
-constexpr u64 vds_bits64_mask_deny(u64 bits, u64 mask)
-{
-	u64 inverse_mask = vds_bits64_not(mask);
-	return vds_bits64_and(bits, mask);
-}
-
-constexpr vds::Result<u8> find_first_set(u64 bits)
+constexpr inline vds::Result<u8> find_first_set(u64 bits)
 {
 	vds::Result<u8> res = {};
 
