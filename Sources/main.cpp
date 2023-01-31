@@ -90,7 +90,6 @@ int kickstart(int argc, char** argv)
 	exd_world_comp_register(w, sizeof(struct Position), exd::ComponentTypeID::Position_e);
 
 
-
 	varia_elapsed_t ___do_not_use_e;
 	varia_elapsed_t * p_timetrack = &___do_not_use_e;
 
