@@ -116,7 +116,6 @@ void exd_view_iterate_forwards_single_with_entity(exd_view_t * self, FUNC cb)
 	for_range_var(i, len)
 	{
 		exd_entity_t e = vds_array_get_unsafe(&comp->dense_ents, i);
-		// cb(self, static_cast<T *>(comp->get_untyped_mutable_direct(i)), e);
 		cb(self, static_cast<T *>(exd_component_get_untyped_mutable_direct(comp, i)), e);
 	}
 }
@@ -126,13 +125,14 @@ void exd_view_iterate_forwards(exd_view_t * self, FUNC cb)
 {
 	DEBUG_ENSURE_TRUE(self->finalized, "View was not finalized before usage.");
 
-	//TODO(zshoals 01-29-2023):> Verify that dense_ents length == exd_component_active_entities length
-	// size_t const len = self->shortest_dataset->dense_ents.length();
-	size_t const len = vds_array_length(&self->shortest_dataset->dense_ents);
+	// size_t const len = vds_array_length(&self->shortest_dataset->dense_ents);
+	size_t const len = exd_component_length(self->shortest_dataset);
 	for_range_var(i, len)
 	{
-		// exd_entity_t e = *self->shortest_dataset->dense_ents.get_unsafe(i);
-		exd_entity_t e = *(vds_array_get_unsafe(self->shortest_dataset, i));
+		//Note(zshoals 01-31-2023):> We go straight to the dense ents here as we have a sort of 
+		//bad solution to having multiple components to select from. We pass the entity
+		//which implicitly guarantees that the included components will be available
+		exd_entity_t e = *(vds_array_get_unsafe(&self->shortest_dataset->dense_ents, i));
 		if (exd_view_internal_entity_matches_query_requirements(self, e))
 		{
 			cb(self, e);
@@ -191,7 +191,7 @@ void exd_view_iterate_backwards(exd_view_t * self, FUNC cb)
 {
 	DEBUG_ENSURE_TRUE(self->finalized, "View was not finalized before usage.");
 
-	size_t const len = vds_array_length(&self->shortest_dataset->dense_ents);
+	size_t const len = exd_component_length(self->shortest_dataset);
 	for_reverse_range_var(i, len)
 	{
 		exd_entity_t e = *(vds_get_unsafe(&self->shortest_dataset->dense_ents, i));
