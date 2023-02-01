@@ -1,9 +1,11 @@
 #include "World.hpp"
 #include "Entity.hpp"
+#include "View.hpp"
 #include "EXDConstants.hpp"
 #include "ComponentTypes.hpp"
 
 #include "varia/ds/StaticArray.hpp"
+#include "varia/ds/Allocator.hpp"
 
 #include "varia/logging.hpp"
 #include "varia/util/Memory.hpp"

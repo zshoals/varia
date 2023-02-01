@@ -1,14 +1,22 @@
 #pragma once
-#include "Entity.hpp"
-#include "Component.hpp"
 #include "EXDConstants.hpp"
-#include "View.hpp"
 #include "ComponentTypes.hpp"
+#include "Component.hpp"
 
-#include "varia/ds/Allocator.hpp"
 #include "varia/ds/StaticArray.hpp"
 
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+//||                Forward Includes                                     ||
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+
 struct exd_view_t;
+struct exd_entity_t;
+struct vds_allocator_t;
+
+//||_____________________________________________________________________||
+
 
 struct exd_world_t
 {

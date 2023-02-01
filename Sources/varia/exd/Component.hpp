@@ -3,7 +3,6 @@
 #include "ComponentTypes.hpp"
 #include "Entity.hpp"
 #include "varia/ds/StaticArray.hpp"
-#include "varia/ds/Allocator.hpp"
 
 struct exd_component_t
 {

@@ -3,13 +3,21 @@
 #include "Entity.hpp"
 #include "Component.hpp"
 #include "ComponentTypes.hpp"
-#include "World.hpp"
 
 #include "varia/vcommon.hpp"
 #include "varia/ds/StaticArray.hpp"
 
+//||_____________________________________________________________________||
+//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+//||                 Forward Includes                                    ||
+//||_____________________________________________________________________||
 
 struct exd_world_t;
+
+//||_____________________________________________________________________||
+
+
+
 
 struct exd_view_t
 {

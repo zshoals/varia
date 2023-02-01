@@ -1,22 +1,6 @@
 #include "kinc/window.h"
 #include "kinc/system.h"
 #include "kinc/display.h"
-#include "kinc/log.h"
-
-#include "varia/logging.hpp"
-#include "varia/util/Memory.hpp"
-#include "varia/comps/Position.hpp"
-#include "varia/util/Elapsed.hpp"
-
-#include "varia/ds/Allocator.hpp"
-#include "varia/exd/World.hpp"
-#include "varia/exd/Component.hpp"
-#include "varia/exd/View.hpp"
-#include "varia/exd/Entity.hpp"
-
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdio.h>
 
 
 int kickstart(int argc, char** argv) 
@@ -77,41 +61,6 @@ int kickstart(int argc, char** argv)
 
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
-	// kinc_set_update_callback(&mainloop);
-
-
-	vds_allocator_t arena;
-	size_t memsize = varia_memory_megabytes_to_bytes(128);
-	void * mem = static_cast<void *>(malloc(memsize));
-	vds_allocator_initialize(&arena, mem, memsize);
-
-	exd_world_t * w = vds_allocator_malloc(&arena, exd_world_t, 1);
-	exd_world_initialize(w, &arena);
-	exd_world_comp_register(w, sizeof(struct Position), exd::ComponentTypeID::Position_e);
-
-
-	varia_elapsed_t ___do_not_use_e;
-	varia_elapsed_t * p_timetrack = &___do_not_use_e;
-
-	varia_elapsed_begin_and_log(p_timetrack, "Ent create and set");
-	for_range(80000)
-	{
-		exd_entity_t ent = exd_world_ent_create(w);
-		exd_world_comp_set(w, ent, exd::ComponentTypeID::Position_e);
-	}
-	varia_elapsed_end_and_log(p_timetrack);
-
-	exd_view_t v = exd_world_create_view(w);
-	exd_view_include(&v, exd::ComponentTypeID::Position_e);
-	exd_view_compile(&v);
-
-	exd_view_iterate_backwards_single<Position>(&v, [](Position * pos)
-	{
-		VARIA_QLOG("Hello.");
-	});
-
-	VARIA_QLOG("Complete");
-
 
 	kinc_start();
 
