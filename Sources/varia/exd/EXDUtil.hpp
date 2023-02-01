@@ -5,8 +5,8 @@
 
 constexpr u8 exd_utility_calculate_id_shift(size_t entity_count)
 {
-	size_t nearest = varia_math_pow2_next_nearest(entity_count);
-	u8 shift = varia_math_pow2_to_bitshift_value(nearest);
+	size_t nearest = vmath_pow2_next_nearest(entity_count);
+	u8 shift = vmath_pow2_to_bitshift_value(nearest);
 
 	//Note(zshoals Dec-12-2022): The shift value is used for bitmasking
 	//This value should result in 
