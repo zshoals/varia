@@ -270,7 +270,7 @@ void vds_array_sort_all(vds_array_t<T, Size> * arr)
 }
 
 template <typename T, int Size, typename FUNC>
-void vds_array_iterate(vds_array_t<T, Size> * arr, const FUNC f)
+void vds_array_for_each(vds_array_t<T, Size> * arr, const FUNC f)
 {
 	const size_t len = vds_array_length(arr)
 	for_range_var(i, len)
@@ -279,3 +279,31 @@ void vds_array_iterate(vds_array_t<T, Size> * arr, const FUNC f)
 		f(element);
 	}
 }
+
+
+//Note(zshoals 02-02-2023):> Testing of overloading a dereference operator
+//Wanted to try and make it so that a pointer cannot accidentally be incremented/added to
+//or perform an improper action with it.
+
+// struct bob
+// {
+// 	int a;
+// };
+
+// template<typename T>
+// struct const_ptr
+// {
+// 	T * const ptr;
+// 	T * operator->() { return ptr; }
+// };
+
+// void random(void)
+// {
+// 	vds_array_t<bob, 100> ___do_not_use_arr;
+// 	vds_array_t<bob, 100> * arr = &___do_not_use_arr;
+
+// 	vds_array_for_each(arr, [](const_ptr<bob> value)
+// 	{
+// 		value->a += 3498080;
+// 	});
+// }
