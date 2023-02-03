@@ -2,6 +2,11 @@
 #include "kinc/system.h"
 #include "kinc/display.h"
 
+#include "varia/logging.hpp"
+#include "varia/ds/StringView.hpp"
+
+#include "varia/io/File.hpp"
+
 
 int kickstart(int argc, char** argv) 
 {
@@ -61,6 +66,21 @@ int kickstart(int argc, char** argv)
 
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
+
+
+	vds_strview_t string = vds_strview_create("");
+	vds_strview_sequence_t<16> sequence = vds_strview_split_by<16>(string, " ");
+	vds_strview_sequence_print_all(&sequence);
+
+	unsigned char buffer[4096];
+	unsigned char * p_buffer = &buffer[0];
+	vds_result_t<varia_io_file_t> file = varia_io_file_load_asset("config.vcfg", p_buffer);
+	if (file.valid)
+	{
+		vds_strview_sequence_t<32> config_lines = varia_io_file_read_lines<32>(file.value);
+		vds_strview_sequence_print_all(&config_lines);
+	}
+
 
 	kinc_start();
 
