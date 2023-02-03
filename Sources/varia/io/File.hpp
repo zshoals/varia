@@ -26,5 +26,6 @@ vds_strview_sequence_t<MaxSize> varia_io_file_read_lines(varia_io_file_t file)
 
 	//TODO(zshoals 02-02-2023):> Strings from the config file aren't actually null terminated
 	//so that doesn't work, we need to count characters
-	return vds_strview_split_by<MaxSize>(vds_strview_create(text), splitter);
+	vds_strview_sequence_t<MaxSize> dummy = vds_strview_split_by_v2<MaxSize>(vds_strview_create_with_length(text, file.size), splitter);
+	return dummy;
 }

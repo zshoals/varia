@@ -22,6 +22,7 @@ struct vds_strview_sequence_t
 };
 
 vds_strview_t vds_strview_create(char const * null_term_string);
+vds_strview_t vds_strview_create_with_length(char const * null_term_string, size_t length);
 bool vds_strview_matches(vds_strview_t a, vds_strview_t b);
 char const * vds_strview_raw(vds_strview_t stringview);
 vds_result_t<vds_strview_t> vds_strview_find_first_occurrence(vds_strview_t haystack, vds_strview_t needle);
@@ -58,6 +59,7 @@ void vds_strview_sequence_buffer_size_requirement(vds_strview_sequence_t<MaxSize
 	}
 }
 
+//Note(zshoals 02-03-2023):> Only handles a 1 character sized separator at present
 template<int MaxSize>
 vds_strview_sequence_t<MaxSize> vds_strview_split_by(vds_strview_t stringview, char const * separator)
 {
@@ -81,7 +83,7 @@ vds_strview_sequence_t<MaxSize> vds_strview_split_by(vds_strview_t stringview, c
 	size_t sequence_length = 0;
 	{
 
-		while(remaining_chars != 0)
+		while(remaining_chars - 1 != 0)
 		{
 			//We've found a character
 			if (base_string_addr[sequence_length + current_char_idx] != *separator)
@@ -103,6 +105,7 @@ vds_strview_sequence_t<MaxSize> vds_strview_split_by(vds_strview_t stringview, c
 				sv._length = sequence_length;
 
 				current_char_idx += sequence_length;
+				++current_char_idx;
 				sequence_length = 0;
 
 				vds_array_try_push(&svs.strviews, sv);
@@ -120,15 +123,173 @@ vds_strview_sequence_t<MaxSize> vds_strview_split_by(vds_strview_t stringview, c
 		sv.string = &base_string_addr[current_char_idx];
 		sv._length = sequence_length;
 
-		current_char_idx += sequence_length;
-		sequence_length = 0;
-
 		vds_array_try_push(&svs.strviews, sv);
 	}
 
 	return svs;
 }
 
+
+template<int MaxSize>
+vds_strview_sequence_t<MaxSize> vds_strview_internal_split_by_line(vds_strview_t stringview)
+{
+	vds_strview_sequence_t<MaxSize> svs = {};
+	vds_array_initialize(&svs.strviews);
+
+	if (stringview._length == 0) return svs;
+
+	//This-is-a-string
+	//---This--is--a-string-
+
+	char const * base_string_addr = stringview.string;
+	size_t string_end_idx = stringview._length;
+
+	size_t sequence_begin_idx = 0;
+	size_t sequence_length = 0;
+
+	//Strip leading separators
+	for(size_t i = 0; i < stringview._length; ++i)
+	{
+		if (base_string_addr[i] == '\r')
+		{
+			if (i + 1 < stringview._length)
+			{
+				if (base_string_addr[i + 1] == '\n')
+				{
+					sequence_begin_idx += 2;
+				}
+			}
+		}
+		else if (base_string_addr[i] == '\n')
+		{
+			++sequence_begin_idx;
+		}
+		//All leading newlines are culled
+		else
+		{
+			break;
+		}
+	}
+
+	//Strip tailing separators
+	for(size_t i = string_end_idx; i > sequence_begin_idx; --i)
+	{
+
+	}
+
+	while(sequence_begin_idx < string_end_idx)
+	{
+		if 
+		(
+			(base_string_addr[sequence_begin_idx + sequence_length] == *separator)
+			||
+			(sequence_begin_idx + sequence_length >= string_end_idx)
+		)
+		{
+			vds_strview_t view;
+			view.string = &base_string_addr[sequence_begin_idx];
+			view._length = sequence_length;
+
+			vds_array_try_push(&svs.strviews, view);
+
+			sequence_begin_idx += sequence_length;
+			sequence_length = 0;
+
+			//Strip subsequent separators (possibly duplicates)
+			for(size_t i = sequence_begin_idx; i < stringview._length; ++i)
+			{
+				if (base_string_addr[i] != *separator) break;
+				++sequence_begin_idx;
+			}
+		}
+		//The character is part of a valid string sequence
+		else if (base_string_addr[sequence_begin_idx + sequence_length] != *separator)
+		{
+			++sequence_length;
+		}
+	}
+
+	return svs;
+
+}
+
+template<int MaxSize>
+vds_strview_sequence_t<MaxSize> vds_strview_split_by_v2(vds_strview_t stringview, char const * separator)
+{
+	//Special case new lines, as they may be slashN or slashR slashN
+	// if (*separator == '\n')
+	// {
+	// 	return vds_strview_internal_split_by_line(stringview);
+	// }
+
+	vds_strview_sequence_t<MaxSize> svs = {};
+	vds_array_initialize(&svs.strviews);
+
+	if (stringview._length == 0) return svs;
+
+	//This-is-a-string
+	//---This--is--a-string-
+
+	char const * base_string_addr = stringview.string;
+	size_t string_end_idx = stringview._length;
+
+	size_t sequence_begin_idx = 0;
+	size_t sequence_length = 0;
+
+	while(sequence_begin_idx + sequence_length - 1 < string_end_idx)
+	{
+		if 
+		(
+			base_string_addr[sequence_begin_idx + sequence_length] == *separator
+			&&
+			sequence_length > 0
+		)
+		{
+			vds_strview_t view;
+			view.string = &base_string_addr[sequence_begin_idx];
+			view._length = sequence_length;
+
+			vds_array_try_push(&svs.strviews, view);
+
+			sequence_begin_idx += sequence_length;
+			sequence_length = 0;
+
+			//Strip subsequent separators (possibly duplicates)
+			for(size_t i = sequence_begin_idx; i < stringview._length; ++i)
+			{
+				if (base_string_addr[i] != *separator) break;
+				++sequence_begin_idx;
+			}
+		}
+		// Repeating/lead/trailing seperator
+		else if
+		(
+			base_string_addr[sequence_begin_idx + sequence_length] == *separator
+			&&
+			sequence_length == 0
+		)
+		{
+			++sequence_begin_idx;
+		}
+		//The character is part of a valid string sequence
+		else if (base_string_addr[sequence_begin_idx + sequence_length] != *separator)
+		{
+			++sequence_length;
+		}
+	}
+
+	if (sequence_length > 0)
+	{
+			vds_strview_t view;
+			view.string = &base_string_addr[sequence_begin_idx];
+			view._length = sequence_length;
+
+			vds_array_try_push(&svs.strviews, view);
+	}
+
+	return svs;
+
+}
 
 
 //Note(zshoals 02-02-2023):> Useless? We still need to figure out a way to actually track each individual string

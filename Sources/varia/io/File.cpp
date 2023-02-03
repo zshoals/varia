@@ -20,14 +20,15 @@ vds_result_t<varia_io_file_t> varia_io_file_load_asset(const char * filepath, vd
 	if (opened)
 	{
 
-		size_t size = kinc_file_reader_size(&reader) + 1; //Null terminator
-		file.bytes = vds_allocator_malloc(allocator, unsigned char, size);
+		size_t size = kinc_file_reader_size(&reader); //Null terminator
+		file.bytes = vds_allocator_malloc(allocator, unsigned char, size + 1);
 
-		int size_read = kinc_file_reader_read(&reader, file.bytes, size - 1);
+		int size_read = kinc_file_reader_read(&reader, file.bytes, size);
+		++size_read;
 
 		file.size = size_read;
 		file.loaded = true;
-		file.bytes[size] = '\0';
+		file.bytes[size_read] = '\0';
 
 		res.valid = VDS_RESULT_STATUS_SUCCESS_E;
 
@@ -57,10 +58,13 @@ vds_result_t<varia_io_file_t> varia_io_file_load_save(const char * filepath, vds
 
 	if (opened)
 	{
-		size_t size = kinc_file_reader_size(&reader) + 1; // Null terminator
-		file.bytes = vds_allocator_malloc(allocator, unsigned char, size);
+		size_t size = kinc_file_reader_size(&reader); 
+		file.bytes = vds_allocator_malloc(allocator, unsigned char, size + 1); //Add a space for a null term
 
-		int size_read = kinc_file_reader_read(&reader, file.bytes, size - 1);
+		//Note(zshoals 02-03-2023):> This size_read value is one less byte than we allocated
+		//we allocate an extra byte for the null terminator
+		int size_read = kinc_file_reader_read(&reader, file.bytes, size);
+		++size_read; //Add the null terminator to the size
 
 		file.size = size_read;
 		file.loaded = true;
