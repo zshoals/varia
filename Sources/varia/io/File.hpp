@@ -3,6 +3,8 @@
 #include "varia/ds/Result.hpp"
 #include "varia/ds/StringView.hpp"
 
+struct vds_allocator_t;
+
 struct varia_io_file_t
 {
 	unsigned char * bytes;
@@ -10,8 +12,8 @@ struct varia_io_file_t
 	bool loaded;
 };
 
-vds_result_t<varia_io_file_t> varia_io_file_load_asset(const char * filepath, unsigned char * buffer);
-vds_result_t<varia_io_file_t> varia_io_file_load_save(const char * filepath, unsigned char * buffer);
+vds_result_t<varia_io_file_t> varia_io_file_load_asset(const char * filepath, vds_allocator_t * allocator);
+vds_result_t<varia_io_file_t> varia_io_file_load_save(const char * filepath, vds_allocator_t * allocator);
 
 template<int MaxSize>
 vds_strview_sequence_t<MaxSize> varia_io_file_read_lines(varia_io_file_t file)
@@ -22,5 +24,7 @@ vds_strview_sequence_t<MaxSize> varia_io_file_read_lines(varia_io_file_t file)
 	proxy[0] = '\n';
 	char const * splitter = &proxy[0];
 
+	//TODO(zshoals 02-02-2023):> Strings from the config file aren't actually null terminated
+	//so that doesn't work, we need to count characters
 	return vds_strview_split_by<MaxSize>(vds_strview_create(text), splitter);
 }
