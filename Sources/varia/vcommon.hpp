@@ -26,6 +26,7 @@ typedef unsigned int uint;
 #define VARIA_CONCAT(A, B) VARIA_CONCAT_IMPL(A, B)
 
 #define VARIA_NO_OPERATION() ((void)0)
+#define VARIA_INTENTIONALLY_DO_NOTHING() ((void)0)
 
 #define VARIA_ZERO_INIT(THIS_PTR) memset((THIS_PTR), 0, (sizeof(*THIS_PTR)))
 #define VARIA_ZERO_INIT_SIZE(PTR, SIZE) memset((PTR), 0, SIZE)
