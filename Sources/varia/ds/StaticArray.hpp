@@ -99,6 +99,16 @@ void vds_array_push(vds_array_t<T, Size> * arr, T value)
 }
 
 template <typename T, int Size>
+void vds_array_try_push(vds_array_t<T, Size> * arr, T value)
+{
+	if (arr->push_idx < Size)
+	{
+		arr->data[arr->push_idx] = value;
+		++arr->push_idx;
+	}
+}
+
+template <typename T, int Size>
 void vds_array_push_without_data(vds_array_t<T, Size> * arr)
 {
 	DEBUG_ENSURE_UINT_LT(arr->push_idx, Size, "Attempted element push of full StaticArray");
@@ -113,6 +123,16 @@ T vds_array_pop(vds_array_t<T, Size> * arr)
 
 	--arr->push_idx;
 	return arr->data[arr->push_idx];
+}
+
+template <typename T, int Size>
+void vds_array_try_pop(vds_array_t<T, Size> * arr, T value)
+{
+	if (arr->push_idx >= 1)
+	{
+		--arr->push_idx;
+		return arr->data[arr->push_idx];
+	}
 }
 
 template <typename T, int Size>
