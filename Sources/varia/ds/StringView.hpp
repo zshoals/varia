@@ -31,6 +31,11 @@ void vds_strview_print(vds_strview_t stringview);
 
 
 
+template<int MaxSize>
+size_t vds_strview_sequence_length(vds_strview_sequence_t<MaxSize> * sequence)
+{
+	return vds_array_length(&sequence->strviews);
+}
 
 template<int MaxSize>
 void vds_strview_sequence_print_all(vds_strview_sequence_t<MaxSize> * sequence)
@@ -59,62 +64,70 @@ vds_strview_sequence_t<MaxSize> vds_strview_split_by(vds_strview_t stringview, c
 	vds_strview_sequence_t<MaxSize> svs = {};
 	if (stringview._length == 0 || *separator == '\0') return svs;
 
+	size_t remaining_chars = stringview._length;
+	size_t current_char_idx = 0;
+	char const * base_string_addr = vds_strview_raw(stringview);
 
-	char const * search_head = vds_strview_raw(stringview);
-
-	//Ignore leading separators
-	while(*search_head == *separator)
+	//Strip leading characters equivalent to the separator
 	{
-		++search_head;
+		while(base_string_addr[current_char_idx] == *separator && remaining_chars != 0)
+		{
+			++current_char_idx;
+			--remaining_chars;
+		}
 	}
-
 
 	//Actually start splitting stringviews
-	char const * first_split = search_head;
 	size_t sequence_length = 0;
-
-	while(*search_head != '\0')
 	{
-		if (*search_head == *separator)
+
+		while(remaining_chars != 0)
 		{
-			vds_strview_t sv;
-			sv.string = first_split;
-			sv._length = sequence_length;
-
-			if (vds_array_length(&svs.strviews) >= MaxSize) break;
-			vds_array_push(&svs.strviews, sv);
-
-			//Ignore repeat separators
-			while(*search_head == *separator)
+			//We've found a character
+			if (base_string_addr[sequence_length + current_char_idx] != *separator)
 			{
-				++search_head;
+				++sequence_length;
 			}
 
-			//Reset the split searches
-			first_split = search_head;
-			sequence_length = 0;
-		}
+			//We've encountered a repeated separator (IE, 2 spaces in a row)
+			else if (sequence_length == 0) 
+			{
+				++current_char_idx;
+			}
 
-		++search_head;
-		++sequence_length;
+			//We've encountered a single separator that is not duplicated
+			else
+			{
+				vds_strview_t sv;
+				sv.string = &base_string_addr[current_char_idx];
+				sv._length = sequence_length;
+
+				current_char_idx += sequence_length;
+				sequence_length = 0;
+
+				vds_array_try_push(&svs.strviews, sv);
+			}
+
+			--remaining_chars;
+		}
 	}
 
-	//Final split needs special management
-	if (sequence_length > 1)
+	//Special case: We've depleted characters remaining, but there is still a character sequence
+	//that hasn't been processed yet
+	if (sequence_length > 0)
 	{
-		if (vds_array_length(&svs.strviews) < MaxSize)
-		{
-			vds_strview_t sv;
-			sv.string = first_split;
-			sv._length = sequence_length;
+		vds_strview_t sv;
+		sv.string = &base_string_addr[current_char_idx];
+		sv._length = sequence_length;
 
-			vds_array_push(&svs.strviews, sv);
-		}
+		current_char_idx += sequence_length;
+		sequence_length = 0;
+
+		vds_array_try_push(&svs.strviews, sv);
 	}
 
 	return svs;
 }
-
 
 
 
@@ -144,4 +157,71 @@ vds_strview_sequence_t<MaxSize> vds_strview_split_by(vds_strview_t stringview, c
 // 		*write_head = '\0';
 // 		++write_head;
 // 	}
+// }
+
+// //OLD
+// //OLD
+// template<int MaxSize>
+// vds_strview_sequence_t<MaxSize> vds_strview_split_by(vds_strview_t stringview, char const * separator)
+// {
+// 	vds_strview_sequence_t<MaxSize> svs = {};
+// 	if (stringview._length == 0 || *separator == '\0') return svs;
+
+// 	char const * search_head = vds_strview_raw(stringview);
+// 	size_t remaining_chars = stringview._length;
+
+// 	//Ignore leading separators
+// 	while(*search_head == *separator && remaining_chars != 0)
+// 	{
+// 		++search_head;
+// 		--remaining_chars;
+// 	}
+
+
+// 	//Actually start splitting stringviews
+// 	char const * first_split = search_head;
+// 	size_t sequence_length = 0;
+
+// 	while(*search_head != '\0' && remaining_chars != 0)
+// 	{
+// 		if (*search_head == *separator)
+// 		{
+// 			vds_strview_t sv;
+// 			sv.string = first_split;
+// 			sv._length = sequence_length;
+
+// 			if (vds_array_length(&svs.strviews) >= MaxSize) break;
+// 			vds_array_push(&svs.strviews, sv);
+
+// 			//Ignore repeat separators
+// 			while(*search_head == *separator && remaining_chars != 0)
+// 			{
+// 				++search_head;
+// 				--remaining_chars;
+// 			}
+
+// 			//Reset the split searches
+// 			first_split = search_head;
+// 			sequence_length = 0;
+// 		}
+
+// 		++search_head;
+// 		--remaining_chars;
+// 		++sequence_length;
+// 	}
+
+// 	//Final split needs special management
+// 	if (sequence_length > 1)
+// 	{
+// 		if (vds_array_length(&svs.strviews) < MaxSize)
+// 		{
+// 			vds_strview_t sv;
+// 			sv.string = first_split;
+// 			sv._length = sequence_length;
+
+// 			vds_array_push(&svs.strviews, sv);
+// 		}
+// 	}
+
+// 	return svs;
 // }
