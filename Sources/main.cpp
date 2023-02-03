@@ -2,8 +2,12 @@
 #include "kinc/system.h"
 #include "kinc/display.h"
 
+#include "varia/ds/Allocator.hpp"
+#include "varia/util/Memory.hpp"
 #include "varia/logging.hpp"
 #include "varia/ds/StringView.hpp"
+
+#include <stdlib.h>
 
 #include "varia/io/File.hpp"
 
@@ -67,18 +71,20 @@ int kickstart(int argc, char** argv)
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
 
+	vds_allocator_t mem;
+	void * buffer = calloc(1, varia_memory_kilobytes_to_bytes(1));
+	vds_allocator_initialize(&mem, buffer, varia_memory_kilobytes_to_bytes(1));
 
-	vds_strview_t string = vds_strview_create("");
-	vds_strview_sequence_t<16> sequence = vds_strview_split_by<16>(string, " ");
-	vds_strview_sequence_print_all(&sequence);
-
-	unsigned char buffer[4096];
-	unsigned char * p_buffer = &buffer[0];
-	vds_result_t<varia_io_file_t> file = varia_io_file_load_asset("config.vcfg", p_buffer);
+	vds_result_t<varia_io_file_t> file = varia_io_file_load_asset("config.vcfg", &mem);
 	if (file.valid)
 	{
 		vds_strview_sequence_t<32> config_lines = varia_io_file_read_lines<32>(file.value);
-		vds_strview_sequence_print_all(&config_lines);
+		for (vds_strview_t const & sv : config_lines)
+		{
+			vds_strview_sequence_t<2> cvar_and_value = vds_strview_split_by_v2<2>(sv, " ");
+			if (vds_strview_sequence_length(&cvar_and_value) != 2) continue;
+			vds_strview_sequence_print_all(&cvar_and_value);
+		}
 	}
 
 
