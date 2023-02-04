@@ -75,17 +75,16 @@ int kickstart(int argc, char** argv)
 	void * buffer = calloc(1, varia_memory_kilobytes_to_bytes(1));
 	vds_allocator_initialize(&mem, buffer, varia_memory_kilobytes_to_bytes(1));
 
-	vds_result_t<varia_io_file_t> file = varia_io_file_load_asset("config.vcfg", &mem);
-	if (file.valid)
+	vds_result_t<varia_io_file_t> fileresult = varia_io_file_load_asset("config.vcfg", &mem);
+	if (fileresult.valid)
 	{
-		vds_strview_sequence_t<32> config_lines = varia_io_file_read_lines<32>(file.value);
-		vds_strview_sequence_print_all(&config_lines);
-		for (vds_strview_t const & sv : config_lines)
-		{
-			vds_strview_sequence_t<2> cvar_and_value = vds_strview_split_by_v2<2>(sv, "-");
-			if (vds_strview_sequence_length(&cvar_and_value) != 2) continue;
-			vds_strview_sequence_print_all(&cvar_and_value);
-		}
+		VARIA_NO_OPERATION();
+		varia_io_file_t file = fileresult.value;
+		vds_strview_t textData = vds_strview_create_with_length(reinterpret_cast<char const *>(file.bytes), file.size);
+
+		vds_strview_sequence_t<16> splits = vds_strview_split<16>(textData, "\n");
+
+		vds_strview_sequence_print_all(&splits);
 	}
 
 
