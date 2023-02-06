@@ -4,6 +4,9 @@
 
 #include "varia/vcommon.hpp"
 
+//TODO(zshoals 02-04-2023):> This is not very useful currently, in fact we can't even get an element
+//We need to rework this completely, make sure to read over "add" and "remove" functions, do these make sense?
+//Probably not tbh
 template <typename T, int KeyRange, int ElementCount>
 struct vds_sparse_set_t
 {
