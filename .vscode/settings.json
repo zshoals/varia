@@ -20,6 +20,7 @@
 		"xtr1common": "cpp",
 		"*.def": "cpp",
 		"memory": "cpp",
-		"atomic": "cpp"
+		"atomic": "cpp",
+		"initializer_list": "c"
 	}
 }

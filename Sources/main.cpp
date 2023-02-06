@@ -78,13 +78,17 @@ int kickstart(int argc, char** argv)
 	vds_result_t<varia_io_file_t> fileresult = varia_io_file_load_asset("config.vcfg", &mem);
 	if (fileresult.valid)
 	{
-		VARIA_NO_OPERATION();
 		varia_io_file_t file = fileresult.value;
 		vds_strview_t textData = vds_strview_create_with_length(reinterpret_cast<char const *>(file.bytes), file.size);
 
 		vds_strview_sequence_t<16> splits = vds_strview_split<16>(textData, "\n");
 
-		vds_strview_sequence_print_all(&splits);
+		for(vds_strview_t const & sv : splits)
+		{
+			vds_strview_sequence_t<2> left_right = vds_strview_split<2>(sv, " ");
+			if (vds_strview_sequence_length(&left_right) != 2) continue;
+			vds_strview_sequence_print_all(&left_right);
+		}
 	}
 
 
