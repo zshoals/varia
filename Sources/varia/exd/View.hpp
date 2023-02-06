@@ -84,8 +84,8 @@ inline bool exd_view_internal_entity_matches_query_requirements(exd_view_t * sel
 //mechanism.
 
 //Located in the header for (hopefully) inlining purposes
-template<typename T, typename FUNC>
-void exd_view_iterate_forwards_single(exd_view_t * self, FUNC cb)
+template<typename T, typename Predicate>
+void exd_view_iterate_forwards_single(exd_view_t * self, Predicate cb)
 {
 	DEBUG_ENSURE_TRUE(self->finalized, "View was not finalized before usage.");
 	//Note(zshoals Dec-28-2822):> We add one here as one include is removed for optimization purposes
@@ -106,8 +106,8 @@ void exd_view_iterate_forwards_single(exd_view_t * self, FUNC cb)
 	}
 }
 
-template<typename T, typename FUNC>
-void exd_view_iterate_forwards_single_with_entity(exd_view_t * self, FUNC cb)
+template<typename T, typename Predicate>
+void exd_view_iterate_forwards_single_with_entity(exd_view_t * self, Predicate cb)
 {
 	DEBUG_ENSURE_TRUE(self->finalized, "View was not finalized before usage.");
 	//Note(zshoals Dec-28-2822):> We add one here as one include is removed for optimization purposes
@@ -128,8 +128,8 @@ void exd_view_iterate_forwards_single_with_entity(exd_view_t * self, FUNC cb)
 	}
 }
 
-template<typename FUNC>
-void exd_view_iterate_forwards(exd_view_t * self, FUNC cb)
+template<typename Predicate>
+void exd_view_iterate_forwards(exd_view_t * self, Predicate cb)
 {
 	DEBUG_ENSURE_TRUE(self->finalized, "View was not finalized before usage.");
 
@@ -155,8 +155,8 @@ void exd_view_iterate_forwards(exd_view_t * self, FUNC cb)
 //||                       Backwards Iteration                           ||
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-template<typename T, typename FUNC>
-void exd_view_iterate_backwards_single(exd_view_t * self, FUNC cb)
+template<typename T, typename Predicate>
+void exd_view_iterate_backwards_single(exd_view_t * self, Predicate cb)
 {
 	DEBUG_ENSURE_TRUE(self->finalized, "View was not finalized before usage.");
 	DEBUG_ENSURE_UINT_EQUALS(vds_array_length(&self->comp_include) + 1, 1, "Tried to iterate a single element, however, multiple components were included.");
@@ -174,8 +174,8 @@ void exd_view_iterate_backwards_single(exd_view_t * self, FUNC cb)
 	}
 }
 
-template<typename T, typename FUNC>
-void exd_view_iterate_backwards_single_with_entity(exd_view_t * self, FUNC cb)
+template<typename T, typename Predicate>
+void exd_view_iterate_backwards_single_with_entity(exd_view_t * self, Predicate cb)
 {
 	DEBUG_ENSURE_TRUE(self->finalized, "View was not finalized before usage.");
 	DEBUG_ENSURE_UINT_EQUALS(vds_array_length(&self->comp_include) + 1, 1, "Tried to iterate a single element, however, multiple components were included.");
@@ -194,8 +194,8 @@ void exd_view_iterate_backwards_single_with_entity(exd_view_t * self, FUNC cb)
 	}
 }
 
-template<typename FUNC>
-void exd_view_iterate_backwards(exd_view_t * self, FUNC cb)
+template<typename Predicate>
+void exd_view_iterate_backwards(exd_view_t * self, Predicate cb)
 {
 	DEBUG_ENSURE_TRUE(self->finalized, "View was not finalized before usage.");
 
