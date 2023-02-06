@@ -54,37 +54,37 @@ void vds_array_initialize(vds_array_t<T, Size> * arr)
 }
 
 template <typename T, int Size>
-size_t vds_array_front(vds_array_t<T, Size> * arr)
+size_t vds_array_front(vds_array_t<T, Size> const * arr)
 {
 	return 0;
 }
 
 template <typename T, int Size>
-size_t vds_array_back(vds_array_t<T, Size> * arr)
+size_t vds_array_back(vds_array_t<T, Size> const * arr)
 {
 	return arr->push_idx - 1;
 }
 
 template <typename T, int Size>
-size_t vds_array_length(vds_array_t<T, Size> * arr)
+size_t vds_array_length(vds_array_t<T, Size> const * arr)
 {
 	return arr->push_idx;
 }
 
 template <typename T, int Size>
-size_t vds_array_capacity(vds_array_t<T, Size> * arr)
+size_t vds_array_capacity(vds_array_t<T, Size> const * arr)
 {
 	return Size;
 }
 
 template <typename T, int Size>
-bool vds_array_is_populated(vds_array_t<T, Size> * arr)
+bool vds_array_is_populated(vds_array_t<T, Size> const * arr)
 {
 	return arr->push_idx > 0;
 }
 
 template <typename T, int Size>
-bool vds_array_is_empty(vds_array_t<T, Size> * arr)
+bool vds_array_is_empty(vds_array_t<T, Size> const * arr)
 {
 	return !vds_array_is_populated(arr);
 }
@@ -99,13 +99,16 @@ void vds_array_push(vds_array_t<T, Size> * arr, T value)
 }
 
 template <typename T, int Size>
-void vds_array_try_push(vds_array_t<T, Size> * arr, T value)
+bool vds_array_try_push(vds_array_t<T, Size> * arr, T value)
 {
 	if (arr->push_idx < Size)
 	{
 		arr->data[arr->push_idx] = value;
 		++arr->push_idx;
+		return true;
 	}
+
+	return false;
 }
 
 template <typename T, int Size>
@@ -125,15 +128,15 @@ T vds_array_pop(vds_array_t<T, Size> * arr)
 	return arr->data[arr->push_idx];
 }
 
-template <typename T, int Size>
-void vds_array_try_pop(vds_array_t<T, Size> * arr, T value)
-{
-	if (arr->push_idx >= 1)
-	{
-		--arr->push_idx;
-		return arr->data[arr->push_idx];
-	}
-}
+// template <typename T, int Size>
+// void vds_array_try_pop(vds_array_t<T, Size> * arr, T value)
+// {
+// 	if (arr->push_idx >= 1)
+// 	{
+// 		--arr->push_idx;
+// 		return arr->data[arr->push_idx];
+// 	}
+// }
 
 template <typename T, int Size>
 void vds_array_set(vds_array_t<T, Size> * arr, size_t index, T value)
@@ -159,14 +162,14 @@ void vds_array_set_all(vds_array_t<T, Size> * arr, T value)
 }
 
 template <typename T, int Size>
-T const * vds_array_get(vds_array_t<T, Size> * arr, size_t index)
+T const * vds_array_get(vds_array_t<T, Size> const * arr, size_t index)
 {
 	ENSURE_UINT_LT(index, Size, "Attempted to get an element out of range in StaticArray.");
 	return &arr->data[index];
 }
 
 template <typename T, int Size>
-T const * vds_array_get_unsafe(vds_array_t<T, Size> * arr, size_t index)
+T const * vds_array_get_unsafe(vds_array_t<T, Size> const * arr, size_t index)
 {
 	DEBUG_ENSURE_UINT_LT(index, Size, "Attempted to get an element out of range in StaticArray.");
 	return &arr->data[index];
@@ -187,7 +190,7 @@ T * vds_array_get_mut_unsafe(vds_array_t<T, Size> * arr, size_t index)
 }
 
 template <typename T, int Size>
-size_t vds_array_index_of(vds_array_t<T, Size> * arr, T const * value)
+size_t vds_array_index_of(vds_array_t<T, Size> const * arr, T const * value)
 {
 	for_range_var(i, arr->push_idx)
 	{
@@ -289,14 +292,25 @@ void vds_array_sort_all(vds_array_t<T, Size> * arr)
 	#undef Q_SWAP
 }
 
-template <typename T, int Size, typename FUNC>
-void vds_array_for_each(vds_array_t<T, Size> * arr, const FUNC f)
+template <typename T, int Size, typename Predicate>
+void vds_array_for_each(vds_array_t<T, Size> * arr, const Predicate f)
 {
-	const size_t len = vds_array_length(arr)
+	const size_t len = vds_array_length(arr);
 	for_range_var(i, len)
 	{
 		T * element = vds_array_get_mut_unsafe(arr, i);
 		f(element);
+	}
+}
+
+template <typename T, int Size, typename Predicate>
+void vds_array_for_each_with_index(vds_array_t<T, Size> * arr, const Predicate f)
+{
+	const size_t len = vds_array_length(arr);
+	for_range_var(i, len)
+	{
+		T * element = vds_array_get_mut_unsafe(arr, i);
+		f(element, i);
 	}
 }
 
