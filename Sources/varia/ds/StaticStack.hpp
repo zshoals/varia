@@ -3,6 +3,8 @@
 #include "varia/vcommon.hpp"
 #include "varia/validation.hpp"
 
+#include <string.h>
+
 
 template<typename T, int Size>
 struct vds_stack_t
@@ -14,7 +16,7 @@ struct vds_stack_t
 template<typename T, int Size>
 void vds_stack_initialize(vds_stack_t<T, Size> * self)
 {
-	VARIA_ZERO_INIT(self);
+	memset(self, 0, sizeof(*self));
 }
 
 template<typename T, int Size>

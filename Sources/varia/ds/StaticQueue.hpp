@@ -6,8 +6,7 @@
 #include "StaticRingbuf.hpp"
 #include "Result.hpp"
 
-
-
+#include <string.h>
 
 template<typename T, int Size>
 struct vds_queue_t //Note(zshoals 01-31-2023):> Hey QT, winkyface ;)
@@ -22,7 +21,7 @@ struct vds_queue_t //Note(zshoals 01-31-2023):> Hey QT, winkyface ;)
 template<typename T, int Size>
 void vds_queue_initialize(vds_queue_t<T, Size> * self)
 {
-	VARIA_ZERO_INIT(self);
+	memset(self, 0, sizeof(*self));
 }
 
 //Tries to push a new value onto the queue. 

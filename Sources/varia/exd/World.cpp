@@ -10,6 +10,8 @@
 #include "varia/logging.hpp"
 #include "varia/util/Memory.hpp"
 
+#include <string.h>
+
 
 //============
 //Init Convenience
@@ -94,7 +96,7 @@ void exd_world_initialize(exd_world_t * world, vds_allocator_t * allocator)
 
 	//Note(zshoals Dec-26-2022):> Components are registered on demand, so just zero 
 	//to start with but do not actually register components
-	VARIA_ZERO_INIT_SIZE(&world->components[0], sizeof(world->components));
+	memset(&world->components[0], 0, sizeof(world->components));
 }
 
 exd_entity_t exd_world_ent_create(exd_world_t * world)

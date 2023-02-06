@@ -3,8 +3,6 @@
 //Includes types that are basically used everywhere
 
 #include <stdint.h>
-#include <assert.h>
-#include <string.h>
 
 typedef uint8_t u8;
 typedef uint16_t u16;
@@ -28,9 +26,10 @@ typedef unsigned int uint;
 #define VARIA_NO_OPERATION() ((void)0)
 #define VARIA_INTENTIONALLY_DO_NOTHING() ((void)0)
 
-#define VARIA_ZERO_INIT(THIS_PTR) memset((THIS_PTR), 0, (sizeof(*THIS_PTR)))
-#define VARIA_ZERO_INIT_SIZE(PTR, SIZE) memset((PTR), 0, SIZE)
-
+//Note(zshoals 02-05-2023):> Prefer just doing the memset manually; don't bring in the entire
+//string header here just to memset stuff (this isn't needed everywhere)
+// #define VARIA_ZERO_INIT(THIS_PTR) memset((THIS_PTR), 0, (sizeof(*THIS_PTR)))
+// #define VARIA_ZERO_INIT_SIZE(PTR, SIZE) memset((PTR), 0, SIZE)
 
 //Note(zshoals 01-24-2023):> Maybe too clunky to use in practice
 //taken from https://stackoverflow.com/questions/13842468/comma-in-c-c-macro

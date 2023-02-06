@@ -8,6 +8,7 @@
 #include "varia/ds/StringView.hpp"
 
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "varia/io/File.hpp"
 

@@ -7,6 +7,8 @@
 #include "varia/vcommon.hpp"
 #include "varia/validation.hpp"
 
+#include <string.h>
+
 
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
@@ -56,7 +58,7 @@ struct vds_bitset32_t
 template<int Size>
 void vds_bitset32_initialize(vds_bitset32_t<Size> * self)
 {
-	VARIA_ZERO_INIT(self);
+	memset(self, 0, sizeof(*self));
 }
 
 template<int Size>

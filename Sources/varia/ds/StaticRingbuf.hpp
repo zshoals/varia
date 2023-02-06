@@ -4,6 +4,8 @@
 #include "varia/validation.hpp"
 #include "kinc/log.h"
 
+#include <string.h>
+
 template<typename T, int Size>
 struct vds_ringbuf_t
 {
@@ -63,7 +65,7 @@ struct vds_ringbuf_t
 template<typename T, int Size>
 void vds_ringbuf_initialize(vds_ringbuf_t<T, Size> * self)
 {
-	VARIA_ZERO_INIT(self);
+	memset(self, 0, sizeof(*self));
 }
 
 template<typename T, int Size>

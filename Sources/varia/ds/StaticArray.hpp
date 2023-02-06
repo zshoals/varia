@@ -50,7 +50,7 @@ struct vds_array_t
 template <typename T, int Size>
 void vds_array_initialize(vds_array_t<T, Size> * arr)
 {
-	VARIA_ZERO_INIT(arr);
+	memset(arr, 0, sizeof(*arr));
 }
 
 template <typename T, int Size>
