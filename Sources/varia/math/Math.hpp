@@ -58,9 +58,9 @@ constexpr inline T vmath_ceil_next_nearest(T value, T target_multiple)
 	return (((target_multiple - (value % target_multiple)) * round_up) + value);
 }
 
-constexpr static u8 vmath_pow2_to_bitshift_value(size_t pow2_value)
+constexpr static unsigned int vmath_pow2_to_bitshift_value(size_t pow2_value)
 {
-	u8 shift = 0;
+	unsigned int shift = 0;
 	while (pow2_value > 1)
 	{
 		pow2_value /= 2;
