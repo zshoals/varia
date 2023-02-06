@@ -8,7 +8,6 @@
 #include "varia/ds/StringView.hpp"
 
 #include <stdlib.h>
-#include <inttypes.h>
 
 #include "varia/io/File.hpp"
 
@@ -90,6 +89,11 @@ int kickstart(int argc, char** argv)
 			if (vds_strview_sequence_length(&left_right) != 2) continue;
 			vds_strview_sequence_print_all(&left_right);
 		}
+	}
+
+	for_range_var(i, 100)
+	{
+		VARIA_ITERATION_GUARD(i, 50);
 	}
 
 

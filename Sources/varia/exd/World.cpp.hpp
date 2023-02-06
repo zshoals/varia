@@ -147,6 +147,9 @@ bool exd_world_ent_valid(exd_world_t * world, exd_entity_t ent)
 }
 
 //TODO(zshoals 01-01-2023):> Check for double registration? 
+//TODO(zshoals 02-05-2023):> We aren't checking if registering a new component would exceed our max capacity
+//This is kind of important if we set the "Max Components" constant manually to break the 
+//eveything recompiling problem whenever we add or remove a component
 void exd_world_comp_register(exd_world_t * world, size_t element_size, exd::ComponentTypeID type)
 {
 	void * storage_mem = vds_allocator_allocate_aligned_count(world->allocator, element_size, EXD_GLOBAL_CONSTANTS_MAX_ENTITIES, VARIA_MEMORY_CONSTANTS_DEFAULT_ALIGNMENT);
