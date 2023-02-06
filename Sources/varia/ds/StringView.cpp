@@ -30,6 +30,34 @@ bool vds_strview_matches(vds_strview_t a, vds_strview_t b)
 	return false;
 }
 
+vds_strview_t vds_strview_strip_leading_glyph(vds_strview_t stringview, char const * glyph)
+{
+	for_range_var(i, stringview._length)
+	{
+		if (vds_strview_raw(stringview)[i] != glyph[0])
+		{
+			size_t const new_len = stringview._length - i;
+			return vds_strview_create_with_length(&vds_strview_raw(stringview)[i], new_len);
+		}
+	}
+
+	return vds_strview_create_with_length("", 0);
+}
+
+vds_strview_t vds_strview_strip_trailing_glyph(vds_strview_t stringview, char const * glyph)
+{
+	for_reverse_range_var(i, stringview._length)
+	{
+		if (vds_strview_raw(stringview)[i] != glyph[0])
+		{
+			size_t const new_len = i;
+			return vds_strview_create_with_length(&vds_strview_raw(stringview)[0], new_len);
+		}
+	}
+
+	return vds_strview_create_with_length("", 0);
+}
+
 char const * vds_strview_raw(vds_strview_t stringview)
 {
 	return stringview.string;

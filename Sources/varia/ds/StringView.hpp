@@ -29,6 +29,8 @@ bool vds_strview_matches(vds_strview_t a, vds_strview_t b);
 char const * vds_strview_raw(vds_strview_t stringview);
 vds_result_t<vds_strview_t> vds_strview_find_first_occurrence(vds_strview_t haystack, vds_strview_t needle);
 void vds_strview_print(vds_strview_t stringview);
+vds_strview_t vds_strview_strip_leading_glyph(vds_strview_t stringview, char const * glyph);
+vds_strview_t vds_strview_strip_trailing_glyph(vds_strview_t stringview, char const * glyph);
 
 
 
