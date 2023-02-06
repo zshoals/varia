@@ -19,6 +19,8 @@ struct vds_strview_sequence_t
 	vds_array_t<vds_strview_t, MaxSize> strviews;
 	auto begin(void) { return strviews.begin(); }
 	auto end(void) { return strviews.end(); }
+	auto cbegin(void) const { return begin(); }
+	auto cend(void) const { return end(); }
 };
 
 vds_strview_t vds_strview_create(char const * null_term_string);
@@ -39,7 +41,7 @@ void vds_strview_sequence_initialize(vds_strview_sequence_t<MaxSize> * self)
 }
 
 template<int MaxSize>
-size_t vds_strview_sequence_length(vds_strview_sequence_t<MaxSize> * sequence)
+size_t vds_strview_sequence_length(vds_strview_sequence_t<MaxSize> const * sequence)
 {
 	return vds_array_length(&sequence->strviews);
 }
@@ -51,6 +53,24 @@ void vds_strview_sequence_print_all(vds_strview_sequence_t<MaxSize> * sequence)
 	{
 		vds_strview_print(str);
 	}
+}
+
+template <int MaxSize>
+void vds_strview_sequence_push(vds_strview_sequence_t<MaxSize> * self, vds_strview_t stringview)
+{
+	vds_array_push(&self->strviews, stringview);
+}
+
+template <int MaxSize>
+bool vds_strview_sequence_try_push(vds_strview_sequence_t<MaxSize> * self, vds_strview_t stringview)
+{
+	return vds_array_try_push(&self->strviews, stringview);
+}
+
+template <int MaxSize>
+vds_strview_t vds_strview_sequence_pop(vds_strview_sequence_t<MaxSize> * self, vds_strview_t stringview)
+{
+	return vds_array_pop(&self->strviews);
 }
 
 template <int MaxSize>
@@ -73,7 +93,7 @@ vds_strview_sequence_t<MaxSize> vds_strview_internal_split_newline(vds_strview_t
 				size_t last_char_index = counter;
 				size_t first_char_index = last_char_index - sequence_length;
 				vds_strview_t view = vds_strview_create_with_length(&raw_string[first_char_index], sequence_length);
-				vds_array_try_push(&svs.strviews, view);
+				vds_strview_sequence_try_push(&svs, view);
 
 				sequence_length = 0;
 			}
@@ -93,7 +113,7 @@ vds_strview_sequence_t<MaxSize> vds_strview_internal_split_newline(vds_strview_t
 		size_t last_char_index = counter;
 		size_t first_char_index = last_char_index - sequence_length;
 		vds_strview_t view = vds_strview_create_with_length(&raw_string[first_char_index], sequence_length);
-		vds_array_try_push(&svs.strviews, view);
+		vds_strview_sequence_try_push(&svs, view);
 	}
 	
 
@@ -103,16 +123,23 @@ vds_strview_sequence_t<MaxSize> vds_strview_internal_split_newline(vds_strview_t
 template <int MaxSize>
 vds_strview_sequence_t<MaxSize> vds_strview_split(vds_strview_t string, char const * separator)
 {
+
+	vds_strview_sequence_t<MaxSize> svs;
+	vds_strview_sequence_initialize(&svs);
+
+	if (string._length == 0) return svs;
+
+
+
 	//Special case newline splitting as it may be either "just" a slashN or both slashR and slashN
 	if (*separator == '\n' || *separator == '\r') 
 	{
 		return vds_strview_internal_split_newline<MaxSize>(string);
 	}
 
-	//Generic case with a single character to split on
-	vds_strview_sequence_t<MaxSize> svs;
-	vds_strview_sequence_initialize(&svs);
 
+
+	//Generic case with a single character to split on
 	char const * raw_string = vds_strview_raw(string);
 	size_t sequence_length = 0;
 	size_t counter = 0;
@@ -127,7 +154,7 @@ vds_strview_sequence_t<MaxSize> vds_strview_split(vds_strview_t string, char con
 				size_t last_char_index = counter;
 				size_t first_char_index = last_char_index - sequence_length;
 				vds_strview_t view = vds_strview_create_with_length(&raw_string[first_char_index], sequence_length);
-				vds_array_try_push(&svs.strviews, view);
+				vds_strview_sequence_try_push(&svs, view);
 
 				sequence_length = 0;
 			}
@@ -142,12 +169,13 @@ vds_strview_sequence_t<MaxSize> vds_strview_split(vds_strview_t string, char con
 		}
 	}
 
+	//Handle the last remaining string sequence that wasn't processed in the previous loop
 	if (sequence_length > 0)
 	{
 		size_t last_char_index = counter;
 		size_t first_char_index = last_char_index - sequence_length;
 		vds_strview_t view = vds_strview_create_with_length(&raw_string[first_char_index], sequence_length);
-		vds_array_try_push(&svs.strviews, view);
+		vds_strview_sequence_try_push(&svs, view);
 	}
 	
 
