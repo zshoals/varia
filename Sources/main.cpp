@@ -93,7 +93,7 @@ int kickstart(int argc, char** argv)
 		}
 	}
 
-	if (dread_run_tests() == -1)
+	if (dread_run_tests(false) == -1)
 	{
 		VARIA_QLOG("Success!");
 	}

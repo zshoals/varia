@@ -13,9 +13,9 @@ void test_strview_all_tests(void)
 		
 		if (vds_strview_matches(sv, vds_strview_create("Hello")))
 		{
-			return "S";
+			return DREAD_SUCCESS;
 		}
-		return "F";
+		return DREAD_FAILURE;
 	});
 
 
@@ -27,10 +27,10 @@ void test_strview_all_tests(void)
 
 		if (vds_strview_matches(sv, vds_strview_create("Good")))
 		{
-			return "S";
+			return DREAD_SUCCESS;
 		}
 
-		return "F";
+		return DREAD_FAILURE;
 	});
 
 	DTEST("Empty Stringview Matches Empty Stringview",
@@ -41,10 +41,10 @@ void test_strview_all_tests(void)
 
 		if (vds_strview_matches(a, b))
 		{
-			return "S";
+			return DREAD_SUCCESS;
 		}
 
-		return "F";
+		return DREAD_FAILURE;
 	});
 
 	DTEST("Empty Stringview Does Not Match Stringview With Characters",
@@ -56,9 +56,9 @@ void test_strview_all_tests(void)
 		//DOES NOT MATCH
 		if (!vds_strview_matches(a, b))
 		{
-			return "S";
+			return DREAD_SUCCESS;
 		}
 
-		return "F";
+		return DREAD_FAILURE;
 	});
 }
