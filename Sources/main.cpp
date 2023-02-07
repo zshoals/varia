@@ -12,6 +12,7 @@
 #include "varia/io/File.hpp"
 
 #include "dread/Dread.hpp"
+#include "varia/tests/Test_Everything.hpp"
 
 
 int kickstart(int argc, char** argv) 
@@ -93,14 +94,8 @@ int kickstart(int argc, char** argv)
 		}
 	}
 
-	if (dread_run_tests(false) == -1)
-	{
-		VARIA_QLOG("Success!");
-	}
-	else 
-	{
-		VARIA_QLOG("Failure!");
-	}
+	test_add_every_test_to_dread();
+	dread_run_tests(false);
 
 	kinc_start();
 

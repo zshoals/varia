@@ -12,6 +12,7 @@ constexpr char const * DREAD_SUCCESS = "S";
 constexpr char const * DREAD_FAILURE = "F";
 
 using dread_test_func_t = char const *(*)(void);
+using dread_result_t = char const *;
 
 struct dread_test_runner_t
 {
@@ -27,6 +28,5 @@ extern dread_test_runner_t _dread_tests_storage;
 
 /* Returns -1 for success, TestID Number for first test failure
 */
-void dread_push_test(char const * test_name, dread_test_func_t fn);
 void DTEST(char const * test_name, dread_test_func_t lambda_fn);
 int dread_run_tests(bool verbose);

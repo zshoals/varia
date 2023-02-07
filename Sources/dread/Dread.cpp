@@ -1,18 +1,8 @@
 #include "Dread.hpp"
 
-#include "tests/Test_StringViews.hpp"
-
 #include "kinc/log.h"
 
 dread_test_runner_t _dread_tests_storage = {};
-
-
-//Note(zshoals 02-06-2023):> Place all tests in this function
-//Make sure to also ==INCLUDE YOUR TESTS== at the top of this file.
-void dread_unitlocal_add_test_batch(void)
-{
-	test_strview_all_tests();
-}
 
 void dread_push_test(char const * test_name, dread_test_func_t fn)
 {
@@ -37,7 +27,6 @@ void DTEST(char const * test_name, dread_test_func_t lambda_fn)
 
 int dread_run_tests(bool verbose)
 {
-	dread_unitlocal_add_test_batch();
 	kinc_log(KINC_LOG_LEVEL_INFO, "\n[DREAD TESTING FRAMEWORK]::Running %d tests...", _dread_tests_storage._length);
 
 	int first_test_failed_id = -1;

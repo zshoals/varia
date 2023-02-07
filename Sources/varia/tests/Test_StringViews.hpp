@@ -5,8 +5,14 @@
 
 void test_strview_all_tests(void)
 {
+
+//TESTS BEGIN HERE
+
+
+
+
 	DTEST("Strip Trailing Glyphs From Stringview",
-	[](void) -> char const *
+	[](void) -> dread_result_t
 	{
 		vds_strview_t sv = vds_strview_create("Hello     ");
 		sv = vds_strview_strip_trailing_glyph(sv, " ");
@@ -18,9 +24,8 @@ void test_strview_all_tests(void)
 		return DREAD_FAILURE;
 	});
 
-
 	DTEST("Strip Leading Glyphs From Stringview", 
-	[](void) -> char const *
+	[](void) -> dread_result_t
 	{
 		vds_strview_t sv = vds_strview_create("---Good");
 		sv = vds_strview_strip_leading_glyph(sv, "-");
@@ -34,7 +39,7 @@ void test_strview_all_tests(void)
 	});
 
 	DTEST("Empty Stringview Matches Empty Stringview",
-	[](void) -> char const *
+	[](void) -> dread_result_t
 	{
 		vds_strview_t a = vds_strview_create("");
 		vds_strview_t b = vds_strview_create("");
@@ -48,7 +53,7 @@ void test_strview_all_tests(void)
 	});
 
 	DTEST("Empty Stringview Does Not Match Stringview With Characters",
-	[](void) -> char const *
+	[](void) -> dread_result_t
 	{
 		vds_strview_t a = vds_strview_create("");
 		vds_strview_t b = vds_strview_create("Yo, what's going on over here Ralph?");
@@ -61,4 +66,8 @@ void test_strview_all_tests(void)
 
 		return DREAD_FAILURE;
 	});
-}
+
+
+
+
+} //TESTS END HERE
