@@ -11,6 +11,8 @@
 
 #include "varia/io/File.hpp"
 
+#include "dread/Dread.hpp"
+
 
 int kickstart(int argc, char** argv) 
 {
@@ -91,19 +93,14 @@ int kickstart(int argc, char** argv)
 		}
 	}
 
-	vds_strview_t str = vds_strview_create("BBBBBB");
-	VARIA_LOG_INT(str._length);
-	VARIA_QLOG("Split");
-	vds_strview_print(str);
-	str = vds_strview_strip_leading_glyph(str, "B");
-	VARIA_LOG_INT(str._length);
-	VARIA_LOG_INT(str._length);
-	VARIA_LOG_INT(str._length);
-	VARIA_LOG_INT(str._length);
-	vds_strview_print(str);
-	str = vds_strview_strip_trailing_glyph(str, " ");
-	vds_strview_print(str);
-	VARIA_LOG_INT(str._length);
+	if (dread_run_tests() == -1)
+	{
+		VARIA_QLOG("Success!");
+	}
+	else 
+	{
+		VARIA_QLOG("Failure!");
+	}
 
 	kinc_start();
 

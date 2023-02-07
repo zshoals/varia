@@ -58,6 +58,12 @@ void vds_strview_sequence_print_all(vds_strview_sequence_t<MaxSize> * sequence)
 }
 
 template <int MaxSize>
+bool vds_strview_sequence_try_push_new_strview(vds_strview_sequence_t<MaxSize> * self, char const * string)
+{
+	return vds_array_try_push(&self->strviews, vds_strview_create(string));
+}
+
+template <int MaxSize>
 void vds_strview_sequence_push(vds_strview_sequence_t<MaxSize> * self, vds_strview_t stringview)
 {
 	vds_array_push(&self->strviews, stringview);
