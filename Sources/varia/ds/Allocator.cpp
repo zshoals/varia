@@ -19,6 +19,8 @@ void vds_allocator_initialize(vds_allocator_t * self, void * memory, size_t buff
 void * vds_allocator_allocate_aligned(vds_allocator_t * self, size_t size, size_t alignment)
 {
 	DEBUG_ENSURE_UINT_GT_ZERO(size, "Tried to make an empty memory allocation.");
+	size_t _DEBUG_MAX_ALLOCATION_SIZE = 1 * 1000 * 1000 * 1000; //1 Gigabyte
+	DEBUG_ENSURE_UINT_LT(size, _DEBUG_MAX_ALLOCATION_SIZE, "Tried to make a very large allocation (1 GB+). Was this intended?");
 
 	uintptr_t base_addr = reinterpret_cast<uintptr_t>(self->data); 
 	base_addr += self->current_offset;
@@ -27,7 +29,8 @@ void * vds_allocator_allocate_aligned(vds_allocator_t * self, size_t size, size_
 	uintptr_t target_address = base_addr + (alignment - misalign);
 	size_t offset_advance_amount = misalign + size;
 
-	DEBUG_ENSURE_UINT_LT(self->current_offset + offset_advance_amount, self->buffer_len, "Allocator OOM");
+	//Note(zshoals 02-08-2023):> Better to be safe than sorry; always check that the allocation size is ok
+	ENSURE_UINT_LT(self->current_offset + offset_advance_amount, self->buffer_len, "Allocator OOM");
 
 	self->current_offset += offset_advance_amount;
 
