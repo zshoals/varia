@@ -6,17 +6,17 @@ constexpr double TAU = PI * 2;
 
 constexpr inline float vmath_lerp(float value, float start, float end)
 {
-	return start * (1 - value) + (end * value);
+	return (start * (1 - value)) + (end * value);
 }
 
-constexpr inline float vmath_inverse_lerp(float value, float start, float end)
+constexpr inline float vmath_linear_norm(float value, float start, float end)
 {
 	return (value - start) / (end - start);
 }
 
 constexpr inline float vmath_remap(float value, float s1, float e1, float s2, float e2)
 {
-	return vmath_inverse_lerp(vmath_lerp(value, s1, e1), s2, e2);
+	return vmath_linear_norm(vmath_lerp(value, s1, e1), s2, e2);
 }
 
 constexpr inline float vmath_rad2deg(float radians)

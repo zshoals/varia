@@ -10,10 +10,13 @@
 #include <stdlib.h>
 
 #include "varia/io/File.hpp"
+#include "varia/util/Elapsed.hpp"
 
 #include "dread/Dread.hpp"
 #include "varia/tests/Test_Everything.hpp"
 
+#include "varia/simd/i32q.hpp"
+#include "varia/simd/f32q.hpp"
 
 int kickstart(int argc, char** argv) 
 {
@@ -96,6 +99,15 @@ int kickstart(int argc, char** argv)
 
 	test_add_every_test_to_dread();
 	dread_run_tests(false);
+
+	f32q a = f32q_set_all(100);
+	f32q b = f32q_set(100, 200, 300, 400);
+	a += b;
+
+	VARIA_LOG_FLOAT(f32q_get(a, 0));
+	VARIA_LOG_FLOAT(f32q_get(a, 1));
+	VARIA_LOG_FLOAT(f32q_get(a, 2));
+	VARIA_LOG_FLOAT(f32q_get(a, 3));
 
 	kinc_start();
 
