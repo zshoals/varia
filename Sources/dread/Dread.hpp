@@ -14,6 +14,12 @@ constexpr char const * DREAD_FAILURE = "F";
 using dread_test_func_t = char const *(*)(void);
 using dread_result_t = char const *;
 
+enum class dread_verbosity_e
+{
+	Quiet,
+	Verbose
+};
+
 struct dread_test_runner_t
 {
 	int _length;
@@ -29,4 +35,4 @@ extern dread_test_runner_t _dread_tests_storage;
 /* Returns -1 for success, TestID Number for first test failure
 */
 void DTEST(char const * test_name, dread_test_func_t lambda_fn);
-int dread_run_tests(bool verbose);
+int dread_run_tests(dread_verbosity_e verbosity);

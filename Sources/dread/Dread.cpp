@@ -25,7 +25,7 @@ void DTEST(char const * test_name, dread_test_func_t lambda_fn)
 	dread_push_test(test_name, lambda_fn);
 }
 
-int dread_run_tests(bool verbose)
+int dread_run_tests(dread_verbosity_e verbosity)
 {
 	kinc_log(KINC_LOG_LEVEL_INFO, "\n[DREAD TESTING FRAMEWORK]::Running %d tests...", _dread_tests_storage._length);
 
@@ -72,7 +72,7 @@ int dread_run_tests(bool verbose)
 		//All tests passed
 		kinc_log(KINC_LOG_LEVEL_INFO, "Tests Completed Successfully: %d", _dread_tests_storage._length);
 
-		if (verbose)
+		if (verbosity == dread_verbosity_e::Verbose)
 		{
 			for (int i = 0; i < _dread_tests_storage._length; ++i)
 			{
