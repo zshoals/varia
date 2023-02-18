@@ -3,6 +3,7 @@
 #include "varia/ds/Allocator.hpp"
 #include "kinc/io/filereader.h"
 
+//TODO(zshoals 02-17-2023):> This should have a size limit parameter passed in
 static inline vds_result_t<varia_io_file_t> vds_io_file_unitlocal_load_file(const char * filepath, vds_allocator_t * allocator, int filetype)
 {
 	kinc_file_reader_t reader = {};
@@ -40,11 +41,13 @@ static inline vds_result_t<varia_io_file_t> vds_io_file_unitlocal_load_file(cons
 	return res;
 }
 
+//TODO(zshoals 02-17-2023):> This should have a size limit parameter passed in
 vds_result_t<varia_io_file_t> varia_io_file_load_asset(const char * filepath, vds_allocator_t * allocator)
 {
 	return vds_io_file_unitlocal_load_file(filepath, allocator, KINC_FILE_TYPE_ASSET);
 }
 
+//TODO(zshoals 02-17-2023):> This should have a size limit parameter passed in
 vds_result_t<varia_io_file_t> varia_io_file_load_save(const char * filepath, vds_allocator_t * allocator)
 {
 	return vds_io_file_unitlocal_load_file(filepath, allocator, KINC_FILE_TYPE_SAVE);
