@@ -3,7 +3,7 @@
 #include "varia/vcommon.hpp"
 #include "kinc/simd/float32x4.h"
 
-constexpr double PI = 3.145926545;
+static constexpr double PI = 3.145926545;
 
 typedef kinc_float32x4_t f32q;
 typedef kinc_float32x4_mask_t f32q_mask;
@@ -64,8 +64,11 @@ static inline f32q_mask f32q_ones_mask_lane3(void) {
 	return f32q_cmplt(f32q_set(1.0f, 1.0f, 1.0f, 0.0f), f32q_set(0.0f, 0.0f, 0.0f, 1.0f));
 }
 static inline f32q_mask f32q_mask_zeroes(void) { return f32q_set_all(0.0f); }
-static inline f32q_mask f32q_mask_ones(void) { return f32q_cmpgt(f32q_set_all(1.0f), f32q_set_all(0.0f)); }
-
+static inline f32q_mask f32q_mask_ones(void) 
+{ 
+	f32q zeroes = f32q_mask_zeroes();
+	return f32q_cmpeq(zeroes, zeroes); 
+}
 
 
 
