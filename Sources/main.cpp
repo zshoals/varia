@@ -2,10 +2,12 @@
 #include "kinc/system.h"
 #include "kinc/display.h"
 
+#include "varia/vcommon.hpp"
 #include "varia/ds/Allocator.hpp"
 #include "varia/util/Memory.hpp"
 #include "varia/logging.hpp"
 #include "varia/ds/StringView.hpp"
+#include "varia/ds/StaticArray.hpp"
 
 #include <stdlib.h>
 
@@ -81,33 +83,40 @@ int kickstart(int argc, char** argv)
 	void * buffer = calloc(1, varia_memory_kilobytes_to_bytes(1));
 	vds_allocator_initialize(&mem, buffer, varia_memory_kilobytes_to_bytes(1));
 
-	vds_result_t<varia_io_file_t> fileresult = varia_io_file_load_asset("config.vcfg", &mem);
-	if (fileresult.valid)
+	vds_array_t<f32, 1024> float_arr;
+	vds_array_initialize(&float_arr);
+	vds_array_for_each_with_index(&float_arr, [](f32 * elem, size_t i)
 	{
-		varia_io_file_t file = fileresult.value;
-		vds_strview_t textData = vds_strview_create_with_length(reinterpret_cast<char const *>(file.bytes), file.size);
+		*elem = i;
+	});
 
-		vds_strview_sequence_t<16> splits = vds_strview_split<16>(textData, "\n");
-
-		for(vds_strview_t const & sv : splits)
-		{
-			vds_strview_sequence_t<2> left_right = vds_strview_split<2>(sv, " ");
-			if (vds_strview_sequence_length(&left_right) != 2) continue;
-			vds_strview_sequence_print_all(&left_right);
-		}
+	for_range_var(i, 127)
+	{
+		vds_array_push(&float_arr, static_cast<f32>(i));
 	}
 
+	vds_array_iterate_step_4(&float_arr, [](f32 * elements)
+	{
+		f32q q = f32q_load(elements);
+		f32q a = f32q_set_all(100.0f);
+		f32q b = f32q_set_all(333.3f);
+
+		q += (a + b + (a * b));
+		// q /= (a + b);
+
+		f32q_store(elements, q);
+	});
+
+	vds_array_iterate_step_4(&float_arr, [](f32 * elements)
+	{
+		VARIA_LOG_FLOAT(elements[0]);
+		VARIA_LOG_FLOAT(elements[1]);
+		VARIA_LOG_FLOAT(elements[2]);
+		VARIA_LOG_FLOAT(elements[3]);
+	});
+
 	test_add_every_test_to_dread();
-	dread_run_tests(false);
-
-	f32q a = f32q_set_all(100);
-	f32q b = f32q_set(100, 200, 300, 400);
-	a += b;
-
-	VARIA_LOG_FLOAT(f32q_get(a, 0));
-	VARIA_LOG_FLOAT(f32q_get(a, 1));
-	VARIA_LOG_FLOAT(f32q_get(a, 2));
-	VARIA_LOG_FLOAT(f32q_get(a, 3));
+	dread_run_tests(dread_verbosity_e::Quiet);
 
 	kinc_start();
 

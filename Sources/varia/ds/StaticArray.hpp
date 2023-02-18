@@ -1,6 +1,5 @@
 #pragma once
 
-#include "varia/vcommon.hpp"
 #include "varia/validation.hpp"
 #include "varia/ds/qsort.h"
 #include "varia/ds/SearchResult.hpp"
@@ -19,7 +18,7 @@
 template <typename T, int Size>
 struct vds_array_t
 {
-	T data[Size];
+	alignas(16) T data[Size];
 	size_t push_idx;
 
 	struct vds_iterators_array_iter
@@ -313,6 +312,47 @@ void vds_array_for_each_with_index(vds_array_t<T, Size> * arr, const Predicate f
 		f(element, i);
 	}
 }
+
+template <typename T, int Size, typename Predicate>
+void vds_array_iterate_step_4(vds_array_t<T, Size> * arr, const Predicate f)
+{
+	static_assert(Size % 4 == 0, "Size must be a multiple of four"); //4 f32's to a SIMD register in SSE2
+
+	const size_t len = vds_array_length(arr);
+	for(int i = 0; i < len; i += 4)
+	{
+		T * quad_element = vds_array_get_mut_unsafe(arr, i);
+		f(quad_element);
+	}
+}
+
+template <typename T, int Size, typename Predicate>
+void vds_array_iterate_step_8(vds_array_t<T, Size> * arr, const Predicate f)
+{
+	static_assert(Size % 8 == 0, "Size must be a multiple of eight"); //4 f32's to a SIMD register in SSE2
+
+	const size_t len = vds_array_length(arr);
+	for(int i = 0; i < len; i += 8)
+	{
+		T * octo_element = vds_array_get_mut_unsafe(arr, i);
+		f(octo_element);
+	}
+}
+
+template <typename T, int Size, typename Predicate>
+void vds_array_iterate_step_16(vds_array_t<T, Size> * arr, const Predicate f)
+{
+	static_assert(Size % 16 == 0, "Size must be a multiple of sixteen"); //4 f32's to a SIMD register in SSE2
+
+	const size_t len = vds_array_length(arr);
+	for(int i = 0; i < len; i += 16)
+	{
+		T * sixteen_element = vds_array_get_mut_unsafe(arr, i);
+		f(sixteen_element);
+	}
+}
+
+
 
 
 //Note(zshoals 02-02-2023):> Testing of overloading a dereference operator
