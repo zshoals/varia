@@ -111,6 +111,12 @@ static inline kinc_int32x4_t kinc_float32x4_cvt_truncate_to_int32x4(kinc_float32
 	return kinc_int32x4_intrin_load_unaligned(&quad[0]);
 }
 
+
+
+
+
+
+
 kinc_float32x4_t kinc_float32x4_log(kinc_float32x4_t x)
 {
 	kinc_int32x4_t emm0;
@@ -169,6 +175,11 @@ kinc_float32x4_t kinc_float32x4_log(kinc_float32x4_t x)
 
 	return x;
 }
+
+
+
+
+
 
 
 _PS_CONST(exp_hi,	88.3762626647949f);
@@ -241,6 +252,103 @@ kinc_float32x4_t kinc_float32x4_exp(kinc_float32x4_t x)
 	kinc_float32x4_t pow2n = kinc_uint32x4_cast_to_float32x4(emm0);
 
 	y = kinc_float32x4_mul(y, pow2n);
+
+	return y;
+}
+
+
+
+
+
+
+_PS_CONST(minus_cephes_DP1, -0.78515625);
+_PS_CONST(minus_cephes_DP2, -2.4187564849853515625e-4);
+_PS_CONST(minus_cephes_DP3, -3.77489497744594108e-8);
+_PS_CONST(sincof_p0, -1.9515295891E-4);
+_PS_CONST(sincof_p1,  8.3321608736E-3);
+_PS_CONST(sincof_p2, -1.6666654611E-1);
+_PS_CONST(coscof_p0,  2.443315711809948E-005);
+_PS_CONST(coscof_p1, -1.388731625493765E-003);
+_PS_CONST(coscof_p2,  4.166664568298827E-002);
+_PS_CONST(cephes_FOPI, 1.27323954473516); // 4 / M_PI
+
+kinc_float32x4_t kinc_float32x4_sin(kinc_float32x4_t x)
+{
+	kinc_float32x4_t xmm1;
+	kinc_float32x4_t xmm2 = kinc_float32x4_load_all(0.0f);
+	kinc_float32x4_t xmm3;
+	kinc_float32x4_t sign_bit;
+	kinc_float32x4_t y;
+
+	kinc_uint32x4_t emm0;
+	kinc_uint32x4_t emm2;
+
+	sign_bit = x;
+
+	x = kinc_float32x4_and(x, kinc_float32x4_mask_load_cast(_ps_inv_sign_mask));
+	sign_bit = kinc_float32x4_and(sign_bit, kinc_float32x4_mask_load_cast(_ps_sign_mask));
+	y = kinc_float32x4_mul(x, kinc_float32x4_intrin_load_unaligned(_ps_cephes_FOPI));
+
+	emm2 = kinc_float32x4_cvt_truncate_to_int32x4(y);
+	emm2 = kinc_int32x4_cast_to_uint32x4
+	(
+		kinc_int32x4_add(kinc_uint32x4_cast_to_int32x4(emm2), kinc_uint32x4_cast_to_int32x4(kinc_uint32x4_intrin_load_unaligned(_pi32_1)))
+	);
+	emm2 = kinc_uint32x4_and(emm2, kinc_uint32x4_intrin_load_unaligned(_pi32_inv1));
+	y = kinc_uint32x4_cast_to_float32x4(emm2);
+
+	emm0 = kinc_uint32x4_and(emm2, kinc_uint32x4_intrin_load_unaligned(_pi32_4));
+	emm0 = kinc_uint32x4_shift_left(emm0, 29);
+
+	emm2 = kinc_uint32x4_and(emm2, kinc_uint32x4_intrin_load_unaligned(_pi32_2));
+	emm2 = kinc_uint32x4_cmpeq(emm2, kinc_uint32x4_load_all(0.0f));
+
+	kinc_float32x4_t swap_sign_bit = kinc_uint32x4_cast_to_float32x4(emm0);
+	kinc_float32x4_t poly_mask = kinc_uint32x4_cast_to_float32x4(emm2);
+	sign_bit = kinc_float32x4_xor(sign_bit, swap_sign_bit);
+
+	//Magic
+	xmm1 = kinc_float32x4_intrin_load_unaligned(_ps_minus_cephes_DP1);
+	xmm2 = kinc_float32x4_intrin_load_unaligned(_ps_minus_cephes_DP2);
+	xmm3 = kinc_float32x4_intrin_load_unaligned(_ps_minus_cephes_DP3);
+	xmm1 = kinc_float32x4_mul(y, xmm1);
+	xmm2 = kinc_float32x4_mul(y, xmm2);
+	xmm3 = kinc_float32x4_mul(y, xmm3);
+	x = kinc_float32x4_add(x, xmm1);
+	x = kinc_float32x4_add(x, xmm2);
+	x = kinc_float32x4_add(x, xmm3);
+
+	y = kinc_float32x4_intrin_load_unaligned(_ps_coscof_p0);
+	kinc_float32x4_t z = kinc_float32x4_mul(x, x);
+
+	y = kinc_float32x4_mul(y, z);
+	y = kinc_float32x4_add(y, kinc_float32x4_intrin_load_unaligned(_ps_coscof_p1));
+	y = kinc_float32x4_mul(y, z);
+	y = kinc_float32x4_add(y, kinc_float32x4_intrin_load_unaligned(_ps_coscof_p2));
+	//Yes, twice
+	y = kinc_float32x4_mul(y, z);
+	y = kinc_float32x4_mul(y, z);
+
+	kinc_float32x4_t tmp = kinc_float32x4_mul(z, kinc_float32x4_intrin_load_unaligned(_ps_0p5));
+	y = kinc_float32x4_sub(y, tmp);
+	y = kinc_float32x4_add(y, kinc_float32x4_intrin_load_unaligned(_ps_1));
+
+	kinc_float32x4_t y2 = kinc_float32x4_intrin_load_unaligned(_ps_sincof_p0);
+	y2 = kinc_float32x4_mul(y2, z);
+	y2 = kinc_float32x4_add(y2, kinc_float32x4_intrin_load_unaligned(_ps_sincof_p1));
+	y2 = kinc_float32x4_mul(y2, z);
+	y2 = kinc_float32x4_add(y2, kinc_float32x4_intrin_load_unaligned(_ps_sincof_p2));
+	y2 = kinc_float32x4_mul(y2, z);
+	//Mul, then add
+	y2 = kinc_float32x4_mul(y2, x);
+	y2 = kinc_float32x4_add(y2, x);
+
+	xmm3 = poly_mask;
+	y2 = kinc_float32x4_and(xmm3, y2);
+	//TODO: WHAT ORDER IS ANDNOT???
+	y = kinc_float32x4_and(xmm3, kinc_float32x4_not(y));
+	y = kinc_float32x4_add(y, y2);
+	y = kinc_float32x4_xor(y, sign_bit);
 
 	return y;
 }
