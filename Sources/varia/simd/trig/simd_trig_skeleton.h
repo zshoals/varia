@@ -30,6 +30,7 @@ static inline simd_fq fq_zeroes(void);
 static inline simd_fq fq_min(simd_fq a, simd_fq b);
 static inline simd_fq fq_max(simd_fq a, simd_fq b);
 
+static inline simd_fq fq_cmpeq(simd_fq a, simd_fq b);
 static inline simd_fq fq_cmplt(simd_fq a, simd_fq b);
 static inline simd_fq fq_cmple(simd_fq a, simd_fq b);
 static inline simd_fq fq_cmpgt(simd_fq a, simd_fq b);

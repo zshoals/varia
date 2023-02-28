@@ -588,18 +588,18 @@ static inline simd_fq simd_fq_cot(simd_fq x)
 
 
 
-_PS_CONST( atanrange_hi, 2.414213562373095 );
-_PS_CONST( atanrange_lo, 0.4142135623730950 );
-const float PIF = 3.141592653589793238;
-const float PIO2F = 1.5707963267948966192;
-_PS_CONST( cephes_PIF, 3.141592653589793238 );
-_PS_CONST( cephes_PIO2F, 1.5707963267948966192 );
-_PS_CONST( cephes_PIO4F, 0.7853981633974483096 );
+_PS_CONST( atanrange_hi, 2.414213562373095f );
+_PS_CONST( atanrange_lo, 0.4142135623730950f );
+const float PIF = 3.141592653589793238f;
+const float PIO2F = 1.5707963267948966192f;
+_PS_CONST( cephes_PIF, 3.141592653589793238f );
+_PS_CONST( cephes_PIO2F, 1.5707963267948966192f );
+_PS_CONST( cephes_PIO4F, 0.7853981633974483096f );
 
-_PS_CONST( atancof_p0, 8.05374449538e-2 );
-_PS_CONST( atancof_p1, 1.38776856032E-1 );
-_PS_CONST( atancof_p2, 1.99777106478E-1 );
-_PS_CONST( atancof_p3, 3.33329491539E-1 );
+_PS_CONST( atancof_p0, 8.05374449538e-2f );
+_PS_CONST( atancof_p1, 1.38776856032E-1f );
+_PS_CONST( atancof_p2, 1.99777106478E-1f );
+_PS_CONST( atancof_p3, 3.33329491539E-1f );
 
 
 
@@ -657,4 +657,53 @@ static inline simd_fq simd_fq_atan(simd_fq x)
 	y = fq_xor(y, sign_bit);
 
 	return y;
+}
+
+
+
+static inline simd_fq simd_fq_atan2(simd_fq y, simd_fq x)
+{
+	simd_fq x_eq_0 = fq_cmpeq(x, fq_load_u(_ps_0));
+	simd_fq x_gt_0 = fq_cmpgt(x, fq_load_u(_ps_0));
+	simd_fq x_le_0 = fq_cmple(x, fq_load_u(_ps_0));
+	simd_fq y_eq_0 = fq_cmpeq(y, fq_load_u(_ps_0));
+	simd_fq x_lt_0 = fq_cmplt(x, fq_load_u(_ps_0));
+	simd_fq y_lt_0 = fq_cmplt(y, fq_load_u(_ps_0));
+
+	simd_fq zero_mask = fq_and(x_eq_0, y_eq_0);
+	simd_fq zero_mask_other_case = fq_and(y_eq_0, x_gt_0);
+	zero_mask = fq_or(zero_mask, zero_mask_other_case);
+
+	simd_fq pio2_mask = fq_and(fq_not(y_eq_0), x_eq_0);
+	simd_fq pio2_mask_sign = fq_and(y_lt_0, iq_as_fq(iq_load_u(_ps_sign_mask)));
+	simd_fq pio2_result = fq_load_u(_ps_cephes_PIO2F);
+	pio2_result = fq_xor(pio2_result, pio2_mask_sign);
+	pio2_result = fq_and(pio2_mask, pio2_result);
+
+	simd_fq pi_mask = fq_and(y_eq_0, x_le_0);
+	simd_fq pi = fq_load_u(_ps_cephes_PIF);
+	simd_fq pi_result = fq_and(pi_mask, pi);
+
+	simd_fq swap_sign_mask_offset = fq_and(x_lt_0, y_lt_0);
+	swap_sign_mask_offset = fq_and(swap_sign_mask_offset, iq_as_fq(iq_load_u(_ps_sign_mask)));
+
+	simd_fq offset0 = fq_zeroes();
+	simd_fq offset1 = fq_load_u(_ps_cephes_PIF);
+	offset1 = fq_xor(offset1, swap_sign_mask_offset);
+	
+	simd_fq offset = fq_and(fq_not(x_lt_0), offset0);
+	offset = fq_and(x_lt_0, offset1);
+
+	simd_fq arg = fq_div(y, x);
+	simd_fq atan_result = simd_fq_atan(arg);
+	atan_result = fq_add(atan_result, offset);
+
+	simd_fq result = fq_and(fq_not(zero_mask), pio2_result);
+	//Twice in a row...is this right?
+	atan_result = fq_and(fq_not(pio2_mask), atan_result);
+	atan_result = fq_and(fq_not(pio2_mask), atan_result);
+	result = fq_or(result, atan_result);
+	result = fq_or(result, pi_result);
+
+	return result;
 }

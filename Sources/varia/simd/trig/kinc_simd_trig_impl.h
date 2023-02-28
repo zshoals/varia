@@ -53,6 +53,10 @@ static inline simd_fq fq_div(simd_fq a, simd_fq b)
 {
 	return kinc_float32x4_div(a, b);
 }
+static inline simd_fq fq_cmpeq(simd_fq a, simd_fq b)
+{
+	return kinc_float32x4_cmpeq(a, b);
+}
 static inline simd_fq fq_cmplt(simd_fq a, simd_fq b)
 {
 	return kinc_float32x4_cmplt(a, b);
