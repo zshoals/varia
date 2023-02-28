@@ -600,3 +600,61 @@ _PS_CONST( atancof_p0, 8.05374449538e-2 );
 _PS_CONST( atancof_p1, 1.38776856032E-1 );
 _PS_CONST( atancof_p2, 1.99777106478E-1 );
 _PS_CONST( atancof_p3, 3.33329491539E-1 );
+
+
+
+static inline simd_fq simd_fq_atan(simd_fq x)
+{
+	simd_fq sign_bit;
+	simd_fq y;
+
+	sign_bit = x;
+
+	x = fq_and(x, iq_as_fq(iq_load_u(_ps_inv_sign_mask)));
+	sign_bit = fq_and(sign_bit, iq_as_fq(iq_load_u(_ps_sign_mask)));
+
+	simd_fq cmp0 = fq_cmpgt(x, fq_load_u(_ps_atanrange_hi));
+	simd_fq cmp1 = fq_cmpgt(x, fq_load_u(_ps_atanrange_lo));
+	simd_fq cmp2 = fq_and(fq_not(cmp0), cmp1);
+
+	simd_fq y0 = fq_and(cmp0, fq_load_u(_ps_cephes_PIO2F));
+	simd_fq x0 = fq_div(fq_load_u(_ps_1), x);
+	x0 = fq_xor(x0, iq_as_fq(iq_load_u(_ps_sign_mask)));
+
+	simd_fq y1 = fq_and(cmp2, fq_load_u(_ps_cephes_PIO4F));
+
+	simd_fq x1_o = fq_sub(x, fq_load_u(_ps_1));
+	simd_fq x1_u = fq_add(x, fq_load_u(_ps_1));
+	simd_fq x1 = fq_div(x1_o, x1_u);
+
+	simd_fq x2 = fq_and(cmp2, x1);
+	x0 = fq_and(cmp0, x0);
+	x2 = fq_or(x2, x0);
+	cmp1 = fq_or(cmp0, cmp2);
+	x2 = fq_and(cmp1, x2);
+	x = fq_and(fq_not(cmp1), x);
+	x = fq_or(x2, x);
+
+	y = fq_or(y0, y1);
+
+
+	simd_fq zz = fq_mul(x, x);
+	simd_fq acc = fq_load_u(_ps_atancof_p0);
+	acc = fq_mul(acc, zz);
+	acc = fq_sub(acc, fq_load_u(_ps_atancof_p1));
+
+	acc = fq_mul(acc, zz);
+	acc = fq_add(acc, fq_load_u(_ps_atancof_p2));
+
+	acc = fq_mul(acc, zz);
+	acc = fq_sub(acc, fq_load_u(_ps_atancof_p3));
+
+	acc = fq_mul(acc, zz);
+	acc = fq_mul(acc, x);
+	acc = fq_add(acc, x);
+	y = fq_add(y, acc);
+
+	y = fq_xor(y, sign_bit);
+
+	return y;
+}
