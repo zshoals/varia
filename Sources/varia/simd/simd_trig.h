@@ -1,3 +1,51 @@
+
+
+/* 	(Mostly) Implementation-agnostic SIMD trigonometry functions
+
+	Uses SSE2 semantics. No special optimizations made for
+	particular SIMD instruction sets. This is intended to be
+	"good enough" for common use, like say, in a video game ;)
+
+	Implement "simd_trig_skeleton.h" using some set of
+	SIMD instructions, like SSE2 or NEON, or even a fallback.
+	Import your implementation into this file.
+
+	With a little effort, could probably be made to work with
+	register widths other than 128bits (probably just needs some
+	changes to the various constant array sizes)
+
+	SSE1 and MMX special casing has been removed entirely.
+	It's 2023 here, and that's old news, sorry.
+
+	Based on "MathFun" and "MathFunExt", see the respective
+	commentary below. I feel bad even putting my name on this,
+	as the real work was done by the previous authors,
+	but am doing so just to avoid licensing problems.
+*/
+
+/* Copyright (C) 2023  zshoals
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+  1. The origin of this software must not be misrepresented; you must not
+     claim that you wrote the original software. If you use this software
+     in a product, an acknowledgment in the product documentation would be
+     appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+     misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+  (this is the zlib license)
+*/
+
+
+
+
+
+
+
 /* SIMD (SSE1+MMX or SSE2) implementation of sin, cos, exp and log
    Inspired by Intel Approximate Math library, and based on the
    corresponding algorithms of the cephes math library
@@ -29,7 +77,12 @@
 
 #include <stdint.h>
 
+//==================================================
+//IMPORTANT: Import your skeleton implementation here
+
 #include "varia/simd/trig/kinc_simd_trig_impl.h"
+
+//==================================================
 
 #define ALIGN16_BEG
 #define ALIGN16_END
