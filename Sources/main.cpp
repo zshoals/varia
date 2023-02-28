@@ -17,8 +17,8 @@
 #include "dread/Dread.hpp"
 #include "varia/tests/Test_Everything.hpp"
 
-#include "varia/simd/i32q.hpp"
-#include "varia/simd/f32q.hpp"
+#include "varia/simd/simd_trig.h"
+
 
 int kickstart(int argc, char** argv) 
 {
@@ -90,30 +90,15 @@ int kickstart(int argc, char** argv)
 		*elem = i;
 	});
 
-	for_range_var(i, 127)
-	{
-		vds_array_push(&float_arr, static_cast<f32>(i));
-	}
 
-	vds_array_iterate_step_4(&float_arr, [](f32 * elements)
-	{
-		f32q q = f32q_load(elements);
-		f32q a = f32q_set_all(100.0f);
-		f32q b = f32q_set_all(333.3f);
 
-		q += (a + b + (a * b));
-		// q /= (a + b);
+	kinc_float32x4_t sins = kinc_float32x4_load(0.1f, 1.0f, 1.54f, 32.f);
+	sins = simd_fq_cos(sins);
 
-		f32q_store(elements, q);
-	});
-
-	vds_array_iterate_step_4(&float_arr, [](f32 * elements)
-	{
-		VARIA_LOG_FLOAT(elements[0]);
-		VARIA_LOG_FLOAT(elements[1]);
-		VARIA_LOG_FLOAT(elements[2]);
-		VARIA_LOG_FLOAT(elements[3]);
-	});
+	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 0));
+	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 1));
+	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 2));
+	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 3));
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
