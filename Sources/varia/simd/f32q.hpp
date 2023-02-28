@@ -3,7 +3,7 @@
 #include "varia/vcommon.hpp"
 #include "kinc/simd/float32x4.h"
 
-static constexpr double PI = 3.145926545;
+static constexpr float PI = 3.145926545f;
 
 typedef kinc_float32x4_t f32q;
 typedef kinc_float32x4_mask_t f32q_mask;
