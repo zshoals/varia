@@ -346,7 +346,7 @@ kinc_float32x4_t kinc_float32x4_sin(kinc_float32x4_t x)
 	xmm3 = poly_mask;
 	y2 = kinc_float32x4_and(xmm3, y2);
 	//TODO: WHAT ORDER IS ANDNOT???
-	y = kinc_float32x4_and(xmm3, kinc_float32x4_not(y));
+	y = kinc_float32x4_and(kinc_float32x4_not(xmm3), y);
 	y = kinc_float32x4_add(y, y2);
 	y = kinc_float32x4_xor(y, sign_bit);
 
