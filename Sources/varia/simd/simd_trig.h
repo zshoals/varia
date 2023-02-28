@@ -372,3 +372,231 @@ static inline simd_fq simd_fq_cos(simd_fq x)
 
 	return y;
 }
+
+
+
+
+
+
+/*
+sse_mathfun_extension.h - zlib license
+Written by Tolga Mizrak 2016
+Extension of sse_mathfun.h, which is written by Julien Pommier
+Based on the corresponding algorithms of the cephes math library
+This is written as an extension to sse_mathfun.h instead of modifying it, just because I didn't want
+to maintain a modified version of the original library. This way switching to a newer version of the
+library won't be a hassle.
+Note that non SSE2 implementations of tan_ps, atan_ps, cot_ps and atan2_ps are not implemented yet.
+As such, currently you need to #define USE_SSE2 to compile.
+With tan_ps, cot_ps you get good precision on input ranges that are further away from the domain
+borders (-PI/2, PI/2 for tan and 0, 1 for cot). See the results on the deviations for these
+functions on my machine:
+checking tan on [-0.25*Pi, 0.25*Pi]
+max deviation from tanf(x): 1.19209e-07 at 0.250000006957*Pi, max deviation from cephes_tan(x):
+5.96046e-08
+   ->> precision OK for the tan_ps <<-
+checking tan on [-0.49*Pi, 0.49*Pi]
+max deviation from tanf(x): 3.8147e-06 at -0.490000009841*Pi, max deviation from cephes_tan(x):
+9.53674e-07
+   ->> precision OK for the tan_ps <<-
+checking cot on [0.2*Pi, 0.7*Pi]
+max deviation from cotf(x): 1.19209e-07 at 0.204303119606*Pi, max deviation from cephes_cot(x):
+1.19209e-07
+   ->> precision OK for the cot_ps <<-
+checking cot on [0.01*Pi, 0.99*Pi]
+max deviation from cotf(x): 3.8147e-06 at 0.987876517942*Pi, max deviation from cephes_cot(x):
+9.53674e-07
+   ->> precision OK for the cot_ps <<-
+With atan_ps and atan2_ps you get pretty good precision, atan_ps max deviation is < 2e-7 and
+atan2_ps max deviation is < 2.5e-7
+*/
+
+/* Copyright (C) 2016 Tolga Mizrak
+  This software is provided 'as-is', without any express or implied
+  warranty.  In no event will the authors be held liable for any damages
+  arising from the use of this software.
+  Permission is granted to anyone to use this software for any purpose,
+  including commercial applications, and to alter it and redistribute it
+  freely, subject to the following restrictions:
+  1. The origin of this software must not be misrepresented; you must not
+	 claim that you wrote the original software. If you use this software
+	 in a product, an acknowledgment in the product documentation would be
+	 appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be
+	 misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
+  (this is the zlib license)
+*/
+
+
+//Mathfun Extensions
+
+_PS_CONST( 0, 0 );
+_PS_CONST( 2, 2 );
+_PI32_CONST( neg1, 1 );
+
+_PS_CONST( tancof_p0, 9.38540185543E-3f );
+_PS_CONST( tancof_p1, 3.11992232697E-3f );
+_PS_CONST( tancof_p2, 2.44301354525E-2f );
+_PS_CONST( tancof_p3, 5.34112807005E-2f );
+_PS_CONST( tancof_p4, 1.33387994085E-1f );
+_PS_CONST( tancof_p5, 3.33331568548E-1f );
+
+_PS_CONST( tancot_eps, 1.0e-4f );
+
+
+static inline simd_fq simd_fq_tan(simd_fq x)
+{
+	simd_fq xmm1;
+	simd_fq xmm2 = fq_zeroes();
+	simd_fq xmm3;
+	simd_fq sign_bit;
+	simd_fq y;
+
+	simd_iq emm2;
+
+	sign_bit = x;
+
+	x = fq_and(sign_bit, iq_as_fq(iq_load_u(_ps_inv_sign_mask)));
+	sign_bit = fq_and(sign_bit, iq_as_fq(iq_load_u(_ps_sign_mask)));
+
+	y = fq_mul(x, fq_load_u(_ps_cephes_FOPI));
+
+	emm2 = fq_truncate_iq(y);
+
+	emm2 = iq_add(emm2, iq_load_u(_pi32_1));
+	emm2 = iq_and(emm2, iq_load_u(_pi32_inv1));
+	y = iq_convert_fq(emm2);
+
+	emm2 = iq_and(emm2, iq_load_u(_pi32_2));
+	emm2 = iq_cmpeq(emm2, iq_zeroes());
+
+	simd_fq poly_mask = iq_as_fq(emm2);
+
+	xmm1 = fq_load_u(_ps_minus_cephes_DP1);
+	xmm2 = fq_load_u(_ps_minus_cephes_DP2);
+	xmm3 = fq_load_u(_ps_minus_cephes_DP3);
+	xmm1 = fq_mul(y, xmm1);
+	xmm2 = fq_mul(y, xmm2);
+	xmm3 = fq_mul(y, xmm3);
+	simd_fq z = fq_add(x, xmm1);
+	z = fq_add(z, xmm2);
+	z = fq_add(z, xmm3);
+
+	simd_fq zz = fq_mul(z, z);
+
+	y = fq_load_u(_ps_tancof_p0);
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p1));
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p2));
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p3));
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p4));
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p5));
+	y = fq_mul(y, zz);
+	y = fq_mul(y, z);
+	y = fq_add(y, z);
+
+		simd_fq y2 = fq_div(fq_load_u(_ps_1), y);
+		y2 = fq_xor(y2, iq_as_fq(iq_load_u(_ps_sign_mask)));
+
+	xmm3 = poly_mask;
+	y = fq_and(xmm3, y);
+	y2 = fq_and(fq_not(xmm3), y2);
+	y = fq_or(y, y2);
+
+	y = fq_xor(y, sign_bit);
+
+	return y;
+}
+
+static inline simd_fq simd_fq_cot(simd_fq x)
+{
+	simd_fq xmm1;
+	simd_fq xmm2 = fq_zeroes();
+	simd_fq xmm3;
+	simd_fq sign_bit;
+	simd_fq y;
+
+	simd_iq emm2;
+
+	sign_bit = x;
+
+	x = fq_and(sign_bit, iq_as_fq(iq_load_u(_ps_inv_sign_mask)));
+	sign_bit = fq_and(sign_bit, iq_as_fq(iq_load_u(_ps_sign_mask)));
+
+	y = fq_mul(x, fq_load_u(_ps_cephes_FOPI));
+
+	emm2 = fq_truncate_iq(y);
+
+	emm2 = iq_add(emm2, iq_load_u(_pi32_1));
+	emm2 = iq_and(emm2, iq_load_u(_pi32_inv1));
+	y = iq_convert_fq(emm2);
+
+	emm2 = iq_and(emm2, iq_load_u(_pi32_2));
+	emm2 = iq_cmpeq(emm2, iq_zeroes());
+
+	simd_fq poly_mask = iq_as_fq(emm2);
+
+	xmm1 = fq_load_u(_ps_minus_cephes_DP1);
+	xmm2 = fq_load_u(_ps_minus_cephes_DP2);
+	xmm3 = fq_load_u(_ps_minus_cephes_DP3);
+	xmm1 = fq_mul(y, xmm1);
+	xmm2 = fq_mul(y, xmm2);
+	xmm3 = fq_mul(y, xmm3);
+	simd_fq z = fq_add(x, xmm1);
+	z = fq_add(z, xmm2);
+	z = fq_add(z, xmm3);
+
+	simd_fq zz = fq_mul(z, z);
+
+	y = fq_load_u(_ps_tancof_p0);
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p1));
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p2));
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p3));
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p4));
+	y = fq_mul(y, zz);
+	y = fq_add(y, fq_load_u(_ps_tancof_p5));
+	y = fq_mul(y, zz);
+	y = fq_mul(y, z);
+	y = fq_add(y, z);
+
+		simd_fq y2 = fq_xor(y, iq_as_fq(iq_load_u(_ps_sign_mask)));
+		y = fq_div(fq_load_u(_ps_1), y);
+
+	xmm3 = poly_mask;
+	y = fq_and(xmm3, y);
+	y2 = fq_and(fq_not(xmm3), y2);
+	y = fq_or(y, y2);
+
+	y = fq_xor(y, sign_bit);
+
+	return y;
+}
+
+
+
+
+
+
+
+
+_PS_CONST( atanrange_hi, 2.414213562373095 );
+_PS_CONST( atanrange_lo, 0.4142135623730950 );
+const float PIF = 3.141592653589793238;
+const float PIO2F = 1.5707963267948966192;
+_PS_CONST( cephes_PIF, 3.141592653589793238 );
+_PS_CONST( cephes_PIO2F, 1.5707963267948966192 );
+_PS_CONST( cephes_PIO4F, 0.7853981633974483096 );
+
+_PS_CONST( atancof_p0, 8.05374449538e-2 );
+_PS_CONST( atancof_p1, 1.38776856032E-1 );
+_PS_CONST( atancof_p2, 1.99777106478E-1 );
+_PS_CONST( atancof_p3, 3.33329491539E-1 );

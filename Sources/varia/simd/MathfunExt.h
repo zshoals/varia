@@ -52,7 +52,7 @@ atan2_ps max deviation is < 2.5e-7
 
 #ifndef _SSE_MATHFUN_EXTENSION_H_INCLUDED_
 #define _SSE_MATHFUN_EXTENSION_H_INCLUDED_
-
+#define USE_SSE2
 #ifndef USE_SSE2
 #error sse1 & mmx version not implemented
 #endif
@@ -65,7 +65,7 @@ atan2_ps max deviation is < 2.5e-7
 #pragma warning( disable : 4305 )
 #endif
 
-#include "sse_mathfun.h"
+#include "varia/simd/MathFun.h"
 
 _PS_CONST( 0, 0 );
 _PS_CONST( 2, 2 );
@@ -292,6 +292,12 @@ v4sf atan2_ps( v4sf y, v4sf x )
 
 	return result;
 }
+
+
+
+
+
+
 
 /* for convenience of calling simd sqrt */
 float sqrt_ps( float x )

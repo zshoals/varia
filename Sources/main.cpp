@@ -92,7 +92,7 @@ int kickstart(int argc, char** argv)
 
 
 
-	kinc_float32x4_t sins = kinc_float32x4_load(0.1f, 1.0f, 1.54f, 32.f);
+	kinc_float32x4_t sins = kinc_float32x4_load(0.1f, 1.0f, 15.f, 32.f);
 	sins = simd_fq_cos(sins);
 
 	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 0));

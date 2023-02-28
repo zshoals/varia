@@ -49,6 +49,10 @@ static inline simd_fq fq_mul(simd_fq a, simd_fq b)
 {
 	return kinc_float32x4_mul(a, b);
 }
+static inline simd_fq fq_div(simd_fq a, simd_fq b)
+{
+	return kinc_float32x4_div(a, b);
+}
 static inline simd_fq fq_cmplt(simd_fq a, simd_fq b)
 {
 	return kinc_float32x4_cmplt(a, b);
@@ -91,30 +95,54 @@ static inline simd_uq fq_as_uq(simd_fq t)
 }
 static inline simd_iq fq_truncate_iq(simd_fq t)
 {
-	float quadf[4];
-	int32_t quad[4];
-	kinc_float32x4_store_unaligned(&quadf[0], t);
+	#if defined(KINC_SSE2)
 
-	quad[0] = (int32_t)floorf(quadf[0]);
-	quad[1] = (int32_t)floorf(quadf[1]);
-	quad[2] = (int32_t)floorf(quadf[2]);
-	quad[3] = (int32_t)floorf(quadf[3]);
+		return _mm_cvttps_epi32(t);
 
-	return kinc_int32x4_intrin_load_unaligned(&quad[0]);
+	#elif defined(KINC_NEON)
+
+		return vcvtq_s32_f32(t);
+
+	#else
+
+		float quadf[4];
+		int32_t quad[4];
+		kinc_float32x4_store_unaligned(&quadf[0], t);
+
+		quad[0] = (int32_t)(quadf[0]);
+		quad[1] = (int32_t)(quadf[1]);
+		quad[2] = (int32_t)(quadf[2]);
+		quad[3] = (int32_t)(quadf[3]);
+
+		return kinc_int32x4_intrin_load_unaligned(&quad[0]);
+
+	#endif
 }
 
 static inline simd_iq fq_round_iq(simd_fq t)
 {
-	float quadf[4];
-	int32_t quad[4];
-	kinc_float32x4_store_unaligned(&quadf[0], t);
+	#if defined(KINC_SSE2)
 
-	quad[0] = (int32_t)roundf(quadf[0]);
-	quad[1] = (int32_t)roundf(quadf[1]);
-	quad[2] = (int32_t)roundf(quadf[2]);
-	quad[3] = (int32_t)roundf(quadf[3]);
+		return _mm_cvtps_epi32(t);
 
-	return kinc_int32x4_intrin_load_unaligned(&quad[0]);
+	#elif defined(KINC_NEON)
+
+		return vcvtq_s32_f32(kinc_float32x4_add(t, kinc_float32x4_load_all(0.5f)));
+
+	#else
+
+		float quadf[4];
+		int32_t quad[4];
+		kinc_float32x4_store_unaligned(&quadf[0], t);
+
+		quad[0] = (int32_t)roundf(quadf[0]);
+		quad[1] = (int32_t)roundf(quadf[1]);
+		quad[2] = (int32_t)roundf(quadf[2]);
+		quad[3] = (int32_t)roundf(quadf[3]);
+
+		return kinc_int32x4_intrin_load_unaligned(&quad[0]);
+
+	#endif
 }
 
 
@@ -170,16 +198,28 @@ static inline simd_uq iq_as_uq(simd_iq t)
 
 static inline simd_fq iq_convert_fq(simd_iq t)
 {
-	int32_t quad[4];
-	float quadf[4];
-	kinc_int32x4_store_unaligned(&quad[0], t);
+	#if defined(KINC_SSE2)
 
-	quadf[0] = (float)quad[0];
-	quadf[1] = (float)quad[1];
-	quadf[2] = (float)quad[2];
-	quadf[3] = (float)quad[3];
+		return _mm_cvtepi32_ps(t);
 
-	return kinc_float32x4_intrin_load_unaligned(&quadf[0]);
+	#elif defined(KINC_NEON)
+
+		return vcvtq_f32_s32(t);
+
+	#else
+
+		int32_t quad[4];
+		float quadf[4];
+		kinc_int32x4_store_unaligned(&quad[0], t);
+
+		quadf[0] = (float)quad[0];
+		quadf[1] = (float)quad[1];
+		quadf[2] = (float)quad[2];
+		quadf[3] = (float)quad[3];
+
+		return kinc_float32x4_intrin_load_unaligned(&quadf[0]);
+
+	#endif
 }
 
 
