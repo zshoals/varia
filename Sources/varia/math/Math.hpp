@@ -6,32 +6,32 @@ constexpr double TAU = PI * 2;
 
 #include <math.h>
 
-constexpr inline float vmath_lerp(float value, float start, float end)
+constexpr VARIA_INLINE float vmath_lerp(float value, float start, float end)
 {
 	return (start * (1 - value)) + (end * value);
 }
 
-constexpr inline float vmath_linear_norm(float value, float start, float end)
+constexpr VARIA_INLINE float vmath_linear_norm(float value, float start, float end)
 {
 	return (value - start) / (end - start);
 }
 
-constexpr inline float vmath_remap(float value, float s1, float e1, float s2, float e2)
+constexpr VARIA_INLINE float vmath_remap(float value, float s1, float e1, float s2, float e2)
 {
 	return vmath_linear_norm(vmath_lerp(value, s1, e1), s2, e2);
 }
 
-constexpr inline float vmath_rad2deg(float radians)
+constexpr VARIA_INLINE float vmath_rad2deg(float radians)
 {
 	return static_cast<float>(radians * (180.0 / PI));
 }
 
-constexpr inline float vmath_deg2rad(float degrees)
+constexpr VARIA_INLINE float vmath_deg2rad(float degrees)
 {
 	return static_cast<float>(degrees * (PI / 180.0));
 }
 
-constexpr inline float vmath_clampF(float value, float lower, float upper)
+constexpr VARIA_INLINE float vmath_clampF(float value, float lower, float upper)
 {
 	if (value < lower) value = lower;
 	if (value > upper) value = upper;
@@ -39,7 +39,7 @@ constexpr inline float vmath_clampF(float value, float lower, float upper)
 	return value;
 }
 
-constexpr inline int vmath_clamp(int value, int lower, int upper)
+constexpr VARIA_INLINE int vmath_clamp(int value, int lower, int upper)
 {
 	if (value < lower) value = lower;
 	if (value > upper) value = upper;
@@ -47,25 +47,25 @@ constexpr inline int vmath_clamp(int value, int lower, int upper)
 	return value;
 }
 
-constexpr inline float vmath_pow2(float value)
+constexpr VARIA_INLINE float vmath_pow2(float value)
 {
 	return value * value;
 }
 
 template <typename T>
-constexpr inline T vmath_mod(T a, T b)
+constexpr VARIA_INLINE T vmath_mod(T a, T b)
 {
 	return (a % b + b) % b;
 }
 
 template <typename T>
-constexpr inline T vmath_ceil_next_nearest(T value, T target_multiple)
+constexpr VARIA_INLINE T vmath_ceil_next_nearest(T value, T target_multiple)
 {
 	bool round_up = (value % target_multiple == 0) ? false : true;
 	return (((target_multiple - (value % target_multiple)) * round_up) + value);
 }
 
-constexpr static unsigned int vmath_pow2_to_bitshift_value(size_t pow2_value)
+constexpr VARIA_INLINE unsigned int vmath_pow2_to_bitshift_value(size_t pow2_value)
 {
 	unsigned int shift = 0;
 	while (pow2_value > 1)
@@ -77,7 +77,7 @@ constexpr static unsigned int vmath_pow2_to_bitshift_value(size_t pow2_value)
 	return shift;
 }
 
-constexpr static size_t vmath_pow2_next_nearest(size_t value)
+constexpr VARIA_INLINE size_t vmath_pow2_next_nearest(size_t value)
 {
 	--value;
 	value |= (value >> 1);

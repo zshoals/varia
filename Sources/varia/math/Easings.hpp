@@ -1,60 +1,61 @@
 #pragma once
 
+#include "varia/vcommon.hpp"
 #include <math.h>
 
 //Note(zshoals Dec-11-2022): Attribution to https://github.com/mnemocron/easing-functions
 
 constexpr double PI = 3.145926545;
 
-float vmath_easeInSine( float t ) {
+VARIA_INLINE float vmath_easeInSine( float t ) {
     return 1 + sin( 1.5707963 * (--t) );
 }
 
-float vmath_easeOutSine( float t ) {
+VARIA_INLINE float vmath_easeOutSine( float t ) {
     return sin( 1.5707963 * t );
 }
 
-float vmath_easeInOutSine( float t ) {
+VARIA_INLINE float vmath_easeInOutSine( float t ) {
     return 0.5 * (1 + sin( 3.1415926 * (t - 0.5) ) );
 }
 
-float vmath_easeInQuad( float t ) {
+VARIA_INLINE float vmath_easeInQuad( float t ) {
     return t * t;
 }
 
-float vmath_easeOutQuad( float t ) {
+VARIA_INLINE float vmath_easeOutQuad( float t ) {
     return t * (2 - t);
 }
 
-float vmath_easeInOutQuad( float t ) {
+VARIA_INLINE float vmath_easeInOutQuad( float t ) {
     return t < 0.5 ? 2 * t * t : t * (4 - 2 * t) - 1;
 }
 
-float vmath_easeInCubic( float t ) {
+VARIA_INLINE float vmath_easeInCubic( float t ) {
     return t * t * t;
 }
 
-float vmath_easeOutCubic( float t ) {
+VARIA_INLINE float vmath_easeOutCubic( float t ) {
     return 1 + (--t) * t * t;
 }
 
-float vmath_easeInOutCubic( float t ) {
+VARIA_INLINE float vmath_easeInOutCubic( float t ) {
     //return t < 0.5 ? 4 * t * t * t : 1 + (t) * (2 * (--t)) * (2 * t);
     // return t < 0.5 ? 4 * t * t * t : 1 + (--t) * (2 * (--t)) * (2 * t);  // returns false output
     return t < 0.5 ? 4 * t * t * t : (t-1)*(2*t-2)*(2*t-2)+1;
 }
 
-float vmath_easeInQuart( float t ) {
+VARIA_INLINE float vmath_easeInQuart( float t ) {
     t *= t;
     return t * t;
 }
 
-float vmath_easeOutQuart( float t ) {
+VARIA_INLINE float vmath_easeOutQuart( float t ) {
     t = (--t) * t;
     return 1 - t * t;
 }
 
-float vmath_easeInOutQuart( float t ) {
+VARIA_INLINE float vmath_easeInOutQuart( float t ) {
     if( t < 0.5 ) {
         t *= t;
         return 8 * t * t;
@@ -64,17 +65,17 @@ float vmath_easeInOutQuart( float t ) {
     }
 }
 
-float vmath_easeInQuint( float t ) {
+VARIA_INLINE float vmath_easeInQuint( float t ) {
     float t2 = t * t;
     return t * t2 * t2;
 }
 
-float vmath_easeOutQuint( float t ) {
+VARIA_INLINE float vmath_easeOutQuint( float t ) {
     float t2 = (--t) * t;
     return 1 + t * t2 * t2;
 }
 
-float vmath_easeInOutQuint( float t ) {
+VARIA_INLINE float vmath_easeInOutQuint( float t ) {
     float t2;
     if( t < 0.5 ) {
         t2 = t * t;
@@ -85,15 +86,15 @@ float vmath_easeInOutQuint( float t ) {
     }
 }
 
-float vmath_easeInExpo( float t ) {
+VARIA_INLINE float vmath_easeInExpo( float t ) {
     return (pow( 2, 8 * t ) - 1) / 255;
 }
 
-float vmath_easeOutExpo( float t ) {
+VARIA_INLINE float vmath_easeOutExpo( float t ) {
     return 1 - pow( 2, -8 * t );
 }
 
-float vmath_easeInOutExpo( float t ) {
+VARIA_INLINE float vmath_easeInOutExpo( float t ) {
     if( t < 0.5 ) {
         return (pow( 2, 16 * t ) - 1) / 510;
     } else {
@@ -101,15 +102,15 @@ float vmath_easeInOutExpo( float t ) {
     }
 }
 
-float vmath_easeInCirc( float t ) {
+VARIA_INLINE float vmath_easeInCirc( float t ) {
     return 1 - sqrt( 1 - t );
 }
 
-float vmath_easeOutCirc( float t ) {
+VARIA_INLINE float vmath_easeOutCirc( float t ) {
     return sqrt( t );
 }
 
-float vmath_easeInOutCirc( float t ) {
+VARIA_INLINE float vmath_easeInOutCirc( float t ) {
     if( t < 0.5 ) {
         return (1 - sqrt( 1 - 2 * t )) * 0.5;
     } else {
@@ -117,15 +118,15 @@ float vmath_easeInOutCirc( float t ) {
     }
 }
 
-float vmath_easeInBack( float t ) {
+VARIA_INLINE float vmath_easeInBack( float t ) {
     return t * t * (2.70158 * t - 1.70158);
 }
 
-float vmath_easeOutBack( float t ) {
+VARIA_INLINE float vmath_easeOutBack( float t ) {
     return 1 + (--t) * t * (2.70158 * t + 1.70158);
 }
 
-float vmath_easeInOutBack( float t ) {
+VARIA_INLINE float vmath_easeInOutBack( float t ) {
     if( t < 0.5 ) {
         return t * t * (7 * t - 2.5) * 2;
     } else {
@@ -133,17 +134,17 @@ float vmath_easeInOutBack( float t ) {
     }
 }
 
-float vmath_easeInElastic( float t ) {
+VARIA_INLINE float vmath_easeInElastic( float t ) {
     float t2 = t * t;
     return t2 * t2 * sin( t * PI * 4.5 );
 }
 
-float vmath_easeOutElastic( float t ) {
+VARIA_INLINE float vmath_easeOutElastic( float t ) {
     float t2 = (t - 1) * (t - 1);
     return 1 - t2 * t2 * cos( t * PI * 4.5 );
 }
 
-float vmath_easeInOutElastic( float t ) {
+VARIA_INLINE float vmath_easeInOutElastic( float t ) {
     float t2;
     if( t < 0.45 ) {
         t2 = t * t;
@@ -156,15 +157,15 @@ float vmath_easeInOutElastic( float t ) {
     }
 }
 
-float vmath_easeInBounce( float t ) {
+VARIA_INLINE float vmath_easeInBounce( float t ) {
     return pow( 2, 6 * (t - 1) ) * fabsf( sin( t * PI * 3.5 ) );
 }
 
-float vmath_easeOutBounce( float t ) {
+VARIA_INLINE float vmath_easeOutBounce( float t ) {
     return 1 - pow( 2, -6 * t ) * fabsf( cos( t * PI * 3.5 ) );
 }
 
-float vmath_easeInOutBounce( float t ) {
+VARIA_INLINE float vmath_easeInOutBounce( float t ) {
     if( t < 0.5 ) {
         return 8 * pow( 2, 8 * (t - 1) ) * fabsf( sin( t * PI * 7 ) );
     } else {
