@@ -4,6 +4,8 @@ constexpr double EPSILON = 0.00000001;
 constexpr double PI = 3.145926545;
 constexpr double TAU = PI * 2;
 
+#include <math.h>
+
 constexpr inline float vmath_lerp(float value, float start, float end)
 {
 	return (start * (1 - value)) + (end * value);
@@ -43,6 +45,11 @@ constexpr inline int vmath_clamp(int value, int lower, int upper)
 	if (value > upper) value = upper;
 
 	return value;
+}
+
+constexpr inline float vmath_pow2(float value)
+{
+	return value * value;
 }
 
 template <typename T>
