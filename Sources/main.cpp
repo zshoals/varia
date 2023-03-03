@@ -17,7 +17,7 @@
 #include "dread/Dread.hpp"
 #include "varia/tests/Test_Everything.hpp"
 
-#include "varia/simd/simd_trig.h"
+#include "varia/simd/f32q.hpp"
 
 
 int kickstart(int argc, char** argv) 
