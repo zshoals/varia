@@ -16,12 +16,21 @@ typedef float f32;
 typedef double f64;
 typedef unsigned char uchar;
 typedef unsigned int uint;
+#include "varia/math/MathTypes.hpp"
+
+
+#ifdef _MSC_VER
+	#define VARIA_INLINE static __forceinline
+#else
+	#define VARIA_INLINE static __attribute__((always_inline))
+#endif
 
 #define VARIA_STRINGIFY_IMPL(X) #X
 #define VARIA_STRINGIFY(X) VARIA_STRINGIFY_IMPL(X)
 
 #define VARIA_CONCAT_IMPL(A, B) A##B
 #define VARIA_CONCAT(A, B) VARIA_CONCAT_IMPL(A, B)
+#define VARIA_MACRO_VAR(VAR_NAME) VARIA_CONCAT(___, VARIA_CONCAT(__LINE__, VAR_NAME))
 
 #define VARIA_NO_OPERATION() ((void)0)
 #define VARIA_INTENTIONALLY_DO_NOTHING() ((void)0)
