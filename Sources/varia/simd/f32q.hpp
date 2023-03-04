@@ -127,7 +127,7 @@ VARIA_INLINE f32q f32q_floor(f32q n)
 {
 	#if defined(KINC_SSE) || defined(KINC_SSE2)
 		f32q y = f32q_round(n);
-		y += f32q_set_all(1.0f) & (y > n);
+		y -= f32q_set_all(1.0f) & (y > n);
 
 		y |= (n & f32q_set_all(-0.0f));
 
@@ -142,7 +142,7 @@ VARIA_INLINE f32q f32q_floor(f32q n)
 	#endif
 }
 
-VARIA_INLINE f32q f32q_floor(f32q n)
+VARIA_INLINE f32q f32q_ceil(f32q n)
 {
 	#if defined(KINC_SSE) || defined(KINC_SSE2)
 		f32q y = f32q_round(n);
