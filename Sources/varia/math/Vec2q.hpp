@@ -27,7 +27,7 @@ constexpr VARIA_INLINE f32q vec2q_dot(vec2q a, vec2q b)
 	return (a.xs * b.xs) + (a.ys * b.ys);
 }
 
-constexpr VARIA_INLINE vec2q vec2q_deflect(vec2q v, vec2q non_normalized_surface_vec)
-{
-	return void;
-}
+// constexpr VARIA_INLINE vec2q vec2q_deflect(vec2q v, vec2q non_normalized_surface_vec)
+// {
+// 	return void;
+// }

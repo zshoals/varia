@@ -61,6 +61,27 @@ VARIA_INLINE f32q_mask operator==(f32q const & a, f32q const & b) { return f32q_
 VARIA_INLINE f32q_mask operator!=(f32q const & a, f32q const & b) { return f32q_cmpneq(a, b); }
 
 //Extensions
+
+VARIA_INLINE f32q f32q_masked_add(f32q a, f32q b_masked, f32q mask)
+{
+	return a + (b_masked & mask);
+}
+
+VARIA_INLINE f32q f32q_masked_sub(f32q a, f32q b_masked, f32q mask)
+{
+	return a - (b_masked & mask);
+}
+
+VARIA_INLINE f32q f32q_masked_mul(f32q a, f32q b_masked, f32q mask)
+{
+	return a * (b_masked & mask);
+}
+
+VARIA_INLINE f32q f32q_masked_div(f32q a, f32q b_masked, f32q mask)
+{
+	return a / (b_masked & mask);
+}
+
 VARIA_INLINE f32q f32q_zero(void) { return f32q_set_all(0.0f); }
 VARIA_INLINE f32q_mask f32q_ones_mask_lane0(void) { 
 	return f32q_cmplt(f32q_set(0.0f, 1.0f, 1.0f, 1.0f), f32q_set(1.0f, 0.0f, 0.0f, 0.0f));
@@ -89,9 +110,12 @@ VARIA_INLINE f32q f32q_round(f32q n)
 
 		y2 |= (n & f32q_set_all(-0.0f));
 
-		f32q overflow_mask = _mm_cmpneq_ps(_mm_castsi128_ps(y1), _mm_castsi128_ps(_mm_set1_epi32(0x80000000)));
+		f32q overflow_mask = _mm_castsi128_ps
+		(
+			_mm_andnot_si128(_mm_cmpeq_epi32(y1, _mm_set1_epi32(0x80000000)), _mm_set1_epi32(0xffffffff))
+		);
 
-		return f32q_select(overflow_mask, y2, n);
+		return f32q_select(y2, n, overflow_mask);
 	#else
 		n.values[0] = roundf(n.values[0]);
 		n.values[1] = roundf(n.values[1]);
@@ -110,9 +134,13 @@ VARIA_INLINE f32q f32q_truncate(f32q n)
 
 		y2 |= (n & f32q_set_all(-0.0f));
 
-		f32q overflow_mask = _mm_cmpneq_ps(_mm_castsi128_ps(y1), _mm_castsi128_ps(_mm_set1_epi32(0x80000000)));
+		// f32q overflow_mask = _mm_cmpneq_ps(_mm_castsi128_ps(y1), _mm_castsi128_ps(_mm_set1_epi32(0x80000000)));
+		f32q overflow_mask = _mm_castsi128_ps
+		(
+			_mm_andnot_si128(_mm_cmpeq_epi32(y1, _mm_set1_epi32(0x80000000)), _mm_set1_epi32(0xffffffff))
+		);
 
-		return f32q_select(overflow_mask, y2, n);
+		return f32q_select(y2, n, overflow_mask);
 	#else
 		n.values[0] = (float)((int)(n.values[0]));
 		n.values[1] = (float)((int)(n.values[1]));
@@ -238,22 +266,21 @@ VARIA_INLINE f32q f32q_atan2(f32q ys, f32q xs)
 
 VARIA_INLINE f32q f32q_wrap_angle(f32q degrees)
 {
-	//355 + 1000
-	//1000 - 355 = 645
-
-	// 200 - 1000
-	//-800
-	f32q degrees_original = degrees;
 	f32q f360 = f32q_set_all(360.0f);
 	f32q f0 = f32q_zero();
-
-	//Surpasses 360 degrees
 	f32q ones = f32q_set_all(1.0f);
-	f32q angle_fill_percent = degrees / f360;
 
 	f32q underflows = degrees < f0;
 	f32q overflows = degrees >= f360;
-	f32q optional_add_one_if_underflow = angle_fill_percent * (underflows & ones);
-	f32q optional_sub_one_if_overflow = angle_fill_percent * (overflows & ones);
+	f32q optional_sub_one_if_underflow = f32q_masked_add(f0, ones, underflows);
+	f32q optional_sub_one_if_overflow = f32q_masked_add(f0, ones, overflows);
 
+	f32q angle_fill_percent = degrees / f360;
+	f32q overflow_360_mult = f360 * f32q_ceil((angle_fill_percent - optional_sub_one_if_overflow));
+	f32q underflow_360_mult = f360 * f32q_ceil((angle_fill_percent - optional_sub_one_if_underflow));
+
+	f32q wrapped_high = f32q_abs(overflow_360_mult - degrees);
+	f32q wrapped_low = f32q_abs(underflow_360_mult - degrees);
+
+	return f32q_select(wrapped_low, f32q_select(wrapped_high, degrees, overflows), underflows);
 }
