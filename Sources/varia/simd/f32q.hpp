@@ -270,17 +270,16 @@ VARIA_INLINE f32q f32q_wrap_angle(f32q degrees)
 	f32q f0 = f32q_zero();
 	f32q ones = f32q_set_all(1.0f);
 
-	f32q underflows = degrees < f0;
+	f32q out_of_range = degrees < f0;
 	f32q overflows = degrees >= f360;
-	f32q optional_sub_one_if_underflow = f32q_masked_add(f0, ones, underflows);
-	f32q optional_sub_one_if_overflow = f32q_masked_add(f0, ones, overflows);
+	out_of_range |= overflows;
+
+	f32q optional_sub_one_if_OOR = f32q_masked_add(f0, ones, out_of_range);
 
 	f32q angle_fill_percent = degrees / f360;
-	f32q overflow_360_mult = f360 * f32q_ceil((angle_fill_percent - optional_sub_one_if_overflow));
-	f32q underflow_360_mult = f360 * f32q_ceil((angle_fill_percent - optional_sub_one_if_underflow));
+	f32q OOR_360_mult = f360 * f32q_ceil((angle_fill_percent - optional_sub_one_if_OOR));
 
-	f32q wrapped_high = f32q_abs(overflow_360_mult - degrees);
-	f32q wrapped_low = f32q_abs(underflow_360_mult - degrees);
+	f32q wrapped = f32q_abs(OOR_360_mult - degrees);
 
-	return f32q_select(wrapped_low, f32q_select(wrapped_high, degrees, overflows), underflows);
+	return f32q_select(wrapped, degrees, out_of_range);
 }

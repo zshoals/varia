@@ -93,7 +93,7 @@ int kickstart(int argc, char** argv)
 
 
 	kinc_float32x4_t plswork = kinc_float32x4_load(100.f, 200.f, 300.f, 400.f);
-	kinc_float32x4_t sins = kinc_float32x4_load(-10000.f, 100.f, 721.f, -1.0f);
+	kinc_float32x4_t sins = kinc_float32x4_load(-10000.f, 100.f, 720.f, -1.0f);
 	sins = f32q_wrap_angle(sins);
 
 	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 0));
