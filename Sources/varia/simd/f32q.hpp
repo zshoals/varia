@@ -62,28 +62,39 @@ VARIA_INLINE f32q_mask operator==(f32q const & a, f32q const & b) { return f32q_
 VARIA_INLINE f32q_mask operator!=(f32q const & a, f32q const & b) { return f32q_cmpneq(a, b); }
 
 //Extensions
-
-VARIA_INLINE f32q f32q_masked_add(f32q a, f32q b_masked, f32q mask)
-{
-	return a + (b_masked & mask);
-}
-
-VARIA_INLINE f32q f32q_masked_sub(f32q a, f32q b_masked, f32q mask)
-{
-	return a - (b_masked & mask);
-}
-
-VARIA_INLINE f32q f32q_masked_mul(f32q a, f32q b_masked, f32q mask)
-{
-	return a * (b_masked & mask);
-}
-
-VARIA_INLINE f32q f32q_masked_div(f32q a, f32q b_masked, f32q mask)
-{
-	return a / (b_masked & mask);
-}
-
 VARIA_INLINE f32q f32q_zero(void) { return f32q_set_all(0.0f); }
+VARIA_INLINE f32q_mask f32q_mask_zeroes(void) { return f32q_set_all(0.0f); }
+VARIA_INLINE f32q_mask f32q_mask_ones(void) 
+{ 
+	f32q zeroes = f32q_mask_zeroes();
+	return f32q_cmpeq(zeroes, zeroes); 
+}
+
+VARIA_INLINE f32q f32q_conditional_add(f32q a, f32q b_masked, f32q_mask condition)
+{
+	return a + (b_masked & condition);
+}
+
+VARIA_INLINE f32q f32q_conditional_sub(f32q a, f32q b_masked, f32q_mask condition)
+{
+	return a - (b_masked & condition);
+}
+
+VARIA_INLINE f32q f32q_conditional_mul(f32q a, f32q b_masked, f32q_mask condition)
+{
+	return f32q_select( (a * b_masked), a, condition);
+}
+
+VARIA_INLINE f32q f32q_conditional_div(f32q a, f32q b_masked, f32q_mask condition)
+{
+	return f32q_select( (a / b_masked), a, condition);
+}
+
+VARIA_INLINE f32q f32q_conditional_clear(f32q n, f32q_mask condition)
+{
+	return f32q_select(n, f32q_zero(), condition);
+}
+
 VARIA_INLINE f32q_mask f32q_ones_mask_lane0(void) { 
 	return f32q_cmplt(f32q_set(0.0f, 1.0f, 1.0f, 1.0f), f32q_set(1.0f, 0.0f, 0.0f, 0.0f));
 }
@@ -95,12 +106,6 @@ VARIA_INLINE f32q_mask f32q_ones_mask_lane2(void) {
 }
 VARIA_INLINE f32q_mask f32q_ones_mask_lane3(void) { 
 	return f32q_cmplt(f32q_set(1.0f, 1.0f, 1.0f, 0.0f), f32q_set(0.0f, 0.0f, 0.0f, 1.0f));
-}
-VARIA_INLINE f32q_mask f32q_mask_zeroes(void) { return f32q_set_all(0.0f); }
-VARIA_INLINE f32q_mask f32q_mask_ones(void) 
-{ 
-	f32q zeroes = f32q_mask_zeroes();
-	return f32q_cmpeq(zeroes, zeroes); 
 }
 
 VARIA_INLINE f32q f32q_round(f32q n)
@@ -203,6 +208,11 @@ VARIA_INLINE f32q f32q_pow(f32q n, int exp)
 VARIA_INLINE f32q f32q_pow2(f32q n)
 {
 	return n * n;
+}
+
+VARIA_INLINE f32q f32q_pow3(f32q n)
+{
+	return n * n * n;
 }
 
 VARIA_INLINE f32q f32q_rad2deg(f32q radians)
