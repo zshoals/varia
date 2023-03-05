@@ -63,10 +63,11 @@ VARIA_INLINE f32q_mask operator!=(f32q const & a, f32q const & b) { return f32q_
 
 //Extensions
 VARIA_INLINE f32q f32q_zero(void) { return f32q_set_all(0.0f); }
-VARIA_INLINE f32q_mask f32q_mask_zeroes(void) { return f32q_set_all(0.0f); }
-VARIA_INLINE f32q_mask f32q_mask_ones(void) 
+VARIA_INLINE f32q f32q_one(void) { return f32q_set_all(1.0f); }
+VARIA_INLINE f32q_mask f32q_mask_0x0(void) { return f32q_set_all(0.0f); }
+VARIA_INLINE f32q_mask f32q_mask_0xffffffff(void) 
 { 
-	f32q zeroes = f32q_mask_zeroes();
+	f32q zeroes = f32q_mask_0x0();
 	return f32q_cmpeq(zeroes, zeroes); 
 }
 
@@ -217,14 +218,18 @@ VARIA_INLINE f32q f32q_pow3(f32q n)
 
 VARIA_INLINE f32q f32q_rad2deg(f32q radians)
 {
-	const float PI = 3.145926545f;
-	return (radians * (f32q_set_all(180.0f) / f32q_set_all(PI)));
+	float const PI = 3.145926545f;
+	f32q const f_1_over_180 = (f32q_one() / f32q_set_all(PI));
+
+	return (radians * (f32q_set_all(180.0f) * f_1_over_180));
 }
 
 VARIA_INLINE f32q f32q_deg2rad(f32q degrees)
 {
-	const float PI = 3.145926545f;
-	return (degrees * (f32q_set_all(PI) / f32q_set_all(180.0f)));
+	float const PI = 3.145926545f;
+	f32q const f_rad_over_deg = f32q_set_all(PI) / f32q_set_all(180.0f);
+
+	return (degrees * f_rad_over_deg);
 }
 
 VARIA_INLINE f32q f32q_lerp(f32q n, f32q starts, f32q ends)
