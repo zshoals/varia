@@ -236,6 +236,11 @@ VARIA_INLINE f32q f32q_clamp(f32q n, f32q lowers, f32q uppers)
 	return f32q_min(lowers, f32q_max(n, uppers));
 }
 
+VARIA_INLINE f32q f32q_wrap(f32q n, f32q limit)
+{
+	return n - (limit * f32q_floor(n * (f32q_set_all(1.0f) / limit) ));
+}
+
 VARIA_INLINE f32q f32q_smoothstep(f32q n, f32q lower_edges, f32q upper_edges)
 {
 	n = f32q_clamp(n, lower_edges, upper_edges);
@@ -266,20 +271,7 @@ VARIA_INLINE f32q f32q_atan2(f32q ys, f32q xs)
 
 VARIA_INLINE f32q f32q_wrap_angle(f32q degrees)
 {
-	f32q f360 = f32q_set_all(360.0f);
-	f32q f0 = f32q_zero();
-	f32q ones = f32q_set_all(1.0f);
-
-	f32q out_of_range = degrees < f0;
-	f32q overflows = degrees >= f360;
-	out_of_range |= overflows;
-
-	f32q optional_sub_one_if_OOR = f32q_masked_add(f0, ones, out_of_range);
-
-	f32q angle_fill_percent = degrees / f360;
-	f32q OOR_360_mult = f360 * f32q_ceil((angle_fill_percent - optional_sub_one_if_OOR));
-
-	f32q wrapped = f32q_abs(OOR_360_mult - degrees);
-
-	return f32q_select(wrapped, degrees, out_of_range);
+	f32q const f1 = f32q_set_all(1.0f);
+	f32q const f360 = f32q_set_all(360.0f);
+	return degrees - (f360 * f32q_floor(degrees * (f1 / f360)));
 }
