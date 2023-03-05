@@ -1,9 +1,6 @@
 #pragma once
 
-constexpr double EPSILON = 0.00000001;
-constexpr double PI = 3.145926545;
-constexpr double TAU = PI * 2;
-
+#include "varia/math/MathConstants.hpp"
 #include <math.h>
 
 constexpr VARIA_INLINE float vmath_lerp(float value, float start, float end)
@@ -23,12 +20,12 @@ constexpr VARIA_INLINE float vmath_remap(float value, float s1, float e1, float 
 
 constexpr VARIA_INLINE float vmath_rad2deg(float radians)
 {
-	return static_cast<float>(radians * (180.0 / PI));
+	return static_cast<float>(radians * (180.0 / VARIA_PI));
 }
 
 constexpr VARIA_INLINE float vmath_deg2rad(float degrees)
 {
-	return static_cast<float>(degrees * (PI / 180.0));
+	return static_cast<float>(degrees * (VARIA_PI / 180.0));
 }
 
 constexpr VARIA_INLINE float vmath_clampF(float value, float lower, float upper)

@@ -3,6 +3,7 @@
 #include "varia/simd/simd_types.h"
 
 #include "varia/vcommon.hpp"
+#include "varia/math/MathConstants.hpp"
 #include "kinc/simd/float32x4.h"
 #include "simd_trig.h"
 
@@ -269,9 +270,16 @@ VARIA_INLINE f32q f32q_atan2(f32q ys, f32q xs)
 	return simd_fq_atan2(ys, xs);
 }
 
-VARIA_INLINE f32q f32q_wrap_angle(f32q degrees)
+VARIA_INLINE f32q f32q_wrap_degrees(f32q degrees)
 {
 	f32q const f1 = f32q_set_all(1.0f);
 	f32q const f360 = f32q_set_all(360.0f);
 	return degrees - (f360 * f32q_floor(degrees * (f1 / f360)));
+}
+
+VARIA_INLINE f32q f32q_wrap_radians(f32q radians)
+{
+	f32q const f1 = f32q_set_all(1.0f);
+	f32q const fTAU = f32q_set_all(VARIA_TAU);
+	return radians - (fTAU * f32q_floor(radians * (f1 / fTAU)));
 }
