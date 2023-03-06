@@ -64,6 +64,8 @@ VARIA_INLINE f32q_mask operator!=(f32q const & a, f32q const & b) { return f32q_
 //Extensions
 VARIA_INLINE f32q f32q_zero(void) { return f32q_set_all(0.0f); }
 VARIA_INLINE f32q f32q_one(void) { return f32q_set_all(1.0f); }
+VARIA_INLINE f32q f32q_two(void) { return f32q_set_all(2.0f); }
+VARIA_INLINE f32q f32q_negative_one(void) { return f32q_set_all(-1.0f); }
 VARIA_INLINE f32q_mask f32q_mask_0x0(void) { return f32q_set_all(0.0f); }
 VARIA_INLINE f32q_mask f32q_mask_0xffffffff(void) 
 { 
@@ -96,6 +98,11 @@ VARIA_INLINE f32q f32q_conditional_clear(f32q n, f32q_mask condition)
 	return f32q_select(n, f32q_zero(), condition);
 }
 
+VARIA_INLINE f32q_mask f32q_condition_merge(f32q_mask condition_a, f32q_mask condition_b)
+{
+	return condition_a | condition_b;
+}
+
 VARIA_INLINE f32q_mask f32q_ones_mask_lane0(void) { 
 	return f32q_cmplt(f32q_set(0.0f, 1.0f, 1.0f, 1.0f), f32q_set(1.0f, 0.0f, 0.0f, 0.0f));
 }
@@ -107,6 +114,33 @@ VARIA_INLINE f32q_mask f32q_ones_mask_lane2(void) {
 }
 VARIA_INLINE f32q_mask f32q_ones_mask_lane3(void) { 
 	return f32q_cmplt(f32q_set(1.0f, 1.0f, 1.0f, 0.0f), f32q_set(0.0f, 0.0f, 0.0f, 1.0f));
+}
+
+VARIA_INLINE int f32q_movemask(f32q mask)
+{
+	#if defined(KINC_SSE2) || defined(KINC_SSE)
+		return _mm_movemask_ps(mask);
+	#else
+		uint32_t cvt[4];
+		uint32_t int_mask;
+		VARIA_BITCAST(&cvt[0], &mask.values[0]);
+
+		int_mask |= ((cvt[0] >> 31) & 0x1) << 0;
+		int_mask |= ((cvt[1] >> 31) & 0x1) << 1;
+		int_mask |= ((cvt[2] >> 31) & 0x1) << 2;
+		int_mask |= ((cvt[3] >> 31) & 0x1) << 3;
+
+		int out;
+		VARIA_BITCAST(&out, &int_mask);
+
+		return out;
+	#endif
+}
+
+VARIA_INLINE f32q f32q_sign(f32q n)
+{
+	f32q_mask mask = n < f32q_zero();
+	return f32q_select(f32q_negative_one(), f32q_one(), mask);
 }
 
 VARIA_INLINE f32q f32q_round(f32q n)
@@ -124,6 +158,7 @@ VARIA_INLINE f32q f32q_round(f32q n)
 
 		return f32q_select(y2, n, overflow_mask);
 	#else
+		//TODO(zshoals 03-05-2023):> Won't work if we're on NEON; we need to explicitly handle NEON now :/
 		n.values[0] = roundf(n.values[0]);
 		n.values[1] = roundf(n.values[1]);
 		n.values[2] = roundf(n.values[2]);

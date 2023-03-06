@@ -90,16 +90,50 @@ int kickstart(int argc, char** argv)
 		*elem = i;
 	});
 
+	vds_array_t<f32q, 10000000> * sins = (vds_array_t<f32q, 10000000> *)malloc(sizeof(vds_array_t<f32q, 10000000>));
 
+	vds_array_initialize(sins);
 
-	kinc_float32x4_t plswork = kinc_float32x4_load(100.f, 200.f, 300.f, 400.f);
-	kinc_float32x4_t sins = kinc_float32x4_load(-10000.f, 100.f, 720.f, -1.0f);
-	sins = f32q_wrap_radians(sins);
+	for_range_var(i, vds_array_capacity(sins))
+	{
+		vds_array_push(sins, f32q_one());
+	}
 
-	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 0));
-	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 1));
-	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 2));
-	VARIA_LOG_FLOAT(kinc_float32x4_get(sins, 3));
+	varia_elapsed_t timer;
+
+	vds_array_for_each(sins, [](f32q * quad)
+	{
+		*quad = f32q_sin(*quad);
+	});
+
+	varia_elapsed_begin_and_log(&timer, "Start sins");
+
+	vds_array_for_each(sins, [](f32q * quad)
+	{
+		*quad = f32q_sin(*quad);
+	});
+
+	// for_range_var_step(i, vds_array_length(sins), 4)
+	// {
+	// 	f32q * f1 = vds_array_get_mut_unsafe(sins, i + 0);
+	// 	f32q * f2 = vds_array_get_mut_unsafe(sins, i + 1);
+	// 	f32q * f3 = vds_array_get_mut_unsafe(sins, i + 2);
+	// 	f32q * f4 = vds_array_get_mut_unsafe(sins, i + 3);
+
+	// 	*f1 = f32q_sin(*f1);
+	// 	*f2 = f32q_sin(*f2);
+	// 	*f3 = f32q_sin(*f3);
+	// 	*f4 = f32q_sin(*f4);
+	// }
+
+	varia_elapsed_end_and_log(&timer);
+
+	f32q sins_out = *vds_array_get(sins, 463634);
+
+	VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 0));
+	VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 1));
+	VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 2));
+	VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 3));
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
