@@ -47,7 +47,7 @@ VARIA_INLINE vec2q vec2q_reflect(vec2q v, vec2q non_normalized_surface_vec)
 {
 	f32q signs = f32q_sign(v.xs) * f32q_sign(v.ys);
 
-	f32q impact_angles = vec2q_atan2(v) * signs;
+	f32q impact_angles = vec2q_atan2(v);
 	f32q normal_angles = vec2q_atan2(non_normalized_surface_vec);
 
 	f32q angle_diff = f32q_abs((impact_angles + f32q_PI()) - normal_angles);

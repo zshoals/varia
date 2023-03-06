@@ -91,7 +91,7 @@ int kickstart(int argc, char** argv)
 		*elem = i;
 	});
 
-	vec2q sins = vec2q_unit_vector_from_angle(f32q_deg2rad(f32q_set_all(355.0f)));
+	vec2q sins = vec2q_unit_vector_from_angle(f32q_deg2rad(f32q_set_all(305.0565f)));
 	f32q in_ang = vec2q_atan2(sins);
 	in_ang = f32q_rad2deg(in_ang);
 	// vec2q sins = { f32q_set_all(1.0f), f32q_set_all(3.0f) };
