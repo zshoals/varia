@@ -18,6 +18,7 @@
 #include "varia/tests/Test_Everything.hpp"
 
 #include "varia/simd/f32q.hpp"
+#include "varia/math/Vec2q.hpp"
 
 
 int kickstart(int argc, char** argv) 
@@ -90,50 +91,30 @@ int kickstart(int argc, char** argv)
 		*elem = i;
 	});
 
-	vds_array_t<f32q, 10000000> * sins = (vds_array_t<f32q, 10000000> *)malloc(sizeof(vds_array_t<f32q, 10000000>));
+	vec2q sins = vec2q_unit_vector_from_angle(f32q_deg2rad(f32q_set_all(355.0f)));
+	f32q in_ang = vec2q_atan2(sins);
+	in_ang = f32q_rad2deg(in_ang);
+	// vec2q sins = { f32q_set_all(1.0f), f32q_set_all(3.0f) };
+	vec2q impact = vec2q_unit_vector_from_angle(f32q_PI());
+	f32q impact_ang = vec2q_atan2(impact);
+	impact_ang = f32q_rad2deg(impact_ang);
 
-	vds_array_initialize(sins);
+	VARIA_QLOG("Before");
+	VARIA_LOG_FLOAT(f32q_get(vec2q_atan2(sins), 0));
 
-	for_range_var(i, vds_array_capacity(sins))
-	{
-		vds_array_push(sins, f32q_one());
-	}
+	sins = vec2q_reflect(sins, impact);
+	f32q ang = vec2q_atan2(sins);
+	ang = f32q_rad2deg(ang);
 
-	varia_elapsed_t timer;
+	VARIA_QLOG("After");
+	VARIA_LOG_FLOAT(f32q_get(ang, 0));
+	VARIA_LOG_FLOAT(f32q_get(in_ang, 0));
+	VARIA_LOG_FLOAT(f32q_get(impact_ang, 0));
 
-	vds_array_for_each(sins, [](f32q * quad)
-	{
-		*quad = f32q_sin(*quad);
-	});
-
-	varia_elapsed_begin_and_log(&timer, "Start sins");
-
-	vds_array_for_each(sins, [](f32q * quad)
-	{
-		*quad = f32q_sin(*quad);
-	});
-
-	// for_range_var_step(i, vds_array_length(sins), 4)
-	// {
-	// 	f32q * f1 = vds_array_get_mut_unsafe(sins, i + 0);
-	// 	f32q * f2 = vds_array_get_mut_unsafe(sins, i + 1);
-	// 	f32q * f3 = vds_array_get_mut_unsafe(sins, i + 2);
-	// 	f32q * f4 = vds_array_get_mut_unsafe(sins, i + 3);
-
-	// 	*f1 = f32q_sin(*f1);
-	// 	*f2 = f32q_sin(*f2);
-	// 	*f3 = f32q_sin(*f3);
-	// 	*f4 = f32q_sin(*f4);
-	// }
-
-	varia_elapsed_end_and_log(&timer);
-
-	f32q sins_out = *vds_array_get(sins, 463634);
-
-	VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 0));
-	VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 1));
-	VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 2));
-	VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 3));
+	// VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 0));
+	// VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 1));
+	// VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 2));
+	// VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 3));
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);

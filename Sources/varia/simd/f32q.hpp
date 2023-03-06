@@ -66,6 +66,7 @@ VARIA_INLINE f32q f32q_zero(void) { return f32q_set_all(0.0f); }
 VARIA_INLINE f32q f32q_one(void) { return f32q_set_all(1.0f); }
 VARIA_INLINE f32q f32q_two(void) { return f32q_set_all(2.0f); }
 VARIA_INLINE f32q f32q_negative_one(void) { return f32q_set_all(-1.0f); }
+VARIA_INLINE f32q f32q_PI(void) { return f32q_set_all(VARIA_PI); }
 VARIA_INLINE f32q_mask f32q_mask_0x0(void) { return f32q_set_all(0.0f); }
 VARIA_INLINE f32q_mask f32q_mask_0xffffffff(void) 
 { 
