@@ -92,18 +92,18 @@ int kickstart(int argc, char** argv)
 	});
 
 	vec2q sins = vec2q_unit_vector_from_angle(f32q_deg2rad(f32q_set_all(305.0565f)));
-	f32q in_ang = vec2q_atan2(sins);
+	f32q in_ang = vec2q_angle(sins);
 	in_ang = f32q_rad2deg(in_ang);
 	// vec2q sins = { f32q_set_all(1.0f), f32q_set_all(3.0f) };
 	vec2q impact = vec2q_unit_vector_from_angle(f32q_PI());
-	f32q impact_ang = vec2q_atan2(impact);
+	f32q impact_ang = vec2q_angle(impact);
 	impact_ang = f32q_rad2deg(impact_ang);
 
 	VARIA_QLOG("Before");
-	VARIA_LOG_FLOAT(f32q_get(vec2q_atan2(sins), 0));
+	VARIA_LOG_FLOAT(f32q_get(vec2q_angle(sins), 0));
 
 	sins = vec2q_reflect(sins, impact);
-	f32q ang = vec2q_atan2(sins);
+	f32q ang = vec2q_angle(sins);
 	ang = f32q_rad2deg(ang);
 
 	VARIA_QLOG("After");
