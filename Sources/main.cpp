@@ -94,39 +94,10 @@ int kickstart(int argc, char** argv)
 		*elem = i;
 	});
 
+	Glog_initialize();
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
-
-
-
-
-	Glog_initialize();
-
-	Glog_string("Hello there, my name is Jackson");
-	Glog_newline();
-	Glog_string("This is the end of the world, and you're not invited.");
-	Glog_newline();
-	Glog_string("Countdown: "); 
-	Glog_time();
-	Glog_print();
-	Glog_clear_buffer();
-
-	Glog_string("We couldn't believe that you had done this....");
-	Glog_newline();
-	Glog_string("This was "); Glog_time(); Glog_string(" seconds ago, and you hurt us. Badly.");
-	Glog_print();
-	Glog_clear_buffer();
-
-	f32q_Gprint_info(f32q_set_all(0.44634f), "This is a Float32x4");
-	Glog_print();
-
-	// f32q bbo = f32q_create(1.0f, 500.f, 300.f, 33209.f);
-
-	// f32q_print(bbo);
-	// f32q_print(bbo);
-	// f32q_print(bbo);
-	// f32q_print(bbo);
 
 	kinc_start();
 

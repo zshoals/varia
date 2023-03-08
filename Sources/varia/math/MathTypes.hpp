@@ -15,7 +15,7 @@ struct alignas(32) vec2q
 };
 
 
-struct alignas(64) mat4
+struct alignas(64) mat4q
 {
 	f32q a;
 	f32q b;
