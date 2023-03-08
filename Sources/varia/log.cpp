@@ -56,8 +56,19 @@ void log_newline(varia_stringbuf_t * buf)
 }
 
 
+#include "varia/ds/DumbBuf.hpp"
 
+void log_float2(vds_dumbbuf_t<char, 12000> * buf)
+{
+	char temp[128];
+	int to_add = snprintf(&temp[0], 128, "%f", 6347453.0033f);
 
+	vds_dumbbuf_try_blit(buf, to_add, [&temp](char * data) -> int64_t
+	{
+		int written = sprintf(data, &temp[0]);
+		return written;
+	});
+}
 
 void log_float(varia_stringbuf_t * buf, double value)
 {

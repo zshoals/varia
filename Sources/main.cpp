@@ -20,6 +20,8 @@
 #include "varia/simd/f32q.hpp"
 #include "varia/math/Vec2q.hpp"
 
+#include "varia/log.hpp"
+
 
 int kickstart(int argc, char** argv) 
 {
@@ -80,6 +82,7 @@ int kickstart(int argc, char** argv)
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
 
+
 	vds_allocator_t mem;
 	void * buffer = calloc(1, varia_memory_kilobytes_to_bytes(1));
 	vds_allocator_initialize(&mem, buffer, varia_memory_kilobytes_to_bytes(1));
@@ -91,33 +94,39 @@ int kickstart(int argc, char** argv)
 		*elem = i;
 	});
 
-	vec2q sins = vec2q_unit_vector_from_angle(f32q_deg2rad(f32q_set_all(305.0565f)));
-	f32q in_ang = vec2q_angle(sins);
-	in_ang = f32q_rad2deg(in_ang);
-	// vec2q sins = { f32q_set_all(1.0f), f32q_set_all(3.0f) };
-	vec2q impact = vec2q_unit_vector_from_angle(f32q_PI());
-	f32q impact_ang = vec2q_angle(impact);
-	impact_ang = f32q_rad2deg(impact_ang);
-
-	VARIA_QLOG("Before");
-	VARIA_LOG_FLOAT(f32q_get(vec2q_angle(sins), 0));
-
-	sins = vec2q_reflect(sins, impact);
-	f32q ang = vec2q_angle(sins);
-	ang = f32q_rad2deg(ang);
-
-	VARIA_QLOG("After");
-	VARIA_LOG_FLOAT(f32q_get(ang, 0));
-	VARIA_LOG_FLOAT(f32q_get(in_ang, 0));
-	VARIA_LOG_FLOAT(f32q_get(impact_ang, 0));
-
-	// VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 0));
-	// VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 1));
-	// VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 2));
-	// VARIA_LOG_FLOAT(kinc_float32x4_get(sins_out, 3));
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
+
+
+
+
+	Glog_initialize();
+
+	Glog_string("Hello there, my name is Jackson");
+	Glog_newline();
+	Glog_string("This is the end of the world, and you're not invited.");
+	Glog_newline();
+	Glog_string("Countdown: "); 
+	Glog_time();
+	Glog_print();
+	Glog_clear_buffer();
+
+	Glog_string("We couldn't believe that you had done this....");
+	Glog_newline();
+	Glog_string("This was "); Glog_time(); Glog_string(" seconds ago, and you hurt us. Badly.");
+	Glog_print();
+	Glog_clear_buffer();
+
+	f32q_Gprint_info(f32q_set_all(0.44634f), "This is a Float32x4");
+	Glog_print();
+
+	// f32q bbo = f32q_create(1.0f, 500.f, 300.f, 33209.f);
+
+	// f32q_print(bbo);
+	// f32q_print(bbo);
+	// f32q_print(bbo);
+	// f32q_print(bbo);
 
 	kinc_start();
 
