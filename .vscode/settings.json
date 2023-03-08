@@ -21,6 +21,18 @@
 		"*.def": "cpp",
 		"memory": "cpp",
 		"atomic": "cpp",
-		"initializer_list": "c"
+		"initializer_list": "c",
+		"cctype": "cpp",
+		"concepts": "cpp",
+		"cstdint": "cpp",
+		"cstdio": "cpp",
+		"ctime": "cpp",
+		"cwchar": "cpp",
+		"exception": "cpp",
+		"iosfwd": "cpp",
+		"new": "cpp",
+		"string": "cpp",
+		"typeinfo": "cpp",
+		"xstddef": "cpp"
 	}
 }
