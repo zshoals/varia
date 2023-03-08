@@ -1,6 +1,7 @@
 #pragma once
 
 #define vds_allocator_malloc(ALLOC_PTR, TYPE, COUNT) static_cast<TYPE *>( vds_allocator_allocate_aligned((ALLOC_PTR), sizeof(TYPE) * (COUNT), alignof(TYPE)))
+#define vds_allocator_malloc_aligned(ALLOC_PTR, TYPE, COUNT, ALIGN) static_cast<TYPE *>( vds_allocator_allocate_aligned((ALLOC_PTR), sizeof(TYPE) * (COUNT), (ALIGN)))
 
 struct vds_allocator_t
 {
