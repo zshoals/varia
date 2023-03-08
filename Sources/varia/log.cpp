@@ -18,6 +18,12 @@ static bool log_in_bounds(varia_stringbuf_t const * buf, size_t chars_to_add)
 void log_print(varia_stringbuf_t * buf)
 {
 	buf->buffer[buf->current_offset] = '\0';
+
+	if (buf->current_offset == 0)
+	{
+		return;
+	} 
+
 	kinc_log(KINC_LOG_LEVEL_INFO, buf->buffer);
 }
 
@@ -55,20 +61,6 @@ void log_newline(varia_stringbuf_t * buf)
 	}
 }
 
-
-#include "varia/ds/DumbBuf.hpp"
-
-void log_float2(vds_dumbbuf_t<char, 12000> * buf)
-{
-	char temp[128];
-	int to_add = snprintf(&temp[0], 128, "%f", 6347453.0033f);
-
-	vds_dumbbuf_try_blit(buf, to_add, [&temp](char * data) -> int64_t
-	{
-		int written = sprintf(data, &temp[0]);
-		return written;
-	});
-}
 
 void log_float(varia_stringbuf_t * buf, double value)
 {
