@@ -221,6 +221,51 @@ VARIA_INLINE void operator/=(f32q const & b, vec2q & a)
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 
+VARIA_INLINE vec2q vec2q_zero(void)
+{
+	vec2q out;
+	out.xs = f32q_zero();
+	out.ys = f32q_zero();
+
+	return out;
+}
+
+VARIA_INLINE vec2q vec2q_left(void)
+{
+	vec2q out;
+	out.xs = f32q_negative_one();
+	out.ys = f32q_zero();
+
+	return out;
+}
+
+VARIA_INLINE vec2q vec2q_up(void)
+{
+	vec2q out;
+	out.xs = f32q_zero();
+	out.ys = f32q_one();
+
+	return out;
+}
+
+VARIA_INLINE vec2q vec2q_right(void)
+{
+	vec2q out;
+	out.xs = f32q_one();
+	out.ys = f32q_zero();
+
+	return out;
+}
+
+VARIA_INLINE vec2q vec2q_down(void)
+{
+	vec2q out;
+	out.xs = f32q_zero();
+	out.ys = f32q_negative_one();
+
+	return out;
+}
+
 VARIA_INLINE f32q vec2q_length(vec2q v)
 {
 	return f32q_sqrt(f32q_pow2(v.xs) + f32q_pow2(v.ys));
@@ -263,6 +308,22 @@ VARIA_INLINE vec2q vec2q_normalize(vec2q vs)
 	return vs;
 }
 
+VARIA_INLINE f32q vec2q_square_magnitude(vec2q v)
+{
+	v.xs = f32q_pow2(v.xs);
+	v.ys = f32q_pow2(v.ys);
+
+	return v.xs + v.ys;
+}
+
+VARIA_INLINE f32q vec2q_magnitude(vec2q v)
+{
+	v.xs = f32q_pow2(v.xs);
+	v.ys = f32q_pow2(v.ys);
+
+	return f32q_sqrt(v.xs + v.ys);
+}
+
 VARIA_INLINE f32q vec2q_dot(vec2q a, vec2q b)
 {
 	return (a.xs * b.xs) + (a.ys * b.ys);
@@ -270,7 +331,7 @@ VARIA_INLINE f32q vec2q_dot(vec2q a, vec2q b)
 
 VARIA_INLINE vec2q vec2q_rotate(vec2q v, f32q radians)
 {
-	f32q const v_angle = vec2q_angle(v);
+	f32q const v_angle = vec2q_angle(v) + radians;
 	f32q const v_sin = f32q_sin(v_angle);
 	f32q const v_cos = f32q_cos(v_angle);
 

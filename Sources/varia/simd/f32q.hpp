@@ -7,12 +7,21 @@
 #include "kinc/simd/float32x4.h"
 #include "simd_trig.h"
 
+#ifdef VARIA_LOG_LOGGING_ENABLED
+	#include "varia/log.hpp"
+#endif
+
 VARIA_INLINE f32q f32q_load(const f32 *values) { return kinc_float32x4_intrin_load(values); }
 VARIA_INLINE f32q f32q_load_u(const f32 *values) { return kinc_float32x4_intrin_load_unaligned(values); }
 VARIA_INLINE void f32q_store(f32 *destination, f32q n) { kinc_float32x4_store(destination, n); } 
 VARIA_INLINE void f32q_store_u(f32 *destination, f32q n) { kinc_float32x4_store_unaligned(destination, n); } 
 VARIA_INLINE f32q f32q_set(f32 a, f32 b, f32 c, f32 d) { return kinc_float32x4_load(a, b, c, d); }
 VARIA_INLINE f32q f32q_set_all(f32 n) { return kinc_float32x4_load_all(n); }
+
+//Renamed versions of set/set_all for semantics
+VARIA_INLINE f32q f32q_create(f32 a, f32 b, f32 c, f32 d) { return f32q_set(a, b, c, d); }
+VARIA_INLINE f32q f32q_create_all(f32 n) { return f32q_set_all(n); }
+
 VARIA_INLINE f32 f32q_get(f32q n, int index) { return kinc_float32x4_get(n, index); }
 VARIA_INLINE f32q f32q_abs(f32q n) { return kinc_float32x4_abs(n); }
 VARIA_INLINE f32q f32q_add(f32q a, f32q b) { return kinc_float32x4_add(a, b); }
@@ -69,10 +78,10 @@ VARIA_INLINE f32q f32q_negative_one(void) { return f32q_set_all(-1.0f); }
 VARIA_INLINE f32q f32q_PI(void) { return f32q_set_all(VARIA_PI); }
 VARIA_INLINE f32q f32q_TAU(void) { return f32q_set_all(VARIA_PI * 2.0f); }
 VARIA_INLINE f32q f32q_EPSILON(void) { return f32q_set_all(VARIA_EPSILON); }
-VARIA_INLINE f32q_mask f32q_mask_0x0(void) { return f32q_set_all(0.0f); }
-VARIA_INLINE f32q_mask f32q_mask_0xffffffff(void) 
+VARIA_INLINE f32q_mask f32q_mask_false(void) { return f32q_set_all(0.0f); }
+VARIA_INLINE f32q_mask f32q_mask_true(void) 
 { 
-	f32q zeroes = f32q_mask_0x0();
+	f32q zeroes = f32q_mask_false();
 	return f32q_cmpeq(zeroes, zeroes); 
 }
 
@@ -336,3 +345,42 @@ VARIA_INLINE f32q f32q_wrap_radians(f32q radians)
 	f32q const fTAU = f32q_set_all(VARIA_TAU);
 	return radians - (fTAU * f32q_floor(radians * (f1 / fTAU)));
 }
+
+
+
+
+
+
+//Debugging utilities
+#ifdef VARIA_LOG_LOGGING_ENABLED
+
+	static void f32q_Gprint(f32q n)
+	{
+		alignas(16) float out[4];
+		f32q_store(&out[0], n);
+
+		Glog_newline();
+		Glog_string("Float32x4");
+		Glog_float(out[0]); Glog_newline();
+		Glog_float(out[1]); Glog_newline();
+		Glog_float(out[2]); Glog_newline();
+		Glog_float(out[3]); Glog_newline();
+		Glog_newline();
+	}
+
+	static void f32q_Gprint_info(f32q n, char const * title_info)
+	{
+		alignas(16) float out[4];
+		f32q_store(&out[0], n);
+
+		Glog_newline();
+		Glog_string(title_info);
+		Glog_newline();
+		Glog_float(out[0]); Glog_newline();
+		Glog_float(out[1]); Glog_newline();
+		Glog_float(out[2]); Glog_newline();
+		Glog_float(out[3]); Glog_newline();
+		Glog_newline();
+	}
+
+#endif
