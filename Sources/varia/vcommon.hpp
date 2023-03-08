@@ -15,6 +15,7 @@ typedef int64_t i64;
 typedef float f32;
 typedef double f64;
 typedef unsigned char uchar;
+typedef unsigned char byte;
 typedef unsigned int uint;
 #include "varia/math/MathTypes.hpp"
 
