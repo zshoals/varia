@@ -24,15 +24,31 @@ void vds_dumbbuf_initialize(vds_dumbbuf_t<T> * buf, vds_allocator_t * alloc, siz
 }
 
 template <typename T>
-int64_t vds_dumbbuf_reset(vds_dumbbuf_t<T> * buf)
+void vds_dumbbuf_initialize_direct(vds_dumbbuf_t<T> * buf, T * buffer, size_t count)
+{
+	buf->_capacity = count;
+	buf->current_offset = 0;
+	buf->buffer = buffer;
+	memset(&buf->buffer[0], 0, sizeof(T) * count);
+}
+
+template <typename T>
+void vds_dumbbuf_reset(vds_dumbbuf_t<T> * buf)
 {
 	buf->current_offset = 0;
+	memset(buf->buffer, 0x69, sizeof(T) * buf->_capacity);
 }
 
 template <typename T>
 int64_t vds_dumbbuf_capacity(vds_dumbbuf_t<T> * buf)
 {
 	return buf->_capacity;
+}
+
+template <typename T>
+void vds_dumbbuf_advance(vds_dumbbuf_t<T> * buf, int64_t count)
+{
+	buf->current_offset += count;
 }
 
 template <typename T>
@@ -50,6 +66,7 @@ T * vds_dumbbuf_data(vds_dumbbuf_t<T> * buf)
 template <typename T>
 T * vds_dumbbuf_data_at_offset(vds_dumbbuf_t<T> * buf)
 {
+	assert(buf->current_offset < buf->_capacity);
 	return &buf->buffer[buf->current_offset];
 }
 
