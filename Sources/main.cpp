@@ -94,7 +94,29 @@ int kickstart(int argc, char** argv)
 		*elem = i;
 	});
 
+	int a = 35032;
+	int b = 4694369;
+
+
 	Glog_initialize();
+
+	Glog_string("Please Work");
+	Glog_string("Please Work");
+	Glog_string("Please Work");
+	Glog_string("Please Work");
+	Glog_string("Please Work");
+	Glog_string("Please");
+	Glog_print();
+	Glog_print();
+	Glog_clear_buffer();
+	Glog_string("THIS IS A TEST");
+	Glog_float(0.64364f);
+	Glog_newline();
+	Glog_uint32(643963999U);
+	Glog_print();
+	Glog_clear_buffer();
+
+	Glog_print();
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);

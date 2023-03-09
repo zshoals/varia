@@ -2,13 +2,13 @@
 
 #include "varia/vcommon.hpp"
 
-struct varia_stringbuf_t
-{
-	char * buffer;
-	size_t capacity;
-	size_t current_offset;
-};
+#include "varia/ds/DumbBuf.hpp"
 
+
+
+#define VARIA_G_STRING_BUF_SIZE 100000
+
+typedef vds_dumbbuf_t<char> varia_stringbuf_t;
 
 //"Global" scratch buffer
 void Glog_initialize(void);
