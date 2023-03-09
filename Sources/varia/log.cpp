@@ -8,31 +8,29 @@
 #include <string.h>
 #include <inttypes.h>
 
-static bool log_in_bounds(varia_stringbuf_t const * buf, size_t chars_to_add)
-{
-	//Note(zshoals 03-08-2023):> We always leave room for a finalizing null terminator while printing
-	return (chars_to_add + buf->current_offset) < buf->capacity - 1;
-}
+// static bool log_in_bounds(varia_stringbuf_t const * buf, size_t chars_to_add)
+// {
+// 	//Note(zshoals 03-08-2023):> We always leave room for a finalizing null terminator while printing
+// 	return (chars_to_add + buf->current_offset) < buf->capacity - 1;
+// }
 
 //Generic buffer
 void log_print(varia_stringbuf_t * buf)
 {
-	buf->buffer[buf->current_offset] = '\0';
+	*vds_dumbbuf_data_at_offset(buf) = '\0';
 
-	if (buf->current_offset == 0)
+	if (vds_dumbbuf_length(buf) == 0)
 	{
 		return;
 	} 
 
-	kinc_log(KINC_LOG_LEVEL_INFO, buf->buffer);
+	kinc_log(KINC_LOG_LEVEL_INFO, vds_dumbbuf_data(buf));
 }
 
 void log_clear_buffer(varia_stringbuf_t * buf)
 {
-	buf->current_offset = 0;
-	memset(buf->buffer, 0x69, buf->capacity);
-
-	buf->buffer[0] = '\0';
+	vds_dumbbuf_reset(buf);
+	*vds_dumbbuf_data(buf) = '\0';
 }
 
 void log_copy_to(varia_stringbuf_t * buf, void * destination, size_t destination_length)
@@ -45,104 +43,104 @@ void log_string(varia_stringbuf_t * buf, char const * string)
 {
 	size_t const to_add = strlen(string);
 
-	if (log_in_bounds(buf, to_add))
+	if (vds_dumbbuf_can_push_amount(buf, to_add))
 	{
-		int written = sprintf(&buf->buffer[buf->current_offset], string);
-		buf->current_offset += written;
+		int written = sprintf(vds_dumbbuf_data_at_offset(buf), string);
+		vds_dumbbuf_advance(buf, written);
 	}
 }
 
 void log_newline(varia_stringbuf_t * buf)
 {
-	if (log_in_bounds(buf, 1))
+	if (vds_dumbbuf_can_push_amount(buf, 1))
 	{
-		buf->buffer[buf->current_offset] = '\n';
-		++buf->current_offset;
+		*vds_dumbbuf_data_at_offset(buf) = '\n';
+		vds_dumbbuf_advance(buf, 1);
 	}
 }
 
 
 void log_float(varia_stringbuf_t * buf, double value)
 {
-	char temp[128];
-	int to_add = snprintf(&temp[0], 128, "%f", value);
+	char temp[64];
+	int to_add = snprintf(&temp[0], 64, "%f", value);
 
-	if (log_in_bounds(buf, to_add))
+	if (vds_dumbbuf_can_push_amount(buf, to_add))
 	{
-		int written = sprintf(&buf->buffer[buf->current_offset], &temp[0]);
-		buf->current_offset += written;
+		int written = sprintf(vds_dumbbuf_data_at_offset(buf), &temp[0]);
+		vds_dumbbuf_advance(buf, written);
 	}
 }
 
 void log_int(varia_stringbuf_t * buf, int value)
 {
-	char temp[128];
-	int to_add = snprintf(&temp[0], 128, "%d", value);
+	char temp[64];
+	int to_add = snprintf(&temp[0], 64, "%d", value);
 
-	if (log_in_bounds(buf, to_add))
+	if (vds_dumbbuf_can_push_amount(buf, to_add))
 	{
-		int written = sprintf(&buf->buffer[buf->current_offset], &temp[0]);
-		buf->current_offset += written;
+		int written = sprintf(vds_dumbbuf_data_at_offset(buf), &temp[0]);
+		vds_dumbbuf_advance(buf, written);
 	}
 }
 
 void log_int32(varia_stringbuf_t * buf, int32_t value)
 {
-	char temp[128];
-	int to_add = snprintf(&temp[0], 128, "%" PRId32, value);
+	char temp[64];
+	int to_add = snprintf(&temp[0], 64, "%" PRId32, value);
 
-	if (log_in_bounds(buf, to_add))
+	if (vds_dumbbuf_can_push_amount(buf, to_add))
 	{
-		int written = sprintf(&buf->buffer[buf->current_offset], &temp[0]);
-		buf->current_offset += written;
+		int written = sprintf(vds_dumbbuf_data_at_offset(buf), &temp[0]);
+		vds_dumbbuf_advance(buf, written);
 	}
 }
 
 void log_uint32(varia_stringbuf_t * buf, uint32_t value)
 {
-	char temp[128];
-	int to_add = snprintf(&temp[0], 128, "%" PRIu32, value);
+	char temp[64];
+	int to_add = snprintf(&temp[0], 64, "%" PRIu32, value);
 
-	if (log_in_bounds(buf, to_add))
+	if (vds_dumbbuf_can_push_amount(buf, to_add))
 	{
-		int written = sprintf(&buf->buffer[buf->current_offset], &temp[0]);
-		buf->current_offset += written;
+		int written = sprintf(vds_dumbbuf_data_at_offset(buf), &temp[0]);
+		vds_dumbbuf_advance(buf, written);
 	}
 }
 
 void log_int64(varia_stringbuf_t * buf, int64_t value)
 {
-	char temp[128];
-	int to_add = snprintf(&temp[0], 128, "%" PRId64, value);
+	char temp[64];
+	int to_add = snprintf(&temp[0], 64, "%" PRId64, value);
 
-	if (log_in_bounds(buf, to_add))
+	if (vds_dumbbuf_can_push_amount(buf, to_add))
 	{
-		int written = sprintf(&buf->buffer[buf->current_offset], &temp[0]);
-		buf->current_offset += written;
+		int written = sprintf(vds_dumbbuf_data_at_offset(buf), &temp[0]);
+		vds_dumbbuf_advance(buf, written);
 	}
 }
 
 void log_uint64(varia_stringbuf_t * buf, uint64_t value)
 {
-	char temp[128];
-	int to_add = snprintf(&temp[0], 128, "%" PRIu64, value);
+	char temp[64];
+	int to_add = snprintf(&temp[0], 64, "%" PRIu64, value);
 
-	if (log_in_bounds(buf, to_add))
+	if (vds_dumbbuf_can_push_amount(buf, to_add))
 	{
-		int written = sprintf(&buf->buffer[buf->current_offset], &temp[0]);
-		buf->current_offset += written;
+		int written = sprintf(vds_dumbbuf_data_at_offset(buf), &temp[0]);
+		vds_dumbbuf_advance(buf, written);
 	}
 }
 
 void log_size(varia_stringbuf_t * buf, size_t value)
 {
-	char temp[128];
-	int to_add = snprintf(&temp[0], 128, "%zu", value);
+	char temp[64];
+	int to_add = snprintf(&temp[0], 64, "%zu", value);
 
-	if (log_in_bounds(buf, to_add))
+	if (vds_dumbbuf_can_push_amount(buf, to_add))
 	{
-		int written = sprintf(&buf->buffer[buf->current_offset], &temp[0]);
-		buf->current_offset += written;
+		int written = sprintf(vds_dumbbuf_data_at_offset(buf), &temp[0]);
+		vds_dumbbuf_advance(buf, written);
 	}
 }
 
@@ -155,16 +153,13 @@ void log_time(varia_stringbuf_t * buf)
 
 
 
-#define VARIA_G_STRING_BUF_SIZE 100000
 static char global_string_buffer_data[VARIA_G_STRING_BUF_SIZE];
 static varia_stringbuf_t global_string_buffer;
 
 //"Global" scratch buffer
 void Glog_initialize(void)
 {
-	global_string_buffer.buffer = &global_string_buffer_data[0];
-	global_string_buffer.current_offset = 0;
-	global_string_buffer.capacity = VARIA_G_STRING_BUF_SIZE;
+	vds_dumbbuf_initialize_direct(&global_string_buffer, &global_string_buffer_data[0], VARIA_G_STRING_BUF_SIZE);
 }
 
 varia_stringbuf_t * Glog_reference(void)
