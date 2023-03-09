@@ -6,6 +6,22 @@
 #define VARIA_VALIDATION_NO_OP() ((void)0)
 #define VARIA_VALIDATION_FLOAT_EPSILON 0.00000001
 
+
+
+
+
+void varia_custom_assert(bool condition, char const * expr, char const * message, char const * file, int line)
+{
+	if (!condition)
+	{
+		kinc_log(KINC_LOG_LEVEL_ERROR, "| Assertion failed.\n|   %s \n|   Message: %s \n|   File: %s \n|   Line: %d \n", expr, message, file, line);
+
+		__debugbreak();
+	}
+}
+
+
+
 //======================================
 //=========INT CHECKS===================
 //======================================

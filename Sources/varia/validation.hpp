@@ -35,7 +35,13 @@ void varia_validation_ensure_ptr_is_null(void * ptr, char const * message, char 
 void varia_validation_ensure_const_ptr_not_null(void const * ptr, char const * message, char const * file, int line);
 void varia_validation_ensure_const_ptr_is_null(void const * ptr, char const * message, char const * file, int line);
 
+void varia_custom_assert(bool condition, char const * expr, char const * message, char const * file, int line);
+
 #ifndef VARIA_DISABLE_UNFORCED_ASSERTS
+
+	#define DEBUG_ASSERT(Expression, Message) varia_custom_assert(Expression, #Expression, Message, __FILE__, __LINE__)
+
+
 	#define DEBUG_ENSURE_TRUE(Expression, Message) assert(( (Message), (Expression) ))
 	#define DEBUG_ENSURE_FALSE(Expression, Message) assert(( (Message), !(Expression) ))
 	#define DEBUG_ENSURE_KILL_NOW(Message) assert(( (Message), 0 ))
