@@ -1,5 +1,6 @@
 #pragma once
 
+#include "varia/vcommon.hpp"
 
 constexpr VARIA_INLINE float vmath_minF(float a, float b)
 {
