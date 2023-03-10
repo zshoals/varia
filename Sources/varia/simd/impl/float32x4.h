@@ -162,7 +162,10 @@ VARIA_INLINE varia_float32x4_t varia_float32x4_shuffle_ghcd(varia_float32x4_t ab
 	return _mm_movehl_ps(abcd, efgh);
 }
 
-
+VARIA_INLINE int varia_float32x4_movemask(varia_float32x4_t t)
+{
+	return _mm_movemask_ps(t);
+}
 
 
 
@@ -369,7 +372,26 @@ VARIA_INLINE varia_float32x4_t varia_float32x4_shuffle_ghcd(varia_float32x4_t ab
 	return vcombine_f32(gh, cd);
 }
 
+VARIA_INLINE int varia_float32x4_movemask(varia_float32x4_t t)
+{
+	float extracted[4];
+	varia_float32x4_store_unaligned(&extracted[0], t);
 
+	uint32_t cvtU[4];
+	memcpy(&cvtU[0], &extracted[0], sizeof(t));
+
+	uint32_t out;
+	int32_t outreal;
+
+	out |= (cvtU[0] & 0x80000000) >> 31;
+	out |= (cvtU[1] & 0x80000000) >> 30;
+	out |= (cvtU[2] & 0x80000000) >> 29;
+	out |= (cvtU[3] & 0x80000000) >> 28;
+
+	memcpy(&outreal, &out, sizeof(outreal));
+
+	return outreal;
+}
 
 
 
@@ -739,6 +761,27 @@ VARIA_INLINE varia_float32x4_t varia_float32x4_shuffle_ghcd(varia_float32x4_t ab
 	value.values[3] = abcd.values[3];
 
 	return value;
+}
+
+VARIA_INLINE int varia_float32x4_movemask(varia_float32x4_t t)
+{
+	float extracted[4];
+	varia_float32x4_store_unaligned(&extracted[0], t);
+
+	uint32_t cvtU[4];
+	memcpy(&cvtU[0], &extracted[0], sizeof(t));
+
+	uint32_t out;
+	int32_t outreal;
+
+	out |= (cvtU[0] & 0x80000000) >> 31;
+	out |= (cvtU[1] & 0x80000000) >> 30;
+	out |= (cvtU[2] & 0x80000000) >> 29;
+	out |= (cvtU[3] & 0x80000000) >> 28;
+
+	memcpy(&outreal, &out, sizeof(outreal));
+
+	return outreal;
 }
 
 
