@@ -1,5 +1,6 @@
 #pragma once
 
+#include "varia/vcommon.hpp"
 #include "types.h"
 
 /*! \file uint32x4.h
@@ -12,31 +13,31 @@ extern "C" {
 
 #if defined(KINC_SSE2)
 
-static inline varia_uint32x4_t varia_uint32x4_intrin_load(const uint32_t *values) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_intrin_load(const uint32_t *values) {
 	return _mm_load_si128((const varia_uint32x4_t *)values);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_intrin_load_unaligned(const uint32_t *values) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_intrin_load_unaligned(const uint32_t *values) {
 	return _mm_loadu_si128((const varia_uint32x4_t *)values);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_load(const uint32_t values[4]) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_load(const uint32_t values[4]) {
 	return _mm_set_epi32(values[3], values[2], values[1], values[0]);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_load_all(uint32_t t) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_load_all(uint32_t t) {
 	return _mm_set1_epi32(t);
 }
 
-static inline void varia_uint32x4_store(uint32_t *destination, varia_uint32x4_t value) {
+VARIA_INLINE void varia_uint32x4_store(uint32_t *destination, varia_uint32x4_t value) {
 	_mm_store_si128((varia_uint32x4_t *)destination, value);
 }
 
-static inline void varia_uint32x4_store_unaligned(uint32_t *destination, varia_uint32x4_t value) {
+VARIA_INLINE void varia_uint32x4_store_unaligned(uint32_t *destination, varia_uint32x4_t value) {
 	_mm_storeu_si128((varia_uint32x4_t *)destination, value);
 }
 
-static inline uint32_t varia_uint32x4_get(varia_uint32x4_t t, int index) {
+VARIA_INLINE uint32_t varia_uint32x4_get(varia_uint32x4_t t, int index) {
 	union {
 		__m128i value;
 		uint32_t elements[4];
@@ -45,67 +46,67 @@ static inline uint32_t varia_uint32x4_get(varia_uint32x4_t t, int index) {
 	return converter.elements[index];
 }
 
-static inline varia_uint32x4_t varia_uint32x4_add(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_add(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return _mm_add_epi32(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_sub(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_sub(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return _mm_sub_epi32(a, b);
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpeq(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpeq(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return _mm_cmpeq_epi32(a, b);
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpneq(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpneq(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return _mm_andnot_si128(_mm_cmpeq_epi32(a, b), _mm_set1_epi32(0xffffffff));
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpge(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpge(varia_uint32x4_t a, varia_uint32x4_t b) {
 	__m128i bias_by = _mm_set1_epi32((uint32_t)0x80000000);
 	return _mm_or_si128(_mm_cmpgt_epi32(_mm_sub_epi32(a, bias_by), _mm_sub_epi32(b, bias_by)), _mm_cmpeq_epi32(a, b));
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpgt(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpgt(varia_uint32x4_t a, varia_uint32x4_t b) {
 	__m128i bias_by = _mm_set1_epi32((uint32_t)0x80000000);
 	return _mm_cmpgt_epi32(_mm_sub_epi32(a, bias_by), _mm_sub_epi32(b, bias_by));
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmple(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmple(varia_uint32x4_t a, varia_uint32x4_t b) {
 	__m128i bias_by = _mm_set1_epi32((uint32_t)0x80000000);
 	return _mm_or_si128(_mm_cmplt_epi32(_mm_sub_epi32(a, bias_by), _mm_sub_epi32(b, bias_by)), _mm_cmpeq_epi32(a, b));
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmplt(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmplt(varia_uint32x4_t a, varia_uint32x4_t b) {
 	__m128i bias_by = _mm_set1_epi32((uint32_t)0x80000000);
 	return _mm_cmplt_epi32(_mm_sub_epi32(a, bias_by), _mm_sub_epi32(b, bias_by));
 }
 
-static inline varia_uint32x4_t varia_uint32x4_sel(varia_uint32x4_t a, varia_uint32x4_t b, varia_uint32x4_mask_t mask) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_sel(varia_uint32x4_t a, varia_uint32x4_t b, varia_uint32x4_mask_t mask) {
 	return _mm_xor_si128(b, _mm_and_si128(mask, _mm_xor_si128(a, b)));
 }
 
-static inline varia_uint32x4_t varia_uint32x4_max(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_max(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return varia_uint32x4_sel(a, b, varia_uint32x4_cmpgt(a, b));
 }
 
-static inline varia_uint32x4_t varia_uint32x4_min(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_min(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return varia_uint32x4_sel(a, b, varia_uint32x4_cmplt(a, b));
 }
 
-static inline varia_uint32x4_t varia_uint32x4_or(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_or(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return _mm_or_si128(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_and(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_and(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return _mm_and_si128(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_xor(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_xor(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return _mm_xor_si128(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_not(varia_uint32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_not(varia_uint32x4_t t) {
 	return _mm_xor_si128(t, _mm_set1_epi32(0xffffffff));
 }
 
@@ -118,91 +119,91 @@ static inline varia_uint32x4_t varia_uint32x4_not(varia_uint32x4_t t) {
 
 #elif defined(KINC_NEON)
 
-static inline varia_uint32x4_t varia_uint32x4_intrin_load(const uint32_t *values) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_intrin_load(const uint32_t *values) {
 	return vld1q_u32(values);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_intrin_load_unaligned(const uint32_t *values) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_intrin_load_unaligned(const uint32_t *values) {
 	return varia_uint32x4_intrin_load(values);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_load(const uint32_t values[4]) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_load(const uint32_t values[4]) {
 	return (varia_uint32x4_t){values[0], values[1], values[2], values[3]};
 }
 
-static inline varia_uint32x4_t varia_uint32x4_load_all(uint32_t t) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_load_all(uint32_t t) {
 	return (varia_uint32x4_t){t, t, t, t};
 }
 
-static inline void varia_uint32x4_store(uint32_t *destination, varia_uint32x4_t value) {
+VARIA_INLINE void varia_uint32x4_store(uint32_t *destination, varia_uint32x4_t value) {
 	vst1q_u32(destination, value);
 }
 
-static inline void varia_uint32x4_store_unaligned(uint32_t *destination, varia_uint32x4_t value) {
+VARIA_INLINE void varia_uint32x4_store_unaligned(uint32_t *destination, varia_uint32x4_t value) {
 	varia_uint32x4_store(destination, value);
 }
 
-static inline uint32_t varia_uint32x4_get(varia_uint32x4_t t, int index) {
+VARIA_INLINE uint32_t varia_uint32x4_get(varia_uint32x4_t t, int index) {
 	return t[index];
 }
 
-static inline varia_uint32x4_t varia_uint32x4_add(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_add(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vaddq_u32(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_sub(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_sub(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vsubq_u32(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_max(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_max(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vmaxq_u32(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_min(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_min(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vminq_u32(a, b);
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpeq(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpeq(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vceqq_u32(a, b);
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpneq(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpneq(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vmvnq_u32(vceqq_u32(a, b));
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpge(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpge(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vcgeq_u32(a, b);
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpgt(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpgt(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vcgtq_u32(a, b);
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmple(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmple(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vcleq_u32(a, b);
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmplt(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmplt(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vcltq_u32(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_sel(varia_uint32x4_t a, varia_uint32x4_t b, varia_uint32x4_mask_t mask) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_sel(varia_uint32x4_t a, varia_uint32x4_t b, varia_uint32x4_mask_t mask) {
 	return vbslq_u32(mask, a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_or(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_or(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vorrq_u32(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_and(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_and(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return vandq_u32(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_xor(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_xor(varia_uint32x4_t a, varia_uint32x4_t b) {
 	return veorq_u32(a, b);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_not(varia_uint32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_not(varia_uint32x4_t t) {
 	return vmvnq_u32(t);
 }
 
@@ -215,7 +216,7 @@ static inline varia_uint32x4_t varia_uint32x4_not(varia_uint32x4_t t) {
 
 #else
 
-static inline varia_uint32x4_t varia_uint32x4_intrin_load(const uint32_t *values) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_intrin_load(const uint32_t *values) {
 	varia_uint32x4_t value;
 	value.values[0] = values[0];
 	value.values[1] = values[1];
@@ -224,11 +225,11 @@ static inline varia_uint32x4_t varia_uint32x4_intrin_load(const uint32_t *values
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_intrin_load_unaligned(const uint32_t *values) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_intrin_load_unaligned(const uint32_t *values) {
 	return varia_uint32x4_intrin_load(values);
 }
 
-static inline varia_uint32x4_t varia_uint32x4_load(const uint32_t values[4]) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_load(const uint32_t values[4]) {
 	varia_uint32x4_t value;
 	value.values[0] = values[0];
 	value.values[1] = values[1];
@@ -237,7 +238,7 @@ static inline varia_uint32x4_t varia_uint32x4_load(const uint32_t values[4]) {
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_load_all(uint32_t t) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_load_all(uint32_t t) {
 	varia_uint32x4_t value;
 	value.values[0] = t;
 	value.values[1] = t;
@@ -246,22 +247,22 @@ static inline varia_uint32x4_t varia_uint32x4_load_all(uint32_t t) {
 	return value;
 }
 
-static inline void varia_uint32x4_store(uint32_t *destination, varia_uint32x4_t value) {
+VARIA_INLINE void varia_uint32x4_store(uint32_t *destination, varia_uint32x4_t value) {
 	destination[0] = value.values[0];
 	destination[1] = value.values[1];
 	destination[2] = value.values[2];
 	destination[3] = value.values[3];
 }
 
-static inline void varia_uint32x4_store_unaligned(uint32_t *destination, varia_uint32x4_t value) {
+VARIA_INLINE void varia_uint32x4_store_unaligned(uint32_t *destination, varia_uint32x4_t value) {
 	varia_uint32x4_store(destination, value);
 }
 
-static inline uint32_t varia_uint32x4_get(varia_uint32x4_t t, int index) {
+VARIA_INLINE uint32_t varia_uint32x4_get(varia_uint32x4_t t, int index) {
 	return t.values[index];
 }
 
-static inline varia_uint32x4_t varia_uint32x4_add(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_add(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_t value;
 	value.values[0] = a.values[0] + b.values[0];
 	value.values[1] = a.values[1] + b.values[1];
@@ -270,7 +271,7 @@ static inline varia_uint32x4_t varia_uint32x4_add(varia_uint32x4_t a, varia_uint
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_sub(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_sub(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_t value;
 	value.values[0] = a.values[0] - b.values[0];
 	value.values[1] = a.values[1] - b.values[1];
@@ -279,7 +280,7 @@ static inline varia_uint32x4_t varia_uint32x4_sub(varia_uint32x4_t a, varia_uint
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_max(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_max(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_t value;
 	value.values[0] = a.values[0] > b.values[0] ? a.values[0] : b.values[0];
 	value.values[1] = a.values[1] > b.values[1] ? a.values[1] : b.values[1];
@@ -288,7 +289,7 @@ static inline varia_uint32x4_t varia_uint32x4_max(varia_uint32x4_t a, varia_uint
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_min(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_min(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_t value;
 	value.values[0] = a.values[0] > b.values[0] ? b.values[0] : a.values[0];
 	value.values[1] = a.values[1] > b.values[1] ? b.values[1] : a.values[1];
@@ -297,7 +298,7 @@ static inline varia_uint32x4_t varia_uint32x4_min(varia_uint32x4_t a, varia_uint
 	return value;
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpeq(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpeq(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_mask_t mask;
 	mask.values[0] = a.values[0] == b.values[0] ? 0xffffffff : 0;
 	mask.values[1] = a.values[1] == b.values[1] ? 0xffffffff : 0;
@@ -306,7 +307,7 @@ static inline varia_uint32x4_mask_t varia_uint32x4_cmpeq(varia_uint32x4_t a, var
 	return mask;
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpneq(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpneq(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_mask_t mask;
 	mask.values[0] = a.values[0] != b.values[0] ? 0xffffffff : 0;
 	mask.values[1] = a.values[1] != b.values[1] ? 0xffffffff : 0;
@@ -315,7 +316,7 @@ static inline varia_uint32x4_mask_t varia_uint32x4_cmpneq(varia_uint32x4_t a, va
 	return mask;
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpge(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpge(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_mask_t mask;
 	mask.values[0] = a.values[0] >= b.values[0] ? 0xffffffff : 0;
 	mask.values[1] = a.values[1] >= b.values[1] ? 0xffffffff : 0;
@@ -324,7 +325,7 @@ static inline varia_uint32x4_mask_t varia_uint32x4_cmpge(varia_uint32x4_t a, var
 	return mask;
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmpgt(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmpgt(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_mask_t mask;
 	mask.values[0] = a.values[0] > b.values[0] ? 0xffffffff : 0;
 	mask.values[1] = a.values[1] > b.values[1] ? 0xffffffff : 0;
@@ -333,7 +334,7 @@ static inline varia_uint32x4_mask_t varia_uint32x4_cmpgt(varia_uint32x4_t a, var
 	return mask;
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmple(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmple(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_mask_t mask;
 	mask.values[0] = a.values[0] <= b.values[0] ? 0xffffffff : 0;
 	mask.values[1] = a.values[1] <= b.values[1] ? 0xffffffff : 0;
@@ -342,7 +343,7 @@ static inline varia_uint32x4_mask_t varia_uint32x4_cmple(varia_uint32x4_t a, var
 	return mask;
 }
 
-static inline varia_uint32x4_mask_t varia_uint32x4_cmplt(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_mask_t varia_uint32x4_cmplt(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_mask_t mask;
 	mask.values[0] = a.values[0] < b.values[0] ? 0xffffffff : 0;
 	mask.values[1] = a.values[1] < b.values[1] ? 0xffffffff : 0;
@@ -351,7 +352,7 @@ static inline varia_uint32x4_mask_t varia_uint32x4_cmplt(varia_uint32x4_t a, var
 	return mask;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_sel(varia_uint32x4_t a, varia_uint32x4_t b, varia_uint32x4_mask_t mask) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_sel(varia_uint32x4_t a, varia_uint32x4_t b, varia_uint32x4_mask_t mask) {
 	varia_uint32x4_t value;
 	value.values[0] = mask.values[0] != 0 ? a.values[0] : b.values[0];
 	value.values[1] = mask.values[1] != 0 ? a.values[1] : b.values[1];
@@ -360,7 +361,7 @@ static inline varia_uint32x4_t varia_uint32x4_sel(varia_uint32x4_t a, varia_uint
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_or(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_or(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_t value;
 	value.values[0] = a.values[0] | b.values[0];
 	value.values[1] = a.values[1] | b.values[1];
@@ -369,7 +370,7 @@ static inline varia_uint32x4_t varia_uint32x4_or(varia_uint32x4_t a, varia_uint3
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_and(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_and(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_t value;
 	value.values[0] = a.values[0] & b.values[0];
 	value.values[1] = a.values[1] & b.values[1];
@@ -378,7 +379,7 @@ static inline varia_uint32x4_t varia_uint32x4_and(varia_uint32x4_t a, varia_uint
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_xor(varia_uint32x4_t a, varia_uint32x4_t b) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_xor(varia_uint32x4_t a, varia_uint32x4_t b) {
 	varia_uint32x4_t value;
 	value.values[0] = a.values[0] ^ b.values[0];
 	value.values[1] = a.values[1] ^ b.values[1];
@@ -387,7 +388,7 @@ static inline varia_uint32x4_t varia_uint32x4_xor(varia_uint32x4_t a, varia_uint
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_not(varia_uint32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_not(varia_uint32x4_t t) {
 	varia_uint32x4_t value;
 	value.values[0] = ~t.values[0];
 	value.values[1] = ~t.values[1];
@@ -396,7 +397,7 @@ static inline varia_uint32x4_t varia_uint32x4_not(varia_uint32x4_t t) {
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_shift_left(varia_uint32x4_t t, const int shift) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_shift_left(varia_uint32x4_t t, const int shift) {
 	varia_uint32x4_t value;
 	value.values[0] = t.values[0] << shift;
 	value.values[1] = t.values[1] << shift;
@@ -406,7 +407,7 @@ static inline varia_uint32x4_t varia_uint32x4_shift_left(varia_uint32x4_t t, con
 	return value;
 }
 
-static inline varia_uint32x4_t varia_uint32x4_shift_right(varia_uint32x4_t t, const int shift) {
+VARIA_INLINE varia_uint32x4_t varia_uint32x4_shift_right(varia_uint32x4_t t, const int shift) {
 	varia_uint32x4_t value;
 	value.values[0] = t.values[0] >> shift;
 	value.values[1] = t.values[1] >> shift;
