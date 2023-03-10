@@ -5,12 +5,9 @@
 #include "varia/vcommon.hpp"
 #include "varia/ds/Allocator.hpp"
 #include "varia/util/Memory.hpp"
-#include "varia/logging.hpp"
 #include "varia/ds/StaticArray.hpp"
 
 #include <stdlib.h>
-
-#include "varia/util/Elapsed.hpp"
 
 #include "dread/Dread.hpp"
 #include "varia/tests/Test_Everything.hpp"
