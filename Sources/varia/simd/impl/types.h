@@ -61,14 +61,6 @@ extern "C" {
 typedef __m128 varia_float32x4_t;
 typedef __m128 varia_float32x4_mask_t;
 
-typedef __m128i kinc_int8x16_t;
-typedef __m128i kinc_int8x16_mask_t;
-typedef __m128i kinc_uint8x16_t;
-typedef __m128i kinc_uint8x16_mask_t;
-typedef __m128i kinc_int16x8_t;
-typedef __m128i kinc_int16x8_mask_t;
-typedef __m128i kinc_uint16x8_t;
-typedef __m128i kinc_uint16x8_mask_t;
 typedef __m128i varia_int32x4_t;
 typedef __m128i varia_int32x4_mask_t;
 typedef __m128i varia_uint32x4_t;
@@ -81,22 +73,6 @@ typedef __m128i varia_uint32x4_mask_t;
 typedef __m128 varia_float32x4_t;
 typedef __m128 varia_float32x4_mask_t;
 
-typedef struct kinc_int8x16 {
-	int8_t values[16];
-} kinc_int8x16_t;
-
-typedef struct kinc_uint8x16 {
-	uint8_t values[16];
-} kinc_uint8x16_t;
-
-typedef struct kinc_int16x8 {
-	int16_t values[8];
-} kinc_int16x8_t;
-
-typedef struct kinc_uint16x8 {
-	uint16_t values[8];
-} kinc_uint16x8_t;
-
 typedef struct varia_int32x4 {
 	int32_t values[4];
 } varia_int32x4_t;
@@ -105,10 +81,6 @@ typedef struct varia_uint32x4 {
 	uint32_t values[4];
 } varia_uint32x4_t;
 
-typedef kinc_int8x16_t kinc_int8x16_mask_t;
-typedef kinc_uint8x16_t kinc_uint8x16_mask_t;
-typedef kinc_int16x8_t kinc_int16x8_mask_t;
-typedef kinc_uint16x8_t kinc_uint16x8_mask_t;
 typedef varia_int32x4_t varia_int32x4_mask_t;
 typedef varia_uint32x4_t varia_uint32x4_mask_t;
 
@@ -119,14 +91,6 @@ typedef varia_uint32x4_t varia_uint32x4_mask_t;
 typedef float32x4_t varia_float32x4_t;
 typedef uint32x4_t varia_float32x4_mask_t;
 
-typedef int8x16_t kinc_int8x16_t;
-typedef uint8x16_t kinc_int8x16_mask_t;
-typedef uint8x16_t kinc_uint8x16_t;
-typedef uint8x16_t kinc_uint8x16_mask_t;
-typedef int16x8_t kinc_int16x8_t;
-typedef uint16x8_t kinc_int16x8_mask_t;
-typedef uint16x8_t kinc_uint16x8_t;
-typedef uint16x8_t kinc_uint16x8_mask_t;
 typedef int32x4_t varia_int32x4_t;
 typedef uint32x4_t varia_int32x4_mask_t;
 typedef uint32x4_t varia_uint32x4_t;
@@ -144,23 +108,6 @@ typedef varia_float32x4_t varia_float32x4_mask_t;
 
 
 
-
-typedef struct kinc_int8x16 {
-	int8_t values[16];
-} kinc_int8x16_t;
-
-typedef struct kinc_uint8x16 {
-	uint8_t values[16];
-} kinc_uint8x16_t;
-
-typedef struct kinc_int16x8 {
-	int16_t values[8];
-} kinc_int16x8_t;
-
-typedef struct kinc_uint16x8 {
-	uint16_t values[8];
-} kinc_uint16x8_t;
-
 typedef struct varia_int32x4 {
 	int32_t values[4];
 } varia_int32x4_t;
@@ -169,10 +116,6 @@ typedef struct varia_uint32x4 {
 	uint32_t values[4];
 } varia_uint32x4_t;
 
-typedef kinc_int8x16_t kinc_int8x16_mask_t;
-typedef kinc_uint8x16_t kinc_uint8x16_mask_t;
-typedef kinc_int16x8_t kinc_int16x8_mask_t;
-typedef kinc_uint16x8_t kinc_uint16x8_mask_t;
 typedef varia_int32x4_t varia_int32x4_mask_t;
 typedef varia_uint32x4_t varia_uint32x4_mask_t;
 
