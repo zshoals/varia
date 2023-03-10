@@ -36,21 +36,6 @@ typedef unsigned int uint;
 #define VARIA_NO_OPERATION() ((void)0)
 #define VARIA_INTENTIONALLY_DO_NOTHING() ((void)0)
 
-//Note(zshoals 02-05-2023):> Prefer just doing the memset manually; don't bring in the entire
-//string header here just to memset stuff (this isn't needed everywhere)
-// #define VARIA_ZERO_INIT(THIS_PTR) memset((THIS_PTR), 0, (sizeof(*THIS_PTR)))
-// #define VARIA_ZERO_INIT_SIZE(PTR, SIZE) memset((PTR), 0, SIZE)
-
-//Note(zshoals 01-24-2023):> Maybe too clunky to use in practice
-//taken from https://stackoverflow.com/questions/13842468/comma-in-c-c-macro
-//Actually should prefer "stacknew" vscode snippet, which generates this pattern without
-//relying on macro weirdness. Kept for posterity.
-#define VARIA_GROUP_ARGS(...) __VA_ARGS__
-#define VARIA_STACK_NEW(TYPE, HANDLE)\
-	TYPE VARIA_CONCAT(_trashme_, HANDLE);\
-	TYPE * HANDLE = &(VARIA_CONCAT(_trashme_, HANDLE))
-
-
 #define VARIA_ITERATION_GUARD(ITERATION_VARIABLE, MAX_COUNT)\
 	if ((ITERATION_VARIABLE) > (MAX_COUNT)) { __debugbreak(); }
 
@@ -65,24 +50,24 @@ typedef unsigned int uint;
 //Note: For now, only support positive values
 #define for_range(STOP)\
 	assert(STOP >= 0);\
-	for (size_t VARIA_CONCAT(_i, __LINE__) = 0; VARIA_CONCAT(_i, __LINE__) < (STOP); ++VARIA_CONCAT(_i, __LINE__))
+	for (int VARIA_CONCAT(_i, __LINE__) = 0; VARIA_CONCAT(_i, __LINE__) < (STOP); ++VARIA_CONCAT(_i, __LINE__))
 
 #define for_range_var(CAPTURE, STOP)\
 	assert(STOP >= 0);\
-	for (size_t (CAPTURE) = 0; (CAPTURE) < (STOP); ++(CAPTURE))
+	for (int (CAPTURE) = 0; (CAPTURE) < (STOP); ++(CAPTURE))
 
 #define for_reverse_range(START)\
 	assert(START >= 0);\
-	for (size_t VARIA_CONCAT(_i, __LINE__) = (START); VARIA_CONCAT(_i, __LINE__)--;)
+	for (int VARIA_CONCAT(_i, __LINE__) = (START); VARIA_CONCAT(_i, __LINE__)--;)
 
 #define for_reverse_range_var(CAPTURE, START)\
 	assert(START >= 0);\
-	for (size_t (CAPTURE) = (START); (CAPTURE)--;)
+	for (int (CAPTURE) = (START); (CAPTURE)--;)
 
 #define for_range_var_slice(CAPTURE, START, STOP)\
 	assert(START >= 0 && STOP >= 0);\
-	for (size_t (CAPTURE) = START; (CAPTURE) < (STOP); ++(CAPTURE))
+	for (int (CAPTURE) = START; (CAPTURE) < (STOP); ++(CAPTURE))
 
 #define for_range_var_step(CAPTURE, STOP, STEP)\
 	assert(STOP >= 0);\
-	for (size_t (CAPTURE) = 0; (CAPTURE) < (STOP); (CAPTURE) += (STEP))
+	for (int (CAPTURE) = 0; (CAPTURE) < (STOP); (CAPTURE) += (STEP))
