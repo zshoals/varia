@@ -58,8 +58,8 @@ extern "C" {
 // SSE2 contains all of SSE
 #include <emmintrin.h>
 
-typedef __m128 kinc_float32x4_t;
-typedef __m128 kinc_float32x4_mask_t;
+typedef __m128 varia_float32x4_t;
+typedef __m128 varia_float32x4_mask_t;
 
 typedef __m128i kinc_int8x16_t;
 typedef __m128i kinc_int8x16_mask_t;
@@ -69,17 +69,17 @@ typedef __m128i kinc_int16x8_t;
 typedef __m128i kinc_int16x8_mask_t;
 typedef __m128i kinc_uint16x8_t;
 typedef __m128i kinc_uint16x8_mask_t;
-typedef __m128i kinc_int32x4_t;
-typedef __m128i kinc_int32x4_mask_t;
-typedef __m128i kinc_uint32x4_t;
-typedef __m128i kinc_uint32x4_mask_t;
+typedef __m128i varia_int32x4_t;
+typedef __m128i varia_int32x4_mask_t;
+typedef __m128i varia_uint32x4_t;
+typedef __m128i varia_uint32x4_mask_t;
 
 #elif defined(KINC_SSE)
 
 #include <xmmintrin.h>
 
-typedef __m128 kinc_float32x4_t;
-typedef __m128 kinc_float32x4_mask_t;
+typedef __m128 varia_float32x4_t;
+typedef __m128 varia_float32x4_mask_t;
 
 typedef struct kinc_int8x16 {
 	int8_t values[16];
@@ -97,27 +97,27 @@ typedef struct kinc_uint16x8 {
 	uint16_t values[8];
 } kinc_uint16x8_t;
 
-typedef struct kinc_int32x4 {
+typedef struct varia_int32x4 {
 	int32_t values[4];
-} kinc_int32x4_t;
+} varia_int32x4_t;
 
-typedef struct kinc_uint32x4 {
+typedef struct varia_uint32x4 {
 	uint32_t values[4];
-} kinc_uint32x4_t;
+} varia_uint32x4_t;
 
 typedef kinc_int8x16_t kinc_int8x16_mask_t;
 typedef kinc_uint8x16_t kinc_uint8x16_mask_t;
 typedef kinc_int16x8_t kinc_int16x8_mask_t;
 typedef kinc_uint16x8_t kinc_uint16x8_mask_t;
-typedef kinc_int32x4_t kinc_int32x4_mask_t;
-typedef kinc_uint32x4_t kinc_uint32x4_mask_t;
+typedef varia_int32x4_t varia_int32x4_mask_t;
+typedef varia_uint32x4_t varia_uint32x4_mask_t;
 
 #elif defined(KINC_NEON)
 
 #include <arm_neon.h>
 
-typedef float32x4_t kinc_float32x4_t;
-typedef uint32x4_t kinc_float32x4_mask_t;
+typedef float32x4_t varia_float32x4_t;
+typedef uint32x4_t varia_float32x4_mask_t;
 
 typedef int8x16_t kinc_int8x16_t;
 typedef uint8x16_t kinc_int8x16_mask_t;
@@ -127,20 +127,20 @@ typedef int16x8_t kinc_int16x8_t;
 typedef uint16x8_t kinc_int16x8_mask_t;
 typedef uint16x8_t kinc_uint16x8_t;
 typedef uint16x8_t kinc_uint16x8_mask_t;
-typedef int32x4_t kinc_int32x4_t;
-typedef uint32x4_t kinc_int32x4_mask_t;
-typedef uint32x4_t kinc_uint32x4_t;
-typedef uint32x4_t kinc_uint32x4_mask_t;
+typedef int32x4_t varia_int32x4_t;
+typedef uint32x4_t varia_int32x4_mask_t;
+typedef uint32x4_t varia_uint32x4_t;
+typedef uint32x4_t varia_uint32x4_mask_t;
 
 #elif defined(KINC_NOSIMD)
 
 #include <kinc/math/core.h>
 
-typedef struct kinc_float32x4 {
+typedef struct varia_float32x4 {
 	float values[4];
-} kinc_float32x4_t;
+} varia_float32x4_t;
 
-typedef kinc_float32x4_t kinc_float32x4_mask_t;
+typedef varia_float32x4_t varia_float32x4_mask_t;
 
 
 
@@ -161,20 +161,20 @@ typedef struct kinc_uint16x8 {
 	uint16_t values[8];
 } kinc_uint16x8_t;
 
-typedef struct kinc_int32x4 {
+typedef struct varia_int32x4 {
 	int32_t values[4];
-} kinc_int32x4_t;
+} varia_int32x4_t;
 
-typedef struct kinc_uint32x4 {
+typedef struct varia_uint32x4 {
 	uint32_t values[4];
-} kinc_uint32x4_t;
+} varia_uint32x4_t;
 
 typedef kinc_int8x16_t kinc_int8x16_mask_t;
 typedef kinc_uint8x16_t kinc_uint8x16_mask_t;
 typedef kinc_int16x8_t kinc_int16x8_mask_t;
 typedef kinc_uint16x8_t kinc_uint16x8_mask_t;
-typedef kinc_int32x4_t kinc_int32x4_mask_t;
-typedef kinc_uint32x4_t kinc_uint32x4_mask_t;
+typedef varia_int32x4_t varia_int32x4_mask_t;
+typedef varia_uint32x4_t varia_uint32x4_mask_t;
 
 #endif
 

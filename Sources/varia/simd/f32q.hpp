@@ -11,40 +11,40 @@
 	#include "varia/log.hpp"
 #endif
 
-VARIA_INLINE f32q f32q_load(const f32 *values) { return kinc_float32x4_intrin_load(values); }
-VARIA_INLINE f32q f32q_load_u(const f32 *values) { return kinc_float32x4_intrin_load_unaligned(values); }
-VARIA_INLINE void f32q_store(f32 *destination, f32q n) { kinc_float32x4_store(destination, n); } 
-VARIA_INLINE void f32q_store_u(f32 *destination, f32q n) { kinc_float32x4_store_unaligned(destination, n); } 
-VARIA_INLINE f32q f32q_set(f32 a, f32 b, f32 c, f32 d) { return kinc_float32x4_load(a, b, c, d); }
-VARIA_INLINE f32q f32q_set_all(f32 n) { return kinc_float32x4_load_all(n); }
+VARIA_INLINE f32q f32q_load(const f32 *values) { return varia_float32x4_intrin_load(values); }
+VARIA_INLINE f32q f32q_load_u(const f32 *values) { return varia_float32x4_intrin_load_unaligned(values); }
+VARIA_INLINE void f32q_store(f32 *destination, f32q n) { varia_float32x4_store(destination, n); } 
+VARIA_INLINE void f32q_store_u(f32 *destination, f32q n) { varia_float32x4_store_unaligned(destination, n); } 
+VARIA_INLINE f32q f32q_set(f32 a, f32 b, f32 c, f32 d) { return varia_float32x4_load(a, b, c, d); }
+VARIA_INLINE f32q f32q_set_all(f32 n) { return varia_float32x4_load_all(n); }
 
 //Renamed versions of set/set_all for semantics
 VARIA_INLINE f32q f32q_create(f32 a, f32 b, f32 c, f32 d) { return f32q_set(a, b, c, d); }
 VARIA_INLINE f32q f32q_create_all(f32 n) { return f32q_set_all(n); }
 
-VARIA_INLINE f32 f32q_get(f32q n, int index) { return kinc_float32x4_get(n, index); }
-VARIA_INLINE f32q f32q_abs(f32q n) { return kinc_float32x4_abs(n); }
-VARIA_INLINE f32q f32q_add(f32q a, f32q b) { return kinc_float32x4_add(a, b); }
-VARIA_INLINE f32q f32q_sub(f32q a, f32q b) { return kinc_float32x4_sub(a, b); }
-VARIA_INLINE f32q f32q_mul(f32q a, f32q b) { return kinc_float32x4_mul(a, b); }
-VARIA_INLINE f32q f32q_div(f32q a, f32q b) { return kinc_float32x4_div(a, b); }
-VARIA_INLINE f32q f32q_max(f32q a, f32q b) { return kinc_float32x4_max(a, b); }
-VARIA_INLINE f32q f32q_min(f32q a, f32q b) { return kinc_float32x4_min(a, b); }
-VARIA_INLINE f32q f32q_neg(f32q n) { return kinc_float32x4_neg(n); }
-VARIA_INLINE f32q f32q_sqrt(f32q n) { return kinc_float32x4_sqrt(n); }
-VARIA_INLINE f32q f32q_reciprocal_approximation(f32q n) { return kinc_float32x4_reciprocal_approximation(n); }
-VARIA_INLINE f32q f32q_reciprocal_sqrt_approximation(f32q n) { return kinc_float32x4_reciprocal_sqrt_approximation(n); }
-VARIA_INLINE f32q f32q_and(f32q a, f32q b) { return kinc_float32x4_and(a, b); }
-VARIA_INLINE f32q f32q_or(f32q a, f32q b) { return kinc_float32x4_or(a, b); }
-VARIA_INLINE f32q f32q_xor(f32q a, f32q b) { return kinc_float32x4_xor(a, b); }
-VARIA_INLINE f32q f32q_not(f32q n) { return kinc_float32x4_not(n); }
-VARIA_INLINE f32q_mask f32q_cmpeq(f32q a, f32q b) { return kinc_float32x4_cmpeq(a, b); }
-VARIA_INLINE f32q_mask f32q_cmpneq(f32q a, f32q b) { return kinc_float32x4_cmpneq(a, b); }
-VARIA_INLINE f32q_mask f32q_cmpgt(f32q a, f32q b) { return kinc_float32x4_cmpgt(a, b); }
-VARIA_INLINE f32q_mask f32q_cmpgte(f32q a, f32q b) { return kinc_float32x4_cmpge(a, b); }
-VARIA_INLINE f32q_mask f32q_cmplt(f32q a, f32q b) { return kinc_float32x4_cmplt(a, b); }
-VARIA_INLINE f32q_mask f32q_cmplte(f32q a, f32q b) { return kinc_float32x4_cmple(a, b); }
-VARIA_INLINE f32q f32q_select(f32q a, f32q b, f32q_mask mask) { return kinc_float32x4_sel(a, b, mask); } 
+VARIA_INLINE f32 f32q_get(f32q n, int index) { return varia_float32x4_get(n, index); }
+VARIA_INLINE f32q f32q_abs(f32q n) { return varia_float32x4_abs(n); }
+VARIA_INLINE f32q f32q_add(f32q a, f32q b) { return varia_float32x4_add(a, b); }
+VARIA_INLINE f32q f32q_sub(f32q a, f32q b) { return varia_float32x4_sub(a, b); }
+VARIA_INLINE f32q f32q_mul(f32q a, f32q b) { return varia_float32x4_mul(a, b); }
+VARIA_INLINE f32q f32q_div(f32q a, f32q b) { return varia_float32x4_div(a, b); }
+VARIA_INLINE f32q f32q_max(f32q a, f32q b) { return varia_float32x4_max(a, b); }
+VARIA_INLINE f32q f32q_min(f32q a, f32q b) { return varia_float32x4_min(a, b); }
+VARIA_INLINE f32q f32q_neg(f32q n) { return varia_float32x4_neg(n); }
+VARIA_INLINE f32q f32q_sqrt(f32q n) { return varia_float32x4_sqrt(n); }
+VARIA_INLINE f32q f32q_reciprocal_approximation(f32q n) { return varia_float32x4_reciprocal_approximation(n); }
+VARIA_INLINE f32q f32q_reciprocal_sqrt_approximation(f32q n) { return varia_float32x4_reciprocal_sqrt_approximation(n); }
+VARIA_INLINE f32q f32q_and(f32q a, f32q b) { return varia_float32x4_and(a, b); }
+VARIA_INLINE f32q f32q_or(f32q a, f32q b) { return varia_float32x4_or(a, b); }
+VARIA_INLINE f32q f32q_xor(f32q a, f32q b) { return varia_float32x4_xor(a, b); }
+VARIA_INLINE f32q f32q_not(f32q n) { return varia_float32x4_not(n); }
+VARIA_INLINE f32q_mask f32q_cmpeq(f32q a, f32q b) { return varia_float32x4_cmpeq(a, b); }
+VARIA_INLINE f32q_mask f32q_cmpneq(f32q a, f32q b) { return varia_float32x4_cmpneq(a, b); }
+VARIA_INLINE f32q_mask f32q_cmpgt(f32q a, f32q b) { return varia_float32x4_cmpgt(a, b); }
+VARIA_INLINE f32q_mask f32q_cmpgte(f32q a, f32q b) { return varia_float32x4_cmpge(a, b); }
+VARIA_INLINE f32q_mask f32q_cmplt(f32q a, f32q b) { return varia_float32x4_cmplt(a, b); }
+VARIA_INLINE f32q_mask f32q_cmplte(f32q a, f32q b) { return varia_float32x4_cmple(a, b); }
+VARIA_INLINE f32q f32q_select(f32q a, f32q b, f32q_mask mask) { return varia_float32x4_sel(a, b, mask); } 
 
 //Operator Overloads
 VARIA_INLINE f32q operator+(f32q const & a, f32q const & b) { return f32q_add(a, b); }
@@ -349,12 +349,12 @@ VARIA_INLINE f32q f32q_wrap_radians(f32q radians)
 
 VARIA_INLINE f32q f32q_shuffle_aebf(f32q abcd, f32q efgh)
 {
-	return kinc_float32x4_shuffle_aebf(abcd, efgh);
+	return varia_float32x4_shuffle_aebf(abcd, efgh);
 }
 
 VARIA_INLINE f32q f32q_shuffle_cgdh(f32q abcd, f32q efgh)
 {
-	return kinc_float32x4_shuffle_cgdh(abcd, efgh);
+	return varia_float32x4_shuffle_cgdh(abcd, efgh);
 }
 
 
