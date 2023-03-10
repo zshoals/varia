@@ -3,11 +3,11 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "kinc/simd/types.h"
-#include "kinc/simd/float32x4.h"
-#include "kinc/simd/int32x4.h"
-#include "kinc/simd/uint32x4.h"
-#include "kinc/simd/type_conversions.h"
+#include "varia/simd/impl/types.h"
+#include "varia/simd/impl/float32x4.h"
+#include "varia/simd/impl/int32x4.h"
+#include "varia/simd/impl/uint32x4.h"
+#include "varia/simd/impl/type_conversions.h"
 
 
 typedef kinc_float32x4_t simd_fq;

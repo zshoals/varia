@@ -4,7 +4,7 @@
 
 #include "varia/vcommon.hpp"
 #include "varia/math/MathConstants.hpp"
-#include "kinc/simd/float32x4.h"
+#include "varia/simd/impl/float32x4.h"
 #include "simd_trig.h"
 
 #ifdef VARIA_LOG_LOGGING_ENABLED

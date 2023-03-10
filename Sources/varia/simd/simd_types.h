@@ -1,4 +1,4 @@
-#include "kinc/simd/types.h"
+#include "varia/simd/impl/types.h"
 
 typedef kinc_float32x4_t f32q;
 typedef kinc_float32x4_mask_t f32q_mask;
