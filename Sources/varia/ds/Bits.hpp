@@ -2,7 +2,6 @@
 
 #include "varia/vcommon.hpp"
 #include "varia/validation.hpp"
-#include "varia/ds/Result.hpp"
 
 
 
@@ -95,50 +94,12 @@ constexpr inline u32 vds_bits32_increment_upper(u32 bits, u8 pivot)
 	return vds_bits32_or(shifted_upper, shifted_lower);
 }
 
-constexpr inline vds_result_t<u8> vds_bits32_find_first_set(u32 bits)
-{
-	//Note(zshoals): Bit "Find First Set" implementation
-	//derived from wikipedia https://en.wikipedia.org/wiki/Find_first_set#FFS
-	u32 x = bits;
-
-	//Note(zshoals): FFS implementations do whatever they want when the value is 0
-	//We do a branchless check to determine if this value is 0,
-	//and then multiply "first_set" by the comparison's result in order to
-	//set a default value (0) for res.value
-	//This value determines whether or not the result is valid
-	bool zero_case_fixup = (x != 0);
-
-	//Note(zshoals): Negating x is intentional
-	//Disables:
-	//"Warning: Unary minus operator applied to unsigned type, result still unsigned"
-	#pragma warning(push)
-	#pragma warning(disable: 4146)
-
-	x &= -x;
-
-	#pragma warning(pop)
-
-	u32 r = (x > 0xFFFF) << 4; x >>= r;
-	u32 q = (x > 0xFF) << 3; x >>= q; r |= q;
-	q = (x > 0xF) << 2; x >>= q; r |= q;
-	q = (x > 0x3) << 1; x >>= q; r |= q;
-	r |= (x >> 1);
-
-	u32 first_set = r * zero_case_fixup;
-
-	vds_result_t<u8> res = {};
-	res.valid = static_cast<vds_result_status_e>(zero_case_fixup);
-	res.value = first_set;
-
-	return res;
-}
-
-constexpr inline vds_result_t<u8> vds_bits32_find_first_unset(u32 bits)
-{
-	u32 inverse = bits;
-	inverse = vds_bits32_not(inverse);
-	return vds_bits32_find_first_set(inverse);
-}	
+// constexpr inline vds_result_t<u8> vds_bits32_find_first_unset(u32 bits)
+// {
+// 	u32 inverse = bits;
+// 	inverse = vds_bits32_not(inverse);
+// 	return vds_bits32_find_first_set(inverse);
+// }	
 
 constexpr inline static u8 vds_bits32_pow2_to_bitshift_value(size_t pow2_value)
 {
@@ -282,27 +243,27 @@ constexpr inline u64 vds_bits64_increment_upper(u64 bits, u8 pivot)
 	return vds_bits64_or(shifted_upper, shifted_lower);
 }
 
-constexpr inline vds_result_t<u8> vds_bits64_find_first_set(u64 bits)
-{
-	vds_result_t<u8> res = {};
+// constexpr inline vds_result_t<u8> vds_bits64_find_first_set(u64 bits)
+// {
+// 	vds_result_t<u8> res = {};
 
-	//TODO(zshoals): Update with Count Leading Zeroes version
-	for_range_var(i, 64)
-	{
-		if (vds_bits64_is_set(bits, static_cast<u8>(i)))
-		{
-			res.valid = VDS_RESULT_STATUS_SUCCESS_E;
-			res.value = static_cast<u8>(i);
+// 	//TODO(zshoals): Update with Count Leading Zeroes version
+// 	for_range_var(i, 64)
+// 	{
+// 		if (vds_bits64_is_set(bits, static_cast<u8>(i)))
+// 		{
+// 			res.valid = VDS_RESULT_STATUS_SUCCESS_E;
+// 			res.value = static_cast<u8>(i);
 
-			return res;
-		}
-	}
+// 			return res;
+// 		}
+// 	}
 
-	res.valid = VDS_RESULT_STATUS_FAILURE_E;
-	res.value = 0;
+// 	res.valid = VDS_RESULT_STATUS_FAILURE_E;
+// 	res.value = 0;
 
-	return res;
-}
+// 	return res;
+// }
 
 
 

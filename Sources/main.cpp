@@ -6,12 +6,10 @@
 #include "varia/ds/Allocator.hpp"
 #include "varia/util/Memory.hpp"
 #include "varia/logging.hpp"
-#include "varia/ds/StringView.hpp"
 #include "varia/ds/StaticArray.hpp"
 
 #include <stdlib.h>
 
-#include "varia/io/File.hpp"
 #include "varia/util/Elapsed.hpp"
 
 #include "dread/Dread.hpp"
