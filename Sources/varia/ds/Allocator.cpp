@@ -18,9 +18,9 @@ void vds_allocator_initialize(vds_allocator_t * self, void * memory, size_t buff
 
 void * vds_allocator_allocate_aligned(vds_allocator_t * self, size_t size, size_t alignment)
 {
-	DEBUG_ENSURE_UINT_GT_ZERO(size, "Tried to make an empty memory allocation.");
+	DEBUG_ENSURE(size > 0, "Tried to make an empty memory allocation.");
 	size_t _DEBUG_MAX_ALLOCATION_SIZE = 1 * 1000 * 1000 * 1000; //1 Gigabyte
-	DEBUG_ENSURE_UINT_LT(size, _DEBUG_MAX_ALLOCATION_SIZE, "Tried to make a very large allocation (1 GB+). Was this intended?");
+	DEBUG_ENSURE(size < _DEBUG_MAX_ALLOCATION_SIZE, "Tried to make a very large allocation(1 GB+). Was this intended?");
 
 	uintptr_t base_addr = reinterpret_cast<uintptr_t>(self->data); 
 	base_addr += self->current_offset;
@@ -30,7 +30,8 @@ void * vds_allocator_allocate_aligned(vds_allocator_t * self, size_t size, size_
 	size_t offset_advance_amount = misalign + size;
 
 	//Note(zshoals 02-08-2023):> Better to be safe than sorry; always check that the allocation size is ok
-	ENSURE_UINT_LT(self->current_offset + offset_advance_amount, self->buffer_len, "Allocator OOM");
+	ENSURE( ((self->current_offset + offset_advance_amount) < self->buffer_len), "Allocator OOM");
+
 
 	self->current_offset += offset_advance_amount;
 
@@ -54,7 +55,8 @@ void vds_allocator_zero(vds_allocator_t * self)
 
 void vds_allocator_copy_to(vds_allocator_t * destination, vds_allocator_t * source)
 {
-	DEBUG_ENSURE_UINT_EQUALS(source->buffer_len, destination->buffer_len, "Allocator tried to copy data but sizes were mismatched.");
+	DEBUG_ENSURE(source->buffer_len == destination->buffer_len, "Allocator tried to copy data but sizes were mismatched.");
+
 	memcpy(destination->data, source->data, destination->buffer_len);
 
 	destination->current_offset = source->current_offset;
