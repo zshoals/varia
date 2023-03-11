@@ -141,11 +141,7 @@ static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4
 
 static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 {
-	int32_t pre_out = t.values[0];
-	uint32_t out;
-	memcpy(&out, &pre_out, sizeof(pre_out));
-
-	return out;
+	return t.values[0];
 }
 
 
@@ -319,11 +315,7 @@ static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4
 
 static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 {
-	int32_t pre_out = t.values[0];
-	uint32_t out;
-	memcpy(&out, &pre_out, sizeof(pre_out));
-
-	return out;
+	return t.values[0];
 }
 
 
