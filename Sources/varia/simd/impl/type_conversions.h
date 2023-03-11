@@ -1,5 +1,6 @@
 #pragma once
 
+#include "varia/Vcommon.hpp"
 #include "types.h"
 #include <kinc/global.h>
 #include <string>
@@ -21,22 +22,22 @@ extern "C" {
 
 
 
-static inline varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4_t t)
+VARIA_INLINE varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4_t t)
 {
 	return _mm_cvtps_epi32(t);
 }
 
-static inline varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x4_t t)
+VARIA_INLINE varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x4_t t)
 {
 	return _mm_cvttps_epi32(t);
 }
 
-static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4_t t)
+VARIA_INLINE varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4_t t)
 {
 	return _mm_cvtepi32_ps(t);
 }
 
-static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
+VARIA_INLINE uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 {
 	int32_t pre_out = _mm_cvtsi128_si32(t);
 	uint32_t out;
@@ -54,22 +55,22 @@ static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 
 
 //Float32x4 ----> Other
-static inline varia_int32x4_t varia_float32x4_cast_to_int32x4(varia_float32x4_t t) {
+VARIA_INLINE varia_int32x4_t varia_float32x4_cast_to_int32x4(varia_float32x4_t t) {
 	return _mm_castps_si128(t);
 }
 
-static inline varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_t t) {
 	return _mm_castps_si128(t);
 }
 
 
 
 //Int32x4 ----> Other
-static inline varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t t) {
+VARIA_INLINE varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t t) {
 	return _mm_castsi128_ps(t);
 }
 
-static inline varia_uint32x4_t varia_int32x4_cast_to_uint32x4(varia_int32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_int32x4_cast_to_uint32x4(varia_int32x4_t t) {
 	//SSE2's m128i is every int type, so we can just return any inbound int type parameter
 	return t;
 }
@@ -77,11 +78,11 @@ static inline varia_uint32x4_t varia_int32x4_cast_to_uint32x4(varia_int32x4_t t)
 
 
 //Unsigned Int32x4 ----> Other
-static inline varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_t t) {
+VARIA_INLINE varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_t t) {
 	return _mm_castsi128_ps(t);
 }
 
-static inline varia_int32x4_t varia_uint32x4_cast_to_int32x4(varia_uint32x4_t t) {
+VARIA_INLINE varia_int32x4_t varia_uint32x4_cast_to_int32x4(varia_uint32x4_t t) {
 	return t;
 }
 
@@ -95,7 +96,7 @@ static inline varia_int32x4_t varia_uint32x4_cast_to_int32x4(varia_uint32x4_t t)
 #include <math.h>
 
 
-static inline varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4_t t)
+VARIA_INLINE varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4_t t)
 {
 	float extracted[4];
 	_mm_storeu_ps(&extracted[0], t);
@@ -110,7 +111,7 @@ static inline varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4
 	return cvt;
 }
 
-static inline varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x4_t t)
+VARIA_INLINE varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x4_t t)
 {
 	//FILL ME
 	float extracted[4];
@@ -126,7 +127,7 @@ static inline varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x
 	return cvt;
 }
 
-static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4_t t)
+VARIA_INLINE varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4_t t)
 {
 	float cvt[4];
 
@@ -139,7 +140,7 @@ static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4
 }
 
 
-static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
+VARIA_INLINE uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 {
 	return t.values[0];
 }
@@ -156,7 +157,7 @@ static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 
 
 //Float32x4 ----> Other
-static inline varia_int32x4_t varia_float32x4_cast_to_int32x4(varia_float32x4_t t) {
+VARIA_INLINE varia_int32x4_t varia_float32x4_cast_to_int32x4(varia_float32x4_t t) {
 	float extracted[4];
 	_mm_storeu_ps(&extracted[0], t);
 
@@ -166,7 +167,7 @@ static inline varia_int32x4_t varia_float32x4_cast_to_int32x4(varia_float32x4_t 
 	return cvt;
 }
 
-static inline varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_t t) {
 	float extracted[4];
 	_mm_storeu_ps(&extracted[0], t);
 
@@ -179,7 +180,7 @@ static inline varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_
 
 
 //Int32x4 ----> Other
-static inline varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t t) {
+VARIA_INLINE varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t t) {
 	float cvt[4];
 	memcpy(&cvt[0], &t.values[0], sizeof(t));
 
@@ -188,7 +189,7 @@ static inline varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t 
 
 
 //Unsigned Int32x4 ----> Other
-static inline varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_t t) {
+VARIA_INLINE varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_t t) {
 	float cvt[4];
 	memcpy(&cvt[0], &t.values[0], sizeof(t));
 
@@ -204,23 +205,23 @@ static inline varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_
 //====================================================
 
 
-static inline varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4_t t)
+VARIA_INLINE varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4_t t)
 {
 	return vcvtaq_s32_f32(t);
 }
 
-static inline varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x4_t t)
+VARIA_INLINE varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x4_t t)
 {
 	return vcvtq_s32_f32(t);
 }
 
-static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4_t t)
+VARIA_INLINE varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4_t t)
 {
 	return vcvtq_f32_s32(t);
 }
 
 
-static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
+VARIA_INLINE uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 {
 	return t[index];
 }
@@ -235,31 +236,31 @@ static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 
 
 //Float32x4 ----> Other
-static inline varia_int32x4_t varia_float32x4_cast_to_int32x4(varia_float32x4_t t) {
+VARIA_INLINE varia_int32x4_t varia_float32x4_cast_to_int32x4(varia_float32x4_t t) {
 	return vreinterpretq_s32_f32(t);
 }
 
-static inline varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_t t) {
 	return vreinterpretq_u32_f32(t);
 }
 
 
 //Int32x4 ----> Other
-static inline varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t t) {
+VARIA_INLINE varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t t) {
 	return vreinterpretq_f32_s32(t);
 }
 
-static inline varia_uint32x4_t varia_int32x4_cast_to_uint32x4(varia_int32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_int32x4_cast_to_uint32x4(varia_int32x4_t t) {
 	return vreinterpretq_u32_s32(t);
 }
 
 
 //Unsigned Int32x4 ----> Other
-static inline varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_t t) {
+VARIA_INLINE varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_t t) {
 	return vreinterpretq_f32_u32(t);
 }
 
-static inline varia_int32x4_t varia_uint32x4_cast_to_int32x4(varia_uint32x4_t t) {
+VARIA_INLINE varia_int32x4_t varia_uint32x4_cast_to_int32x4(varia_uint32x4_t t) {
 	return vreinterpretq_s32_u32(t);
 }
 
@@ -276,7 +277,7 @@ static inline varia_int32x4_t varia_uint32x4_cast_to_int32x4(varia_uint32x4_t t)
 
 #include <math.h>
 
-static inline varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4_t t)
+VARIA_INLINE varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4_t t)
 {
 	varia_int32x4_t out;
 
@@ -288,7 +289,7 @@ static inline varia_int32x4_t varia_float32x4_convert_to_int32x4(varia_float32x4
 	return out;
 }
 
-static inline varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x4_t t)
+VARIA_INLINE varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x4_t t)
 {
 	varia_int32x4_t out;
 
@@ -300,7 +301,7 @@ static inline varia_int32x4_t varia_float32x4_truncate_to_int32x4(varia_float32x
 	return out;
 }
 
-static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4_t t)
+VARIA_INLINE varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4_t t)
 {
 	varia_float32x4_t out;
 
@@ -313,7 +314,7 @@ static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4
 }
 
 
-static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
+VARIA_INLINE uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 {
 	return t.values[0];
 }
@@ -328,14 +329,14 @@ static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
 
 
 //Float32x4 ----> Other
-static inline varia_int32x4_t varia_float32x4_cast_to_int32x4(varia_float32x4_t t) {
+VARIA_INLINE varia_int32x4_t varia_float32x4_cast_to_int32x4(varia_float32x4_t t) {
 	varia_int32x4_t cvt;
 	memcpy(&cvt.values[0], &t.values[0], sizeof(t));
 
 	return cvt;
 }
 
-static inline varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_t t) {
 	varia_uint32x4_t cvt;
 	memcpy(&cvt.values[0], &t.values[0], sizeof(t));
 
@@ -344,7 +345,7 @@ static inline varia_uint32x4_t varia_float32x4_cast_to_uint32x4(varia_float32x4_
 
 
 //Int32x4 ----> Float32x4
-static inline varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t t) {
+VARIA_INLINE varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t t) {
 	varia_float32x4_t cvt;
 	memcpy(&cvt.values[0], &t.values[0], sizeof(t));
 
@@ -353,7 +354,7 @@ static inline varia_float32x4_t varia_int32x4_cast_to_float32x4(varia_int32x4_t 
 
 
 //Unsigned Int32x4 ----> Float32x4
-static inline varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_t t) {
+VARIA_INLINE varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_t t) {
 	varia_float32x4_t cvt;
 	memcpy(&cvt.values[0], &t.values[0], sizeof(t));
 
@@ -371,7 +372,7 @@ static inline varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_
 #if !defined(KINC_SSE2) && (defined(KINC_SSE) || defined(KINC_NOSIMD)) 
 
 //Int32x4 ----> Other
-static inline varia_uint32x4_t varia_int32x4_cast_to_uint32x4(varia_int32x4_t t) {
+VARIA_INLINE varia_uint32x4_t varia_int32x4_cast_to_uint32x4(varia_int32x4_t t) {
 	varia_uint32x4_t cvt;
 	memcpy(&cvt.values[0], &t.values[0], sizeof(t));
 
@@ -380,7 +381,7 @@ static inline varia_uint32x4_t varia_int32x4_cast_to_uint32x4(varia_int32x4_t t)
 
 
 //Unsigned Int32x4 ----> Other
-static inline varia_int32x4_t varia_uint32x4_cast_to_int32x4(varia_uint32x4_t t) {
+VARIA_INLINE varia_int32x4_t varia_uint32x4_cast_to_int32x4(varia_uint32x4_t t) {
 	varia_int32x4_t cvt;
 	memcpy(&cvt.values[0], &t.values[0], sizeof(t));
 
