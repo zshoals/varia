@@ -1,383 +1,202 @@
 #pragma once
 
+#include "varia/Vcommon.hpp"
+#include "varia/ds/Allocator.hpp"
+#include "varia/util/Memory.hpp"
+
+#include "varia/Log.hpp"
 #include "varia/Validation.hpp"
+
 #include "varia/ds/qsort.h"
-#include "varia/ds/SearchResult.hpp"
 
-#include <string.h>
-
-
-
-//VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-//        Iterator
-//VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-
-//VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-//        End Iterator
-//VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-template <typename T, int Size>
+template <typename T>
 struct vds_array_t
 {
-	alignas(16) T data[Size];
-	size_t push_idx;
+	T * _data;
+	T * _error_object;
+	i64 _length;
+	i64 _capacity;
 
-	struct vds_iterators_array_iter
-	{
-		private: 
-			T * ptr;
+	T const & operator[](i64 i) const 
+	{ 
+		DEBUG_ENSURE(i >= 0 && i < this->_capacity, "vds_array_t:> Index out of range");
+		return this->_data[i]; 
+	}
 
-		public: 
-			vds_iterators_array_iter(T * ptr) { this->ptr = ptr; }
-			vds_iterators_array_iter operator++() { ++this->ptr; return *this; }
-			bool operator!=(vds_iterators_array_iter const & other) const { return this->ptr != other.ptr; }
-			T & operator*() const { return *this->ptr; }
-			// T & operator*() { return *this->ptr; }
-
-	};
-
-	vds_iterators_array_iter begin(void) /*const*/ { return vds_iterators_array_iter( &this->data[0] ); }
-	vds_iterators_array_iter end(void) /*const*/ { return vds_iterators_array_iter( &this->data[this->push_idx] ); }
+	T & operator[](i64 i) 
+	{ 
+		DEBUG_ENSURE(i >= 0 && i < this->_capacity, "vds_array_t:> Index out of range");
+		return this->_data[i]; 
+	}
 };
 
-
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-//||                   Free functions                                    ||
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-
-template <typename T, int Size>
-void vds_array_initialize(vds_array_t<T, Size> * arr)
+template <typename T>
+void vds_array_initialize(vds_array_t<T> * arr, vds_allocator_t * alloc, i64 count)
 {
-	memset(arr, 0, sizeof(*arr));
+	arr->_error_object = vds_allocator_malloc_aligned(alloc, T, 1, 16);
+	arr->_data = vds_allocator_malloc_aligned(alloc, T, count, 64);
+	arr->_capacity = count;
+	arr->_length = 0;
+
+	memset(arr->_error_object, 0xC9, sizeof(T));
 }
 
-template <typename T, int Size>
-size_t vds_array_front(vds_array_t<T, Size> const * arr)
+template <typename T>
+void vds_array_reset(vds_array_t<T> * arr)
 {
-	return 0;
+	arr->_length = 0;
 }
 
-template <typename T, int Size>
-size_t vds_array_back(vds_array_t<T, Size> const * arr)
+template <typename T>
+i64 vds_array_length(vds_array_t<T> * arr)
 {
-	return arr->push_idx - 1;
+	return arr->_length;
 }
 
-template <typename T, int Size>
-size_t vds_array_length(vds_array_t<T, Size> const * arr)
+template <typename T>
+i64 vds_array_capacity(vds_array_t<T> * arr)
 {
-	return arr->push_idx;
+	return arr->_capacity;
 }
 
-template <typename T, int Size>
-size_t vds_array_capacity(vds_array_t<T, Size> const * arr)
+template <typename T>
+bool vds_array_is_error_element(vds_array_t<T> * arr, T * possible_err)
 {
-	return Size;
+	return (possible_err == arr->_error_object);
 }
 
-template <typename T, int Size>
-bool vds_array_is_populated(vds_array_t<T, Size> const * arr)
+template <typename T>
+T * vds_array_data(vds_array_t<T> * arr)
 {
-	return arr->push_idx > 0;
+	return arr->_data;
 }
 
-template <typename T, int Size>
-bool vds_array_is_empty(vds_array_t<T, Size> const * arr)
+template <typename T>
+void vds_array_maximize(vds_array_t<T> * arr)
 {
-	return !vds_array_is_populated(arr);
+	arr->_length = arr->_capacity;
 }
 
-template <typename T, int Size>
-void vds_array_push(vds_array_t<T, Size> * arr, T value)
+template <typename T>
+void vds_array_push(vds_array_t<T> * arr, T value)
 {
-	DEBUG_ENSURE_UINT_LT(arr->push_idx, Size, "Attempted element push of full StaticArray");
-
-	arr->data[arr->push_idx] = value;
-	++arr->push_idx;
-}
-
-template <typename T, int Size>
-bool vds_array_try_push(vds_array_t<T, Size> * arr, T value)
-{
-	if (arr->push_idx < Size)
+	if (arr->_length < arr->_capacity)
 	{
-		arr->data[arr->push_idx] = value;
-		++arr->push_idx;
-		return true;
+		arr->_data[arr->_length] = value;
+		++arr->_length;
 	}
-
-	return false;
-}
-
-template <typename T, int Size>
-void vds_array_push_without_data(vds_array_t<T, Size> * arr)
-{
-	DEBUG_ENSURE_UINT_LT(arr->push_idx, Size, "Attempted element push of full StaticArray");
-
-	++arr->push_idx;
-}
-
-template <typename T, int Size>
-T vds_array_pop(vds_array_t<T, Size> * arr)
-{
-	DEBUG_ENSURE_UINT_GTE(arr->push_idx, 1, "Attempted element pop of empty StaticArray.");
-
-	--arr->push_idx;
-	return arr->data[arr->push_idx];
-}
-
-// template <typename T, int Size>
-// void vds_array_try_pop(vds_array_t<T, Size> * arr, T value)
-// {
-// 	if (arr->push_idx >= 1)
-// 	{
-// 		--arr->push_idx;
-// 		return arr->data[arr->push_idx];
-// 	}
-// }
-
-template <typename T, int Size>
-void vds_array_set(vds_array_t<T, Size> * arr, size_t index, T value)
-{
-	ENSURE_UINT_LT(index, Size, "Attempted to set an element out of range in StaticArray.");
-	arr->data[index] = value;
-}
-
-template <typename T, int Size>
-void vds_array_set_unsafe(vds_array_t<T, Size> * arr, size_t index, T value)
-{
-	DEBUG_ENSURE_UINT_LT(index, Size, "(Debug) Attempted to set an element out of range in StaticArray.");
-	arr->data[index] = value;
-}
-
-template <typename T, int Size>
-void vds_array_set_all(vds_array_t<T, Size> * arr, T value)
-{
-	for_range_var(i, Size)
+	else
 	{
-		arr->data[i] = value;
+		Glog_string("vds_array_t:> Pushed a full array at "); Glog_time();
 	}
 }
 
-template <typename T, int Size>
-T const * vds_array_get(vds_array_t<T, Size> const * arr, size_t index)
+template <typename T>
+T const * vds_array_pop(vds_array_t<T> * arr)
 {
-	ENSURE_UINT_LT(index, Size, "Attempted to get an element out of range in StaticArray.");
-	return &arr->data[index];
-}
-
-template <typename T, int Size>
-T const * vds_array_get_unsafe(vds_array_t<T, Size> const * arr, size_t index)
-{
-	DEBUG_ENSURE_UINT_LT(index, Size, "Attempted to get an element out of range in StaticArray.");
-	return &arr->data[index];
-}
-
-template <typename T, int Size>
-T * vds_array_get_mut(vds_array_t<T, Size> * arr, size_t index)
-{
-	ENSURE_UINT_LT(index, Size, "Attempted to get an element out of range in StaticArray.");
-	return &arr->data[index];
-}
-
-template <typename T, int Size>
-T * vds_array_get_mut_unsafe(vds_array_t<T, Size> * arr, size_t index)
-{
-	DEBUG_ENSURE_UINT_LT(index, Size, "Attempted to get an element out of range in StaticArray.");
-	return &arr->data[index];
-}
-
-template <typename T, int Size>
-size_t vds_array_index_of(vds_array_t<T, Size> const * arr, T const * value)
-{
-	for_range_var(i, arr->push_idx)
+	if (arr->_length > 0)
 	{
-		T const * target = vds_array_get(arr, i);
+		--arr->_length;
 
-		if (*value == *target)
-		{
-			return i;
-		}
+		return &arr->_data[arr->_length]
 	}
-
-	return SIZE_MAX;
-}
-
-template <typename T, int Size>
-vds_search_result_t<T> vds_array_find_get(vds_array_t<T, Size> * arr, T const * value)
-{
-	vds_search_result_t<T> result;
-
-	for_range_var(i, arr->push_idx)
+	else
 	{
-		T const * target = vds_array_get(arr, i);
+		Glog_string("vds_array_t:> Popped an empty array at "); Glog_time();
 
-		if (*value == *target)
-		{
-			result.value = target;
-			result.was_found = VDS_SEARCH_RESULT_STATUS_FOUND_E;
-			return result;
-		}
-	}
-
-	result.value = nullptr;
-	result.was_found = VDS_SEARCH_RESULT_STATUS_MISSING_E;
-	return result;
-}
-
-template <typename T, int Size>
-vds_search_result_mut_t<T> vds_array_find_get_mut(vds_array_t<T, Size> * arr, T const * value)
-{
-	vds_search_result_mut_t<T> result;
-
-	for_range_var(i, arr->push_idx)
-	{
-		T * target = vds_array_get_mut(arr, i);
-
-		if (*value == *target)
-		{
-			result.value = target;
-			result.was_found = vds::SearchResultStatus_e::Found;
-			return result;
-		}
-	}
-
-	result.value = nullptr;
-	result.was_found = vds::SearchResultStatus_e::Missing;
-	return result;
-}
-
-template <typename T, int Size>
-void vds_array_swap(vds_array_t<T, Size> * arr, size_t index_a, size_t index_b)
-{
-	T temp = arr->data[index_a];
-	arr->data[index_a] = arr->data[index_b];
-	arr->data[index_b] = temp;
-}
-
-template <typename T, int Size>
-T vds_array_swap_and_pop(vds_array_t<T, Size> * arr, size_t index)
-{
-	vds_array_swap(arr, index, vds_array_back(arr));
-	return vds_array_pop(arr);
-}
-
-template <typename T, int Size>
-void vds_array_sort_stackmode(vds_array_t<T, Size> * arr)
-{
-	T temp;
-
-	#define Q_LESS(i, j) arr->data[i] < arr->data[j]
-	#define Q_SWAP(i, j) temp = arr->data[i], arr->data[i] = arr->data[j], arr->data[j] = temp
-
-	QSORT(arr->push_idx, Q_LESS, Q_SWAP);
-
-	#undef Q_LESS
-	#undef Q_SWAP
-}
-
-template <typename T, int Size>
-void vds_array_sort_all(vds_array_t<T, Size> * arr)
-{
-	T temp;
-
-	#define Q_LESS(i, j) arr->data[i] < arr->data[j]
-	#define Q_SWAP(i, j) temp = arr->data[i], arr->data[i] = arr->data[j], arr->data[j] = temp
-
-	QSORT(Size, Q_LESS, Q_SWAP);
-
-	#undef Q_LESS
-	#undef Q_SWAP
-}
-
-template <typename T, int Size, typename Predicate>
-void vds_array_for_each(vds_array_t<T, Size> * arr, const Predicate f)
-{
-	const size_t len = vds_array_length(arr);
-	for_range_var(i, len)
-	{
-		T * element = vds_array_get_mut_unsafe(arr, i);
-		f(element);
+		return arr->_error_object;
 	}
 }
 
-template <typename T, int Size, typename Predicate>
-void vds_array_for_each_with_index(vds_array_t<T, Size> * arr, const Predicate f)
+template <typename T>
+void vds_array_swap(vds_array_t<T> * arr, i64 a, i64 b)
 {
-	const size_t len = vds_array_length(arr);
-	for_range_var(i, len)
+	T temp = (*arr)[a];
+	(*arr)[a] = (*arr)[b];
+	(*arr)[b] = temp;
+}
+
+template <typename T, typename FUNC>
+void vds_array_iterate(vds_array_t<T> * arr, FUNC f)
+{
+	i64 const len = arr->_length;
+	for (i64 i = 0; i < len; ++i)
 	{
-		T * element = vds_array_get_mut_unsafe(arr, i);
+		T * element = &arr->_data[i];
 		f(element, i);
 	}
 }
 
-template <typename T, int Size, typename Predicate>
-void vds_array_iterate_step_4(vds_array_t<T, Size> * arr, const Predicate f)
+template <typename T, typename FUNC>
+void vds_array_reverse_iterate(vds_array_t<T> * arr, FUNC f)
 {
-	static_assert(Size % 4 == 0, "Size must be a multiple of four"); //4 f32's to a SIMD register in SSE2
-
-	const size_t len = vds_array_length(arr);
-	for(int i = 0; i < len; i += 4)
+	i64 const len = arr->_length - 1;
+	for (i64 = len; i > 0; --i)
 	{
-		T * quad_element = vds_array_get_mut_unsafe(arr, i);
-		f(quad_element);
+		T * element = &arr->_data[i];
+		f(element, i);
 	}
 }
 
-template <typename T, int Size, typename Predicate>
-void vds_array_iterate_step_8(vds_array_t<T, Size> * arr, const Predicate f)
+template <typename T, typename FUNC>
+T * vds_array_find_get(vds_array_t<T> * arr, FUNC f)
 {
-	static_assert(Size % 8 == 0, "Size must be a multiple of eight"); //4 f32's to a SIMD register in SSE2
-
-	const size_t len = vds_array_length(arr);
-	for(int i = 0; i < len; i += 8)
+	i64 const len = arr->_length;
+	for (i64 i = 0; i < len; ++i)
 	{
-		T * octo_element = vds_array_get_mut_unsafe(arr, i);
-		f(octo_element);
+		T * element = &arr->_data[i];
+		if (f(element)) return element;
 	}
-}
 
-template <typename T, int Size, typename Predicate>
-void vds_array_iterate_step_16(vds_array_t<T, Size> * arr, const Predicate f)
-{
-	static_assert(Size % 16 == 0, "Size must be a multiple of sixteen"); //4 f32's to a SIMD register in SSE2
-
-	const size_t len = vds_array_length(arr);
-	for(int i = 0; i < len; i += 16)
-	{
-		T * sixteen_element = vds_array_get_mut_unsafe(arr, i);
-		f(sixteen_element);
-	}
+	return nullptr;
 }
 
 
+template <typename T>
+void vds_array_sort_all(vds_array_t<T> * arr)
+{
+	T temp;
+
+	#define Q_LESS(i, j) arr->data[i] < arr->data[j]
+	#define Q_SWAP(i, j) temp = arr->data[i], arr->data[i] = arr->data[j], arr->data[j] = temp
+
+	QSORT(arr->_length, Q_LESS, Q_SWAP);
+
+	#undef Q_LESS
+	#undef Q_SWAP
+}
 
 
-//Note(zshoals 02-02-2023):> Testing of overloading a dereference operator
-//Wanted to try and make it so that a pointer cannot accidentally be incremented/added to
-//or perform an improper action with it.
+template <typename T>
+vds_array_t<T> vds_array_subsect(vds_array_t<T> * arr, i64 begin, i64 end)
+{
+	vds_array_t<T> sub;
 
-// struct bob
-// {
-// 	int a;
-// };
+	if 
+	( 
+		(begin < 0) || 
+		(begin >= arr->_capacity) || 
+		(end < begin) || 
+		(end >= arr->_capacity)
+	)
+	{
+		sub._data = arr->_error_object;
+		sub._error_object = arr->_error_object;
+		sub._capacity = 0;
+		sub._length = 0;
 
-// template<typename T>
-// struct const_ptr
-// {
-// 	T * const ptr;
-// 	T * operator->() { return ptr; }
-// };
+		return sub;
+	}
+	else
+	{
+		sub._data = &arr->_data[begin];
+		sub._error_object = arr->_error_object;
+		sub._capacity = end - begin + 1;
+		//Note(zshoals 03-10-2023):> Is it proper to make the push count 0?
+		//If the exterior array has pushed values, and then this one pushes...then what?
+		sub._length = 0;
 
-// void random(void)
-// {
-// 	vds_array_t<bob, 100> ___do_not_use_arr;
-// 	vds_array_t<bob, 100> * arr = &___do_not_use_arr;
+		return sub;
+	}
 
-// 	vds_array_for_each(arr, [](const_ptr<bob> value)
-// 	{
-// 		value->a += 3498080;
-// 	});
-// }
+}

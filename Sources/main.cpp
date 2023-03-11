@@ -5,7 +5,7 @@
 #include "varia/Vcommon.hpp"
 #include "varia/ds/Allocator.hpp"
 #include "varia/util/Memory.hpp"
-#include "varia/ds/StaticArray.hpp"
+#include "varia/ds/StaticArray2.hpp"
 
 #include <stdlib.h>
 
@@ -76,24 +76,51 @@ int kickstart(int argc, char** argv)
 
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
+	Glog_initialize();
 
 
 	vds_allocator_t mem;
 	void * buffer = calloc(1, varia_memory_kilobytes_to_bytes(1));
 	vds_allocator_initialize(&mem, buffer, varia_memory_kilobytes_to_bytes(1));
 
-	vds_array_t<f32, 1024> float_arr;
-	vds_array_initialize(&float_arr);
-	vds_array_for_each_with_index(&float_arr, [](f32 * elem, size_t i)
+	// vds_array_t<f32, 1024> float_arr;
+	// vds_array_initialize(&float_arr);
+	// vds_array_for_each_with_index(&float_arr, [](f32 * elem, size_t i)
+	// {
+	// 	*elem = i;
+	// });
+
+	vds_array_t<int> ints;
+	vds_array_initialize(&ints, &mem, 128);
+
+	for_range_var(i, 128)
 	{
-		*elem = i;
+		vds_array_push(&ints, i);	
+	}
+
+	vds_array_iterate(&ints, [](int * elem, i64 i)
+	{
+		Glog_int(*elem);
+		Glog_newline();
 	});
+
+	ints[128];
+
+
+	int * result = vds_array_find_get(&ints, [](int * elem)
+	{
+		return (*elem == 124);
+	});
+
+	Glog_int(*result);
+	Glog_newline();
+	Glog_print();
+	Glog_clear_buffer();
 
 	int a = 35032;
 	int b = 4694369;
 
 
-	Glog_initialize();
 
 	Glog_string("Please Work");
 	Glog_string("Please Work");
