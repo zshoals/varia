@@ -88,6 +88,10 @@ void vds_ringbuf_iterate(vds_ringbuf_t<T> * ring, FUNC f)
 {
 	i64 const len = ring->_length;
 	i64 iter = ring->_head;
+/*
+            0           8/0          8/0...
+			|------------|------------|---......
+*/
 	iter = ((ring->_capacity - ring->_length) + iter) % ring->_capacity;
 
 	for (i64 i = 0; i < len; ++i)
