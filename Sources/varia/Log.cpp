@@ -1,6 +1,8 @@
 
 #include "Log.hpp"
 
+#include "varia/Validation.hpp"
+
 #include "kinc/log.h"
 #include "kinc/system.h"
 
@@ -154,81 +156,97 @@ void log_time(varia_stringbuf_t * buf)
 
 
 static char global_string_buffer_data[VARIA_G_STRING_BUF_SIZE];
+static bool global_string_buffer_initialized = false;
 static varia_stringbuf_t global_string_buffer;
 
 //"Global" scratch buffer
 void Glog_initialize(void)
 {
 	vds_dumbbuf_initialize_direct(&global_string_buffer, &global_string_buffer_data[0], VARIA_G_STRING_BUF_SIZE);
+	global_string_buffer_initialized = true;
 }
 
 varia_stringbuf_t * Glog_reference(void)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	return &global_string_buffer;
 }
 
 void Glog_print(void)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_print(&global_string_buffer);
 }
 
 void Glog_clear_buffer(void)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_clear_buffer(&global_string_buffer);
 }
 
 void Glog_copy_to(void * destination, size_t destination_length)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_copy_to(&global_string_buffer, destination, destination_length);
 }
 
 void Glog_string(char const * string)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_string(&global_string_buffer, string);
 }
 
 void Glog_newline(void)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_newline(&global_string_buffer);
 }
 
 void Glog_float(double value)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_float(&global_string_buffer, value);
 }
 
 void Glog_int(int value)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_int(&global_string_buffer, value);
 }
 
 void Glog_int64(int64_t value)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_int64(&global_string_buffer, value);
 }
 
 void Glog_uint64(uint64_t value)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_uint64(&global_string_buffer, value);
 }
 
 void Glog_int32(int32_t value)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_int32(&global_string_buffer, value);
 }
 
 void Glog_uint32(uint32_t value)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_uint32(&global_string_buffer, value);
 }
 
 void Glog_size(size_t value)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_size(&global_string_buffer, value);
 }
 
 void Glog_time(void)
 {
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_time(&global_string_buffer);
 }
 
