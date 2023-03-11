@@ -1,9 +1,9 @@
-#include "varia/Validation.hpp"
 
 #include "kinc/log.h"
 #include "Log.hpp"
 #include <math.h>
 
+#include "varia/Validation.hpp"
 #define VARIA_VALIDATION_NO_OP() ((void)0)
 #define VARIA_VALIDATION_FLOAT_EPSILON 0.00000001
 
@@ -15,7 +15,7 @@ void varia_custom_assert(bool condition, char const * expr, char const * message
 		Glog_print(); //Write any global unlogged info out
 		Glog_clear_buffer();
 
-		kinc_log(KINC_LOG_LEVEL_ERROR, "| Assertion failed.\n|   %s \n|   Message: %s \n|   File: %s \n|   Line: %d \n", expr, message, file, line);
+		kinc_log(KINC_LOG_LEVEL_ERROR, "| Assertion failed\n|   %s \n|   Message: %s \n|   File: %s \n|   Line: %d \n", expr, message, file, line);
 
 		#if defined(_MSC_VER)
 			__debugbreak();
@@ -37,13 +37,21 @@ void varia_custom_assert(bool condition, char const * expr, char const * message
 
 void varia_custom_assert_release(bool condition, char const * expr, char const * message, char const * file, int line)
 {
-	if (!condition)
-	{
-		Glog_print();
-		Glog_clear_buffer();
+	#ifndef NDEBUG
 
-		kinc_log(KINC_LOG_LEVEL_ERROR, "| Assertion failed.\n|   %s \n|   Message: %s \n|   File: %s \n|   Line: %d \n", expr, message, file, line);
+		varia_custom_assert(condition, expr, message, file, line);
 
-		assert(false && "A critical runtime error has occurred. Please contact the developer.");
-	}
+	#else
+
+		if (!condition)
+		{
+			Glog_print();
+			Glog_clear_buffer();
+
+			kinc_log(KINC_LOG_LEVEL_ERROR, "| Assertion failed\n|   %s \n|   Message: %s \n|   File: %s \n|   Line: %d \n", expr, message, file, line);
+
+			assert(false && "A critical runtime error has occurred. Please contact the developer.");
+		}
+
+	#endif
 }
