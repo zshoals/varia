@@ -87,7 +87,7 @@ void vds_array_push(vds_array_t<T> * arr, T value)
 	}
 	else
 	{
-		Glog_string("vds_array_t:> Pushed a full array at "); Glog_time();
+		Glog_string("vds_array_t:> Pushed a full array at "); Glog_time(); Glog_newline();
 	}
 }
 
@@ -102,7 +102,7 @@ T const * vds_array_pop(vds_array_t<T> * arr)
 	}
 	else
 	{
-		Glog_string("vds_array_t:> Popped an empty array at "); Glog_time();
+		Glog_string("vds_array_t:> Popped an empty array at "); Glog_time(); Glog_newline();
 
 		return arr->_error_object;
 	}
@@ -148,7 +148,7 @@ T * vds_array_find_get(vds_array_t<T> * arr, FUNC f)
 		if (f(element)) return element;
 	}
 
-	return nullptr;
+	return arr->_error_object;
 }
 
 
