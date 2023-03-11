@@ -18,6 +18,8 @@
 #include "varia/Log.hpp"
 #include "varia/util/Profiler.hpp"
 
+#include "varia/ds/Ringbuf.hpp"
+
 
 int kickstart(int argc, char** argv) 
 {
@@ -84,37 +86,35 @@ int kickstart(int argc, char** argv)
 
 	Glog_initialize();
 	varia_profiler_initialize(&mem);
-	// vds_array_t<f32, 1024> float_arr;
-	// vds_array_initialize(&float_arr);
-	// vds_array_for_each_with_index(&float_arr, [](f32 * elem, size_t i)
-	// {
-	// 	*elem = i;
-	// });
 
-	vds_array_t<int> ints;
-	vds_array_initialize(&ints, &mem, 128);
+	vds_ringbuf_t<double> times;
+	vds_ringbuf_initialize(&times, &mem, 4);
 
+	vds_ringbuf_push(&times, 946334363.342);
+	vds_ringbuf_push(&times, 1.0463);
+	vds_ringbuf_push(&times, 99999.0);
+	vds_ringbuf_push(&times, 99999.0);
+	vds_ringbuf_push(&times, 99999.0);
+	vds_ringbuf_push(&times, (double)0x8000);
+	vds_ringbuf_pop(&times);
+	vds_ringbuf_pop(&times);
+	vds_ringbuf_pop(&times);
+	vds_ringbuf_pop(&times);
+	vds_ringbuf_pop(&times);
+	vds_ringbuf_pop(&times);
+	vds_ringbuf_pop(&times);
+	vds_ringbuf_push(&times, 1.0463);
+	vds_ringbuf_push(&times, 1.0463);
+	// vds_ringbuf_push(&times, 13333337.0);
+	// vds_ringbuf_push(&times, 666666666666.0);
 
-	for_range_var(i, 155)
+	vds_ringbuf_iterate(&times, [](double * elem, i64 i)
 	{
-		vds_array_push(&ints, i);	
-	}
-
-	vds_array_iterate(&ints, [](int * elem, i64 i)
-	{
-		Glog_int(*elem);
+		Glog_double(*elem);
 		Glog_newline();
 	});
 
-	varia_profiler_print();
-	varia_profiler_reset();
-
-	int * result = vds_array_find_get(&ints, [](int * elem)
-	{
-		return (*elem == 124);
-	});
-
-
+	Glog_print();
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
