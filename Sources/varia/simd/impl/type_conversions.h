@@ -36,6 +36,15 @@ static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4
 	return _mm_cvtepi32_ps(t);
 }
 
+static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
+{
+	int32_t pre_out = _mm_cvtsi128_si32(t);
+	uint32_t out;
+	memcpy(&out, &pre_out, sizeof(pre_out));
+
+	return out;
+}
+
 
 
 //====================================================
@@ -75,7 +84,6 @@ static inline varia_float32x4_t varia_uint32x4_cast_to_float32x4(varia_uint32x4_
 static inline varia_int32x4_t varia_uint32x4_cast_to_int32x4(varia_uint32x4_t t) {
 	return t;
 }
-
 
 
 #elif defined(KINC_SSE)
@@ -130,6 +138,15 @@ static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4
 	return _mm_loadu_ps(&cvt[0]);
 }
 
+
+static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
+{
+	int32_t pre_out = t.values[0];
+	uint32_t out;
+	memcpy(&out, &pre_out, sizeof(pre_out));
+
+	return out;
+}
 
 
 
@@ -206,6 +223,11 @@ static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4
 	return vcvtq_f32_s32(t);
 }
 
+
+static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
+{
+	return t[index];
+}
 
 
 
@@ -294,6 +316,15 @@ static inline varia_float32x4_t varia_int32x4_convert_to_float32x4(varia_int32x4
 	return out;
 }
 
+
+static inline uint32_t varia_uint32x4_extract_uint32(varia_uint32x4_t t)
+{
+	int32_t pre_out = t.values[0];
+	uint32_t out;
+	memcpy(&out, &pre_out, sizeof(pre_out));
+
+	return out;
+}
 
 
 
