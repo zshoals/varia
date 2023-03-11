@@ -43,7 +43,7 @@ void * vds_allocator_allocate_aligned_count(vds_allocator_t * self, size_t elem_
 	return vds_allocator_allocate_aligned(self, (elem_size * count), alignment);
 }
 
-void vds_allocator_free_all(vds_allocator_t * self)
+void vds_allocator_reset(vds_allocator_t * self)
 {
 	self->current_offset = 0;
 }

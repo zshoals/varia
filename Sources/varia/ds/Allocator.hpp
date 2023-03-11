@@ -13,7 +13,7 @@ struct vds_allocator_t
 void vds_allocator_initialize(vds_allocator_t * self, void * memory, size_t buffer_size);
 void * vds_allocator_allocate_aligned(vds_allocator_t * self, size_t size, size_t alignment);
 void * vds_allocator_allocate_aligned_count(vds_allocator_t * self, size_t elem_size, size_t count, size_t alignment);
-void vds_allocator_free_all(vds_allocator_t * self);
+void vds_allocator_reset(vds_allocator_t * self);
 void vds_allocator_zero(vds_allocator_t * self);
 
 void vds_allocator_copy_to(vds_allocator_t * destination, vds_allocator_t * source);
