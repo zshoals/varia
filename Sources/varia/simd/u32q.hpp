@@ -4,6 +4,8 @@
 
 #include "varia/vcommon.hpp"
 #include "varia/simd/impl/uint32x4.h"
+#include "varia/simd/impl/float32x4.h"
+#include "varia/simd/impl/type_conversions.h"
 
 VARIA_INLINE u32q u32q_load(const u32 *values) { return varia_uint32x4_intrin_load(values); }
 VARIA_INLINE void u32q_store(u32 *values, u32q n) { varia_uint32x4_store(values, n); }
@@ -55,3 +57,25 @@ VARIA_INLINE void operator^=(u32q & a, u32q const & b) { a = u32q_xor(a, b); }
 //Extensions
 VARIA_INLINE u32q u32q_zero(void) { return u32q_set_all(0); }
 VARIA_INLINE u32q u32q_ones(void) { return u32q_set_all(0xffffffff); }
+
+
+
+
+
+//Horizontal Operations
+
+VARIA_INLINE uint32_t u32q_horizontal_and(u32q n)
+{
+	varia_float32x4_t ab = varia_uint32x4_cast_to_float32x4(n);
+	varia_float32x4_t cd = varia_float32x4_shuffle_ghcd(ab, ab);
+
+	ab = varia_float32x4_and(ab, cd);
+
+	varia_float32x4_t b = varia_float32x4_shuffle_custom(ab, ab, 1, 1, 1, 1);
+
+	ab = varia_float32x4_and(ab, b);
+
+	n = varia_float32x4_cast_to_uint32x4(ab);
+
+	return varia_uint32x4_extract_uint32(n);
+}

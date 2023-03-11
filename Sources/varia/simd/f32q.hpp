@@ -347,15 +347,29 @@ VARIA_INLINE f32q f32q_wrap_radians(f32q radians)
 }
 
 
-VARIA_INLINE f32q f32q_shuffle_aebf(f32q abcd, f32q efgh)
-{
-	return varia_float32x4_shuffle_aebf(abcd, efgh);
-}
+//Note(zshoals 03-10-2023):> Wrong abstraction layer?
+// VARIA_INLINE f32q f32q_shuffle_aebf(f32q abcd, f32q efgh)
+// {
+// 	return varia_float32x4_shuffle_aebf(abcd, efgh);
+// }
 
-VARIA_INLINE f32q f32q_shuffle_cgdh(f32q abcd, f32q efgh)
-{
-	return varia_float32x4_shuffle_cgdh(abcd, efgh);
-}
+// VARIA_INLINE f32q f32q_shuffle_cgdh(f32q abcd, f32q efgh)
+// {
+// 	return varia_float32x4_shuffle_cgdh(abcd, efgh);
+// }
+
+// VARIA_INLINE f32q f32q_shuffle_abef(f32q abcd, f32q efgh)
+// {
+// 	return varia_float32x4_shuffle_abef(abcd, efgh);
+// }
+
+// VARIA_INLINE f32q f32q_shuffle_ghcd(f32q abcd, f32q efgh)
+// {
+// 	return varia_float32x4_shuffle_ghcd(abcd, efgh);
+// }
+
+
+
 
 
 //Debugging utilities
