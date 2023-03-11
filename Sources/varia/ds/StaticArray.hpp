@@ -157,8 +157,8 @@ void vds_array_sort_all(vds_array_t<T> * arr)
 {
 	T temp;
 
-	#define Q_LESS(i, j) arr->data[i] < arr->data[j]
-	#define Q_SWAP(i, j) temp = arr->data[i], arr->data[i] = arr->data[j], arr->data[j] = temp
+	#define Q_LESS(i, j) arr->_data[i] < arr->_data[j]
+	#define Q_SWAP(i, j) temp = arr->_data[i], arr->_data[i] = arr->_data[j], arr->_data[j] = temp
 
 	QSORT(arr->_length, Q_LESS, Q_SWAP);
 
