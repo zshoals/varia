@@ -172,7 +172,8 @@ vds_array_t<T> vds_array_subsect(vds_array_t<T> * arr, i64 begin, i64 end)
 {
 	vds_array_t<T> sub;
 
-	if 
+
+	if //Out of bounds
 	( 
 		(begin < 0) || 
 		(begin >= arr->_capacity) || 

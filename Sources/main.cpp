@@ -18,8 +18,8 @@
 #include "varia/Log.hpp"
 #include "varia/util/Profiler.hpp"
 
-#include "varia/ds/Ringbuf.hpp"
-
+#include "varia/ds/StaticRingbuf.hpp"
+#include "varia/util/Memory.hpp"
 
 int kickstart(int argc, char** argv) 
 {
@@ -80,15 +80,13 @@ int kickstart(int argc, char** argv)
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
 
-	vds_allocator_t mem;
-	void * buffer = calloc(1, varia_memory_megabytes_to_bytes(16));
-	vds_allocator_initialize(&mem, buffer, varia_memory_megabytes_to_bytes(16));
+	varia_memory_initialize_allocators(varia_memory_megabytes_to_bytes(128), varia_memory_megabytes_to_bytes(64));
 
 	Glog_initialize();
-	varia_profiler_initialize(&mem);
+	varia_profiler_initialize(varia_memory_scratch_allocator());
 
 	vds_ringbuf_t<double> times;
-	vds_ringbuf_initialize(&times, &mem, 4);
+	vds_ringbuf_initialize(&times, varia_memory_scratch_allocator(), 4);
 
 	vds_ringbuf_push(&times, 946334363.342);
 	vds_ringbuf_push(&times, 1.0463);
