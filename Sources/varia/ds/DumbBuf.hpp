@@ -20,7 +20,7 @@ void vds_dumbbuf_initialize(vds_dumbbuf_t<T> * buf, vds_allocator_t * alloc, siz
 	buf->_capacity = count;
 	buf->current_offset = 0;
 	buf->buffer = vds_allocator_malloc_aligned(alloc, T, count, 64);
-	memset(&buf->buffer[0], 0, sizeof(T) * count)
+	memset(&buf->buffer[0], 0, sizeof(T) * count);
 }
 
 template <typename T>

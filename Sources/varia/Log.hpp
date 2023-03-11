@@ -31,7 +31,7 @@ void Glog_size(size_t value);
 void Glog_time(void);
 
 //Generic buffer
-void log_print(varia_stringbuf_t const * buf);
+void log_print(varia_stringbuf_t * buf);
 void log_clear_buffer(varia_stringbuf_t * buf);
 void log_copy_to(varia_stringbuf_t const * buf, void * destination, size_t destination_length);
 
