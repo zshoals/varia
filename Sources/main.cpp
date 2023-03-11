@@ -5,7 +5,7 @@
 #include "varia/Vcommon.hpp"
 #include "varia/ds/Allocator.hpp"
 #include "varia/util/Memory.hpp"
-#include "varia/ds/StaticArray2.hpp"
+#include "varia/ds/StaticArray.hpp"
 
 #include <stdlib.h>
 
@@ -93,7 +93,7 @@ int kickstart(int argc, char** argv)
 	vds_array_t<int> ints;
 	vds_array_initialize(&ints, &mem, 128);
 
-	for_range_var(i, 128)
+	for_range_var(i, 155)
 	{
 		vds_array_push(&ints, i);	
 	}
@@ -103,8 +103,6 @@ int kickstart(int argc, char** argv)
 		Glog_int(*elem);
 		Glog_newline();
 	});
-
-	ints[128];
 
 
 	int * result = vds_array_find_get(&ints, [](int * elem)
