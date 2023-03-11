@@ -74,6 +74,18 @@ void log_float(varia_stringbuf_t * buf, double value)
 	}
 }
 
+void log_double(varia_stringbuf_t * buf, double value)
+{
+	char temp[64];
+	int to_add = snprintf(&temp[0], 64, "%.12f", value);
+
+	if (vds_dumbbuf_can_push_amount(buf, to_add))
+	{
+		int written = sprintf(vds_dumbbuf_data_at_offset(buf), &temp[0]);
+		vds_dumbbuf_advance(buf, written);
+	}
+}
+
 void log_int(varia_stringbuf_t * buf, int value)
 {
 	char temp[64];
@@ -206,6 +218,12 @@ void Glog_float(double value)
 {
 	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
 	log_float(&global_string_buffer, value);
+}
+
+void Glog_double(double value)
+{
+	ENSURE(global_string_buffer_initialized, "Glog must be initialized before logging.");
+	log_double(&global_string_buffer, value);
 }
 
 void Glog_int(int value)

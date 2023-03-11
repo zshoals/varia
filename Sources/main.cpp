@@ -16,6 +16,7 @@
 #include "varia/math/Vec2q.hpp"
 
 #include "varia/Log.hpp"
+#include "varia/util/Profiler.hpp"
 
 
 int kickstart(int argc, char** argv) 
@@ -76,13 +77,13 @@ int kickstart(int argc, char** argv)
 
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
-	Glog_initialize();
-
 
 	vds_allocator_t mem;
-	void * buffer = calloc(1, varia_memory_kilobytes_to_bytes(1));
-	vds_allocator_initialize(&mem, buffer, varia_memory_kilobytes_to_bytes(1));
+	void * buffer = calloc(1, varia_memory_megabytes_to_bytes(16));
+	vds_allocator_initialize(&mem, buffer, varia_memory_megabytes_to_bytes(16));
 
+	Glog_initialize();
+	varia_profiler_initialize(&mem);
 	// vds_array_t<f32, 1024> float_arr;
 	// vds_array_initialize(&float_arr);
 	// vds_array_for_each_with_index(&float_arr, [](f32 * elem, size_t i)
@@ -92,6 +93,7 @@ int kickstart(int argc, char** argv)
 
 	vds_array_t<int> ints;
 	vds_array_initialize(&ints, &mem, 128);
+
 
 	for_range_var(i, 155)
 	{
@@ -104,6 +106,8 @@ int kickstart(int argc, char** argv)
 		Glog_newline();
 	});
 
+	varia_profiler_print();
+	varia_profiler_reset();
 
 	int * result = vds_array_find_get(&ints, [](int * elem)
 	{

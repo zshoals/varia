@@ -26,6 +26,12 @@ typedef unsigned int uint;
 	#define VARIA_INLINE static __attribute__((always_inline))
 #endif
 
+#ifdef KORE_WINDOWS
+	#define VARIA_FUNCTION_NAME __FUNCTION__
+#else
+	#define VARIA_FUNCTION_NAME ""
+#endif
+
 #define VARIA_STRINGIFY_IMPL(X) #X
 #define VARIA_STRINGIFY(X) VARIA_STRINGIFY_IMPL(X)
 
