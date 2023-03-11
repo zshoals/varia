@@ -1,7 +1,7 @@
 #pragma once
 
-#include "varia/vcommon.hpp"
-#include "varia/validation.hpp"
+#include "varia/Vcommon.hpp"
+#include "varia/Validation.hpp"
 
 
 

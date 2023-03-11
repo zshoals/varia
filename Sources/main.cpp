@@ -2,7 +2,7 @@
 #include "kinc/system.h"
 #include "kinc/display.h"
 
-#include "varia/vcommon.hpp"
+#include "varia/Vcommon.hpp"
 #include "varia/ds/Allocator.hpp"
 #include "varia/util/Memory.hpp"
 #include "varia/ds/StaticArray.hpp"
@@ -15,7 +15,7 @@
 #include "varia/simd/f32q.hpp"
 #include "varia/math/Vec2q.hpp"
 
-#include "varia/log.hpp"
+#include "varia/Log.hpp"
 
 
 int kickstart(int argc, char** argv) 
@@ -120,3 +120,4 @@ int kickstart(int argc, char** argv)
 
 	return 0;
 }
+

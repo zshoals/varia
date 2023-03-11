@@ -2,13 +2,13 @@
 
 #include "varia/simd/simd_types.h"
 
-#include "varia/vcommon.hpp"
+#include "varia/Vcommon.hpp"
 #include "varia/math/MathConstants.hpp"
 #include "varia/simd/impl/float32x4.h"
 #include "simd_trig.h"
 
 #ifdef VARIA_LOG_LOGGING_ENABLED
-	#include "varia/log.hpp"
+	#include "varia/Log.hpp"
 #endif
 
 VARIA_INLINE f32q f32q_load(const f32 *values) { return varia_float32x4_intrin_load(values); }

@@ -2,7 +2,7 @@
 
 #include "varia/simd/simd_types.h"
 
-#include "varia/vcommon.hpp"
+#include "varia/Vcommon.hpp"
 #include "varia/simd/impl/uint32x4.h"
 #include "varia/simd/impl/float32x4.h"
 #include "varia/simd/impl/type_conversions.h"

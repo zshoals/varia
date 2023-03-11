@@ -1,7 +1,7 @@
-#include "varia/validation.hpp"
+#include "varia/Validation.hpp"
 
 #include "kinc/log.h"
-#include "log.hpp"
+#include "Log.hpp"
 #include <math.h>
 
 #define VARIA_VALIDATION_NO_OP() ((void)0)

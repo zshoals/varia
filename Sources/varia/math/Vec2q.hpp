@@ -2,7 +2,7 @@
 
 #include "varia/math/MathTypes.hpp"
 
-#include "varia/vcommon.hpp"
+#include "varia/Vcommon.hpp"
 
 #include "varia/simd/f32q.hpp"
 #include "varia/simd/simd_trig.h"

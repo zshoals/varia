@@ -1,6 +1,6 @@
 #include "Allocator.hpp"
-#include "varia/vcommon.hpp"
-#include "varia/validation.hpp"
+#include "varia/Vcommon.hpp"
+#include "varia/Validation.hpp"
 #include <inttypes.h>
 #include <string.h>
 
