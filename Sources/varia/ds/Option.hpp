@@ -25,6 +25,11 @@ struct vds_option_t
 		return this->_data;
 	}
 
+	T & unwrap()
+	{
+		return this->_data;
+	}
+
 	operator bool() const
 	{
 		return (bool)this->_has;
@@ -35,10 +40,6 @@ struct vds_option_t
 		return (bool)(this->_has);
 	}
 
-	T & unwrap()
-	{
-		return this->_data;
-	}
 
 };
 

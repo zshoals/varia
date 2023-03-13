@@ -91,19 +91,17 @@ int kickstart(int argc, char** argv)
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
 
-
-	vds_ringbuf_t<int> ring;
-	vds_ringbuf_initialize(&ring, varia_memory_get_scratch_allocator(), 128);
+	vds_array_t<int> ints;
+	vds_array_initialize(&ints, varia_memory_get_scratch_allocator(), 128);
 
 	for_range_var(i, 24)
 	{
-		vds_ringbuf_push(&ring, i);
+		vds_array_push(&ints, i);
 	}
 
-
-	Glog_string("Phase 1");
+	Glog_string("Test 1");
 	Glog_newline();
-	vds_ringbuf_pop_all(&ring, [](int * elem)
+	vds_array_pop_all(&ints, [](int * elem)
 	{
 		Glog_int(*elem);
 		Glog_newline();
@@ -112,15 +110,23 @@ int kickstart(int argc, char** argv)
 	Glog_print();
 	Glog_clear_buffer();
 
-	Glog_string("Phase 2");
-	vds_ringbuf_pop_all(&ring, [](int * elem)
+
+	vds_array_push(&ints, 1337);
+
+	Glog_string("Test 2");
+	Glog_newline();
+	vds_array_pop_all(&ints, [](int * elem)
 	{
-		Glog_string("WOOPS!!!!");
 		Glog_int(*elem);
+		Glog_newline();
 	});
 
 	Glog_print();
 	Glog_clear_buffer();
+
+
+
+
 
 	kinc_start();
 
