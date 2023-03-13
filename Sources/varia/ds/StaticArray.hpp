@@ -3,6 +3,7 @@
 #include "varia/Vcommon.hpp"
 #include "varia/ds/Allocator.hpp"
 #include "varia/util/Memory.hpp"
+#include "varia/ds/Option.hpp"
 
 #include "varia/Log.hpp"
 #include "varia/Validation.hpp"
@@ -28,6 +29,13 @@ struct vds_array_t
 		DEBUG_ENSURE(i >= 0 && i < this->_capacity, "vds_array_t:> Index out of range");
 		return this->_data[i]; 
 	}
+
+	T & at(i64 i)
+	{
+		DEBUG_ENSURE(i >= 0 && i < this->_capacity, "vds_array_t:> Index out of range");
+		return this->_data[i];
+	}
+
 };
 
 template <typename T>
@@ -45,6 +53,18 @@ template <typename T>
 void vds_array_reset(vds_array_t<T> * arr)
 {
 	arr->_length = 0;
+}
+
+template <typename T>
+vds_array_t<T> vds_array_deep_copy(vds_array_t<T> * arr, vds_allocator_t * alloc)
+{
+	vds_array_t<T> out;
+	out._error_object = vds_allocator_allocate_aligned_count(alloc, sizeof(T), 1, 16);
+	out._data = vds_allocator_allocate_aligned_count(alloc, sizeof(T), arr->_capacity, 64);
+	out._capacity = arr->_capacity;
+	out._length = arr->_length;
+
+	return out;
 }
 
 template <typename T>
@@ -139,16 +159,16 @@ void vds_array_reverse_iterate(vds_array_t<T> * arr, FUNC f)
 }
 
 template <typename T, typename FUNC>
-T * vds_array_find_get(vds_array_t<T> * arr, FUNC f)
+vds_option_t<T *> vds_array_find_get(vds_array_t<T> * arr, FUNC f)
 {
 	i64 const len = arr->_length;
 	for (i64 i = 0; i < len; ++i)
 	{
 		T * element = &arr->_data[i];
-		if (f(element)) return element;
+		if (f(element)) return vds_option_create_some(element);
 	}
 
-	return arr->_error_object;
+	return vds_option_create_none<T *>();
 }
 
 
