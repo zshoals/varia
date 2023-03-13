@@ -128,6 +128,18 @@ T const * vds_array_pop(vds_array_t<T> * arr)
 	}
 }
 
+template <typename T, typename FUNC>
+void vds_array_pop_all(vds_array_t<T> * arr, FUNC f)
+{
+	for (i64 i = arr->_length - 1; i >= 0; --i)
+	{
+		T * element = &arr->_data[i];
+		f(element);
+
+		--arr->_length;
+	}
+}
+
 template <typename T>
 void vds_array_swap(vds_array_t<T> * arr, i64 a, i64 b)
 {
