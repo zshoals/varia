@@ -6,13 +6,13 @@ bool _initialized = false;
 vds_allocator_t _permanent;
 vds_allocator_t _scratch;
 
-vds_allocator_t * varia_memory_permanent_allocator(void)
+vds_allocator_t * varia_memory_get_permanent_allocator(void)
 {
 	ENSURE(_initialized, "The allocator subsystem was not initialized.");
 	return &_permanent;
 }
 
-vds_allocator_t * varia_memory_scratch_allocator(void)
+vds_allocator_t * varia_memory_get_scratch_allocator(void)
 {
 	ENSURE(_initialized, "The allocator subsystem was not initialized.");
 	return &_scratch;

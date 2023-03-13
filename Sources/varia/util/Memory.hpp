@@ -14,7 +14,7 @@ constexpr size_t VARIA_MEMORY_CONSTANTS_DEFAULT_ALIGNMENT = 16;
 	memcpy((DESTINATION_PTR), (SOURCE_PTR), (SIZE))
 	
 
-vds_allocator_t * varia_memory_permanent_allocator(void);
-vds_allocator_t * varia_memory_scratch_allocator(void);
+vds_allocator_t * varia_memory_get_permanent_allocator(void);
+vds_allocator_t * varia_memory_get_scratch_allocator(void);
 void varia_memory_initialize_allocators(i64 permanent_size_bytes, i64 scratch_size_bytes);
 void varia_memory_reset_scratch_allocator(void);
