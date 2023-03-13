@@ -101,3 +101,20 @@ void vds_ringbuf_iterate(vds_ringbuf_t<T> * ring, FUNC f)
 		iter = (iter + 1) % ring->_capacity;
 	}
 }
+
+template <typename T, typename FUNC>
+void vds_ringbuf_pop_all(vds_ringbuf_t<T> * ring, FUNC f)
+{
+	i64 const len = ring->_length;
+	i64 iter;
+
+	for (i64 i = 0; i < len; ++i)
+	{
+		iter = vds_ringbuf_previous_head(ring);
+		T * element = &ring->_data._data[iter];
+		f(element);
+
+		--ring->_length;
+		ring->_head = iter;
+	}
+}

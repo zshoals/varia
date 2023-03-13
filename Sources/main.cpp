@@ -86,37 +86,41 @@ int kickstart(int argc, char** argv)
 	varia_memory_initialize_allocators(varia_memory_megabytes_to_bytes(128), varia_memory_megabytes_to_bytes(64));
 
 	Glog_initialize();
-	varia_profiler_initialize(varia_memory_scratch_allocator());
+	varia_profiler_initialize(varia_memory_get_scratch_allocator());
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
 
-	vds_array_t<int> arr;
-	vds_array_initialize(&arr, varia_memory_scratch_allocator(), 128);
-	for_range_var(i, 128)
+
+	vds_ringbuf_t<int> ring;
+	vds_ringbuf_initialize(&ring, varia_memory_get_scratch_allocator(), 128);
+
+	for_range_var(i, 24)
 	{
-		vds_array_push(&arr, i);
+		vds_ringbuf_push(&ring, i);
 	}
 
-	vds_option_t<int *> item = vds_array_find_get(&arr, [](int * elem)
+
+	Glog_string("Phase 1");
+	Glog_newline();
+	vds_ringbuf_pop_all(&ring, [](int * elem)
 	{
-		return *elem == 127;
+		Glog_int(*elem);
+		Glog_newline();
 	});
 
-	if (item)
-	{
-		Glog_string("We added a bob!");
-		Glog_int(**item);
-		Glog_print();
-		Glog_clear_buffer();
-	}
-	else
-	{
-		Glog_string("There wasn't a bob....");
-		Glog_print();
-		Glog_clear_buffer();
-	}
+	Glog_print();
+	Glog_clear_buffer();
 
+	Glog_string("Phase 2");
+	vds_ringbuf_pop_all(&ring, [](int * elem)
+	{
+		Glog_string("WOOPS!!!!");
+		Glog_int(*elem);
+	});
+
+	Glog_print();
+	Glog_clear_buffer();
 
 	kinc_start();
 
