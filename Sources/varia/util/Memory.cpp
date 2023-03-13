@@ -8,19 +8,19 @@ vds_allocator_t _scratch;
 
 vds_allocator_t * varia_memory_permanent_allocator(void)
 {
-	DEBUG_ENSURE(_initialized, "The allocator subsystem was not initialized.");
+	ENSURE(_initialized, "The allocator subsystem was not initialized.");
 	return &_permanent;
 }
 
 vds_allocator_t * varia_memory_scratch_allocator(void)
 {
-	DEBUG_ENSURE(_initialized, "The allocator subsystem was not initialized.");
+	ENSURE(_initialized, "The allocator subsystem was not initialized.");
 	return &_scratch;
 }
 
 void varia_memory_initialize_allocators(i64 permanent_size_bytes, i64 scratch_size_bytes)
 {
-	DEBUG_ENSURE(!_initialized, "The allocator subsystem was already initialized.");
+	ENSURE(!_initialized, "The allocator subsystem was already initialized.");
 	vds_allocator_initialize(&_permanent, calloc(1, permanent_size_bytes), permanent_size_bytes);
 	vds_allocator_initialize(&_scratch, calloc(1, scratch_size_bytes), scratch_size_bytes);
 
@@ -29,5 +29,6 @@ void varia_memory_initialize_allocators(i64 permanent_size_bytes, i64 scratch_si
 
 void varia_memory_reset_scratch_allocator(void)
 {
+	ENSURE(_initialized, "The allocator subsystem was not initialized.");
 	vds_allocator_reset(&_scratch);	
 }
