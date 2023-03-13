@@ -22,6 +22,7 @@
 #include "varia/util/Memory.hpp"
 
 #include "kinc/graphics4/indexbuffer.h"
+#include "varia/ds/Option.hpp"
 
 int kickstart(int argc, char** argv) 
 {
@@ -89,6 +90,32 @@ int kickstart(int argc, char** argv)
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
+
+	vds_array_t<int> arr;
+	vds_array_initialize(&arr, varia_memory_scratch_allocator(), 128);
+	for_range_var(i, 128)
+	{
+		vds_array_push(&arr, i);
+	}
+
+	vds_option_t<int *> item = vds_array_find_get(&arr, [](int * elem)
+	{
+		return *elem == 127;
+	});
+
+	if (item)
+	{
+		Glog_string("We added a bob!");
+		Glog_int(**item);
+		Glog_print();
+		Glog_clear_buffer();
+	}
+	else
+	{
+		Glog_string("There wasn't a bob....");
+		Glog_print();
+		Glog_clear_buffer();
+	}
 
 
 	kinc_start();
