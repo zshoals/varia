@@ -12,10 +12,11 @@ void varia_custom_assert(bool condition, char const * expr, char const * message
 {
 	if (!condition)
 	{
+		Glog_newline();
 		Glog_print(); //Write any global unlogged info out
 		Glog_clear_buffer();
 
-		kinc_log(KINC_LOG_LEVEL_ERROR, "| Assertion failed\n|   %s \n|   Message: %s \n|   File: %s \n|   Line: %d \n", expr, message, file, line);
+		kinc_log(KINC_LOG_LEVEL_ERROR, "| Assertion failed (DEBUG MODE)\n|   %s \n|   Message: %s \n|   File: %s \n|   Line: %d \n", expr, message, file, line);
 
 		#if defined(_MSC_VER)
 			__debugbreak();
@@ -48,7 +49,7 @@ void varia_custom_assert_release(bool condition, char const * expr, char const *
 			Glog_print();
 			Glog_clear_buffer();
 
-			kinc_log(KINC_LOG_LEVEL_ERROR, "| Assertion failed\n|   %s \n|   Message: %s \n|   File: %s \n|   Line: %d \n", expr, message, file, line);
+			kinc_log(KINC_LOG_LEVEL_ERROR, "| Assertion failed (RELEASE MODE)\n|   %s \n|   Message: %s \n|   File: %s \n|   Line: %d \n", expr, message, file, line);
 
 			assert(false && "A critical runtime error has occurred. Please contact the developer.");
 		}
