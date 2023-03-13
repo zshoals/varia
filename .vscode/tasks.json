@@ -11,6 +11,8 @@
 				"windows",
 				"-v",
 				"vs2019",
+				"-g",
+				"direct3d11",
 				"--compile",
 				"--debug",
 			],
@@ -27,6 +29,8 @@
 				"--noshaders",
 				"-v",
 				"vs2019",
+				"-g",
+				"direct3d11",
 				"--compile",
 				"--debug",
 
@@ -44,6 +48,8 @@
 				"--noshaders",
 				"-v",
 				"vs2019",
+				"-g",
+				"direct3d11",
 				"--compile",
 				// "--debug",
 
@@ -61,6 +67,8 @@
 				"--noshaders",
 				"-v",
 				"vs2019",
+				"-g",
+				"direct3d11",
 
 			],
 			"group": "build",

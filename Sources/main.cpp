@@ -21,6 +21,8 @@
 #include "varia/ds/StaticRingbuf.hpp"
 #include "varia/util/Memory.hpp"
 
+#include "kinc/graphics4/indexbuffer.h"
+
 int kickstart(int argc, char** argv) 
 {
 	//=======RUN ALL TESTS======
@@ -85,37 +87,9 @@ int kickstart(int argc, char** argv)
 	Glog_initialize();
 	varia_profiler_initialize(varia_memory_scratch_allocator());
 
-	vds_ringbuf_t<double> times;
-	vds_ringbuf_initialize(&times, varia_memory_scratch_allocator(), 4);
-
-	vds_ringbuf_push(&times, 946334363.342);
-	vds_ringbuf_push(&times, 1.0463);
-	vds_ringbuf_push(&times, 99999.0);
-	vds_ringbuf_push(&times, 99999.0);
-	vds_ringbuf_push(&times, 99999.0);
-	vds_ringbuf_push(&times, (double)0x8000);
-	vds_ringbuf_pop(&times);
-	vds_ringbuf_pop(&times);
-	vds_ringbuf_pop(&times);
-	vds_ringbuf_pop(&times);
-	vds_ringbuf_pop(&times);
-	vds_ringbuf_pop(&times);
-	vds_ringbuf_pop(&times);
-	vds_ringbuf_push(&times, 1.0463);
-	vds_ringbuf_push(&times, 1.0463);
-	// vds_ringbuf_push(&times, 13333337.0);
-	// vds_ringbuf_push(&times, 666666666666.0);
-
-	vds_ringbuf_iterate(&times, [](double * elem, i64 i)
-	{
-		Glog_double(*elem);
-		Glog_newline();
-	});
-
-	Glog_print();
-
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
+
 
 	kinc_start();
 
