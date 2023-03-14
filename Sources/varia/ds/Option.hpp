@@ -14,12 +14,6 @@ struct vds_option_t
 	vds_option_status_e _has;
 	T _data;
 
-	// explicit vds_option_t(T value) : _data{value}, _has{vds_option_status_e::Some} {}
-	// explicit vds_option_t()
-	// {
-	// 	this->_has = vds_option_status_e::None;
-	// }
-
 	T & operator*()
 	{
 		return this->_data;
