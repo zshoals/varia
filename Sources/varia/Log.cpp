@@ -30,7 +30,7 @@ void log_print(varia_stringbuf_t * buf)
 	//Note(zshoals 03-14-2023):> Kinc has an internal print limit of 4096 characters per print
 	//Cycle down 
 	char * data = vds_dumbbuf_data(buf);
-	for (i64 i = 0; i < buflen; i += 4048)
+	for (i64 i = 0; i < buflen; i += 4047)
 	{
 		char tmp[4048];
 		memcpy(&tmp, data, 4047);
@@ -38,7 +38,7 @@ void log_print(varia_stringbuf_t * buf)
 
 		kinc_log(KINC_LOG_LEVEL_INFO, &tmp[0]);
 
-		data += 4048;
+		data += 4047;
 	}
 }
 
