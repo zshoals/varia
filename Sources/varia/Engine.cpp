@@ -46,8 +46,7 @@ void varia_engine_render(double dt)
 void varia_engine_fixed_update(void * UNUSED)
 {
 	double now = kinc_time();
-	double diff = now - loop_context.previous_time;
-	loop_context.accumulator += diff;
+	loop_context.accumulator += now - loop_context.previous_time;
 	loop_context.previous_time = now;
 
 	//Note(zshoals 03-13-2023):> Slowdown bailout
@@ -63,11 +62,27 @@ void varia_engine_fixed_update(void * UNUSED)
 		loop_context.accumulator -= loop_context.fixed_timestep;
 	}
 
+
+
 	//Note(zshoals 03-13-2023):> Render phase
-	if (loop_context.render_accumulator >= loop_context.render_frametime_target)
+	//Get as accurate of a timestamp as we can for this render attempt
+	now = kinc_time();
+	loop_context.render_accumulator += now - loop_context.render_previous_time;
+	loop_context.render_previous_time = now;
+
+	if //Vsync off, Frame limiter on
+	(
+		loop_context.render_limiter_on &&
+		!engine_config.framebuffer.vertical_sync && 
+		(loop_context.render_accumulator >= loop_context.render_frametime_target)
+	)
 	{
 		varia_engine_render(loop_context.accumulator);
 		loop_context.render_accumulator = 0.0;
+	}
+	else //Any other rendering config (if vsync is on, we ignore the frame limiter)
+	{
+		varia_engine_render(loop_context.accumulator);
 	}
 }
 
@@ -134,8 +149,11 @@ void varia_engine_initialize(void)
 		loop_context.max_frametime = 1.0 / 4.0;
 		loop_context.accumulator = 0.0;
 		loop_context.previous_time = 0.0;
-		loop_context.render_frametime_target = 1.0 / 480.0; //480hz
+
+		loop_context.render_frametime_target = 1.0 / 30.0; //480hz
 		loop_context.render_accumulator = 0.0;
+		loop_context.render_previous_time = 0.0;
+		loop_context.render_limiter_on = true;
 
 		engine_config.framebuffer = fbo;
 		engine_config.window = wo;

@@ -13,6 +13,8 @@ struct varia_loop_context_t
 
 	double render_frametime_target;
 	double render_accumulator;
+	double render_previous_time;
+	bool render_limiter_on;
 };
 
 struct varia_engine_configuration_t
