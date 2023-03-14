@@ -9,6 +9,8 @@
 
 void vds_allocator_initialize(vds_allocator_t * self, void * memory, size_t buffer_size)
 {
+	ENSURE(memory != nullptr, "vds_allocator_t:> Provided memory location was null");
+
 	self->data = memory;
 	self->buffer_len = buffer_size;
 	self->current_offset = 0;
