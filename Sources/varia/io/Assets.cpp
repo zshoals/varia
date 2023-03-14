@@ -14,7 +14,7 @@ enum class varia_asset_type_e
 	SAVE
 };
 
-vds_option_t<kinc_g4_shader_t> varia_assets_load_vertex_shader(char const * path, vds_allocator_t * alloc)
+vds_option_t<kinc_g4_shader_t> varia_assets_load_vertex_shader(char const * path)
 {
 	kinc_file_reader_t reader;
 	bool opened = kinc_file_reader_open(&reader, path, KINC_FILE_TYPE_ASSET);
@@ -38,7 +38,7 @@ vds_option_t<kinc_g4_shader_t> varia_assets_load_vertex_shader(char const * path
 	}
 }
 
-vds_option_t<kinc_g4_shader_t> varia_assets_load_fragment_shader(char const * path, vds_allocator_t * alloc)
+vds_option_t<kinc_g4_shader_t> varia_assets_load_fragment_shader(char const * path)
 {
 	kinc_file_reader_t reader;
 	bool opened = kinc_file_reader_open(&reader, path, KINC_FILE_TYPE_ASSET);
