@@ -21,12 +21,25 @@ void log_print(varia_stringbuf_t * buf)
 {
 	*vds_dumbbuf_data_at_offset(buf) = '\0';
 
-	if (vds_dumbbuf_length(buf) == 0)
+	i64 const buflen = vds_dumbbuf_length(buf);
+	if (buflen == 0)
 	{
 		return;
 	} 
 
-	kinc_log(KINC_LOG_LEVEL_INFO, vds_dumbbuf_data(buf));
+	//Note(zshoals 03-14-2023):> Kinc has an internal print limit of 4096 characters per print
+	//Cycle down 
+	char * data = vds_dumbbuf_data(buf);
+	for (i64 i = 0; i < buflen; i += 4048)
+	{
+		char tmp[4048];
+		memcpy(&tmp, data, 4047);
+		tmp[4047] = '\0';
+
+		kinc_log(KINC_LOG_LEVEL_INFO, &tmp[0]);
+
+		data += 4048;
+	}
 }
 
 void log_clear_buffer(varia_stringbuf_t * buf)
