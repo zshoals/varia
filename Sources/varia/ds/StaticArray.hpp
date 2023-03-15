@@ -49,6 +49,17 @@ void vds_array_initialize(vds_array_t<T> * arr, vds_allocator_t * alloc, i64 cou
 	memset(arr->_error_object, 0xC9, sizeof(T));
 }
 
+
+//Note(zshoals 03-14-2023):> Warning: You must include extra space for one error object!
+template <typename T>
+void vds_array_initialize_direct(vds_array_t<T> * arr, T * mem, i64 count)
+{
+	arr->_error_object = mem;
+	arr->_data = mem + 1;
+	arr->_capacity = count;
+	arr->_length = 0;
+}
+
 template <typename T>
 void vds_array_reset(vds_array_t<T> * arr)
 {
