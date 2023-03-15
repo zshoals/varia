@@ -4,7 +4,8 @@
 #include "varia/Validation.hpp"
 #include "varia/io/Assets.hpp"
 
-static varia_graphics_program_textured_t texture_program;
+static varia_graphics_program_t texture_program;
+static bool _initialized = false;
 
 static void varia_local_graphics_program_configure_textured(void)
 {
@@ -21,31 +22,56 @@ static void varia_local_graphics_program_configure_textured(void)
 		ENSURE_UNREACHABLE("ERROR: Standard vertex or fragment shader is missing!");
 	}
 
-	kinc_g4_vertex_structure_init(&texture_program.position);
-	kinc_g4_vertex_structure_init(&texture_program.color);
-	kinc_g4_vertex_structure_init(&texture_program.uv);
+	vds_array_initialize(&texture_program.vertex_structures, varia_memory_get_permanent_allocator(), VARIA_GRAPHICS_PROGRAM_MAX_VERTEX_STRUCTURES);
 
-	kinc_g4_vertex_structure_add(&texture_program.position, "vertexPosition", KINC_G4_VERTEX_DATA_F32_3X);
-	kinc_g4_vertex_structure_add(&texture_program.color, "vertexColor", KINC_G4_VERTEX_DATA_F32_2X);
-	kinc_g4_vertex_structure_add(&texture_program.uv, "vertexUV", KINC_G4_VERTEX_DATA_U8_4X_NORMALIZED);
+	kinc_g4_vertex_structure_t position;
+	kinc_g4_vertex_structure_t color;
+	kinc_g4_vertex_structure_t uv;
+
+	kinc_g4_vertex_structure_init(&position);
+	kinc_g4_vertex_structure_init(&color);
+	kinc_g4_vertex_structure_init(&uv);
+
+	kinc_g4_vertex_structure_add(&position, "vertexPosition", KINC_G4_VERTEX_DATA_F32_3X);
+	kinc_g4_vertex_structure_add(&color, "vertexColor", KINC_G4_VERTEX_DATA_U8_4X_NORMALIZED);
+	kinc_g4_vertex_structure_add(&uv, "vertexUV", KINC_G4_VERTEX_DATA_F32_2X);
+
+	vds_array_push(&texture_program.vertex_structures, position);
+	vds_array_push(&texture_program.vertex_structures, color);
+	vds_array_push(&texture_program.vertex_structures, uv);
 
 	kinc_g4_pipeline_init(&texture_program.pipe);
 	texture_program.pipe.vertex_shader = &texture_program.vertex_shader;
 	texture_program.pipe.fragment_shader = &texture_program.fragment_shader;
-	texture_program.pipe.input_layout[0] = &texture_program.position;
-	texture_program.pipe.input_layout[1] = &texture_program.color;
-	texture_program.pipe.input_layout[2] = &texture_program.uv;
-	texture_program.pipe.input_layout[3] = nullptr;
+	texture_program.pipe.input_layout[0] = &texture_program.vertex_structures[0];
+	texture_program.pipe.input_layout[1] = &texture_program.vertex_structures[1];
+	texture_program.pipe.input_layout[2] = &texture_program.vertex_structures[2];
+	texture_program.pipe.input_layout[3] = NULL;
 	kinc_g4_pipeline_compile(&texture_program.pipe);
 }
 
-
-varia_graphics_program_textured_t * varia_graphics_program_get_textured_program(void)
+varia_graphics_program_t * varia_graphics_program_get_textured_program(void)
 {
-	return &texture_program;
+	if (_initialized)
+	{
+		return &texture_program;
+	}
+	else
+	{
+		ENSURE_UNREACHABLE("varia_graphics_program:> Tried to retrieve a program, but the subsystem was uninitialized.");
+		return nullptr;
+	}
 }
 
 void varia_graphics_program_initialize_defaults(void)
 {
-	varia_local_graphics_program_configure_textured();
+	if (!_initialized)
+	{
+		_initialized = true;
+		varia_local_graphics_program_configure_textured();
+	}
+	else
+	{
+		ENSURE_UNREACHABLE("varia_graphics_program:> Tried to double initialize the program subsystem, which is not allowed.");
+	}
 }
