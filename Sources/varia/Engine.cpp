@@ -12,6 +12,7 @@
 #include "varia/tests/Test_Everything.hpp"
 
 #include "game/Game.hpp"
+#include "varia/graphics/Program.hpp"
 
 
 
@@ -96,7 +97,7 @@ void varia_engine_initialize(void)
 
 
 
-	//Note(zshoals 03-13-2023):> Varia subsystems
+	//Note(zshoals 03-13-2023):> Varia subsystems >>> NOT <<< dependent on Kinc
 	{
 		varia_memory_initialize_allocators
 		(
@@ -106,6 +107,7 @@ void varia_engine_initialize(void)
 		);
 		Glog_initialize();
 		varia_profiler_initialize(varia_memory_get_scratch_allocator());
+
 	}
 
 
@@ -175,6 +177,10 @@ void varia_engine_initialize(void)
 	}
 
 
+	//Note(zshoals 03-14-2023):> Varia subsystems dependent on Kinc
+	{
+		varia_graphics_program_initialize_defaults();
+	}
 
 
 	//Note(zshoals 03-13-2023):> Dread testing system
