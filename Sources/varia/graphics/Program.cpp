@@ -68,7 +68,12 @@ void varia_graphics_program_initialize_defaults(void)
 	if (!_initialized)
 	{
 		_initialized = true;
+
+		//Note(zshoals 03-14-2023):> Actually call all program configurations below this point
+		//vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 		varia_local_graphics_program_configure_textured();
+
+		//^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 	}
 	else
 	{

@@ -47,10 +47,15 @@ struct varia_graphics_sampler_t
 struct varia_graphics_material_t
 {
 	varia_graphics_program_t * program;
-	vds_array_t<varia_graphics_uniform_t> uniforms; //16 of them
-	vds_array_t<varia_graphics_sampler_t> samplers; //8 of them
 
 	bool compiled;
+
+	vds_array_t<varia_graphics_uniform_t> uniforms; //16 of them
+	varia_graphics_uniform_t uniforms_backing_storage[VARIA_GRAPHICS_MATERIAL_MAX_UNIFORMS + 1];
+
+	vds_array_t<varia_graphics_sampler_t> samplers; //8 of them
+	varia_graphics_sampler_t samplers_backing_storage[VARIA_GRAPHICS_MATERIAL_MAX_SAMPLERS + 1];
+
 };
 
 
@@ -78,4 +83,4 @@ void varia_graphics_material_update_uniform_mat4(varia_graphics_material_t * mat
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 
-varia_graphics_material_t varia_graphics_material_default_textured(kinc_matrix4x4_t mvp, kinc_g4_texture_t tex);
+varia_graphics_material_t varia_graphics_material_create_default_textured(kinc_matrix4x4_t mvp, kinc_g4_texture_t tex);

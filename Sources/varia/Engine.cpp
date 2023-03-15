@@ -28,12 +28,12 @@ void varia_engine_set_fixed_timestep(double timestep)
 
 void varia_engine_set_framebuffer_options(kinc_framebuffer_options_t framebuffer_options)
 {
-
+	//TODO(zshoals 03-14-2023):> Set me up!
 }
 
 void varia_engine_set_window_options(kinc_window_options_t window_options)
 {
-
+	//TODO(zshoals 03-14-2023):> Set me up!
 }
 
 
