@@ -13,6 +13,7 @@
 
 #include "game/Game.hpp"
 #include "varia/graphics/Program.hpp"
+#include "varia/graphics/Material.hpp"
 
 
 
@@ -190,7 +191,9 @@ void varia_engine_initialize(void)
 	}
 
 
-
+	kinc_g4_texture_t texfake;
+	kinc_matrix4x4_t mat;
+	varia_graphics_material_t textured = varia_graphics_material_create_default_textured(texfake, mat);
 
 
 	kinc_start();

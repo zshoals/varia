@@ -243,7 +243,7 @@ void varia_graphics_material_update_uniform_mat4(varia_graphics_material_t * mat
 
 
 
-varia_graphics_material_t varia_graphics_material_create_default_textured(kinc_matrix4x4_t mvp, kinc_g4_texture_t tex)
+varia_graphics_material_t varia_graphics_material_create_default_textured(kinc_g4_texture_t tex, kinc_matrix4x4_t mvp)
 {
 	varia_graphics_material_t material = varia_graphics_material_create_from(varia_graphics_program_get_textured_program());
 	varia_graphics_material_add_sampler(&material, "tex", tex);
