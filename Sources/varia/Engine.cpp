@@ -180,6 +180,7 @@ void varia_engine_initialize(void)
 
 	//Note(zshoals 03-14-2023):> Varia subsystems dependent on Kinc
 	{
+		//TODO(zshoals 03-14-2023):> This shouldn't be here, this should be in some graphics subsystem
 		varia_graphics_program_initialize_defaults();
 	}
 
@@ -190,10 +191,6 @@ void varia_engine_initialize(void)
 		dread_run_tests(dread_verbosity_e::Quiet);
 	}
 
-
-	kinc_g4_texture_t texfake;
-	kinc_matrix4x4_t mat;
-	varia_graphics_material_t textured = varia_graphics_material_create_default_textured(texfake, mat);
 
 
 	kinc_start();

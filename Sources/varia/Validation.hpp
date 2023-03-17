@@ -24,9 +24,9 @@ void varia_custom_assert_release(bool condition, char const * expr, char const *
 
 #define ENSURE(Expression, Message) varia_custom_assert_release(Expression, #Expression, Message, __FILE__, __LINE__)
 //Something must die if you reach this point
-#define ENSURE_KILL_NOW(Message) assert(false && "RUNTIME ERROR: Emergency Kill Now in file: " __FILE__)
+#define ENSURE_KILL_NOW(Message) assert(false && "RUNTIME ERROR: Emergency Kill Now! " Message)
 //Intended for things like switch cases with unreachable and unwanted default outcomes, for instance
-#define ENSURE_UNREACHABLE(Message) assert(false && "RUNTIME ERROR: Unreachable was reached in file: " __FILE__)
+#define ENSURE_UNREACHABLE(Message) assert(false && "RUNTIME ERROR: Unreachable was reached! " Message)
 //Intended for unimplemented functions and features, maybe we should add function name support
-#define ENSURE_UNIMPLEMENTED() assert(false && "RUNTIME ERROR: Function is unimplemented in file: " __FILE__)
+#define ENSURE_UNIMPLEMENTED() assert(false && "RUNTIME ERROR: Function is unimplemented.")
 
