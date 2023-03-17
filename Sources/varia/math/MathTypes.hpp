@@ -14,26 +14,22 @@ struct alignas(32) vec2q
 	f32q ys;
 };
 
+// struct alignas(64) mat3
+// {
+// 	float a; float b; float c;
+// 	float d; float e; float f;
+// 	float g; float h; float i;
+// };
 
-struct alignas(64) mat4q
+struct alignas(64) mat3
 {
-	f32q a;
-	f32q b;
-	f32q c;
-	f32q d;
+	float m[9];
+};
 
-	f32q e;
-	f32q f;
-	f32q g;
-	f32q h;
-
-	f32q i;
-	f32q j;
-	f32q k;
-	f32q l;
-
-	f32q m;
-	f32q n;
-	f32q o;
-	f32q p;
+struct alignas(64) mat4
+{
+	float a; float b; float c; float d;
+	float e; float f; float g; float h;
+	float i; float j; float k; float l;
+	float m; float n; float o; float p;
 };
