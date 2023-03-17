@@ -51,10 +51,10 @@ struct varia_graphics_material_t
 	bool compiled;
 
 	vds_array_t<varia_graphics_uniform_t> uniforms; //16 of them
-	varia_graphics_uniform_t uniforms_backing_storage[VARIA_GRAPHICS_MATERIAL_MAX_UNIFORMS + 1]; //Add space for error object
+	varia_graphics_uniform_t _uniforms_backing_storage[VARIA_GRAPHICS_MATERIAL_MAX_UNIFORMS + 1]; //Add space for error object
 
 	vds_array_t<varia_graphics_sampler_t> samplers; //8 of them
-	varia_graphics_sampler_t samplers_backing_storage[VARIA_GRAPHICS_MATERIAL_MAX_SAMPLERS + 1];
+	varia_graphics_sampler_t _samplers_backing_storage[VARIA_GRAPHICS_MATERIAL_MAX_SAMPLERS + 1];
 
 };
 

@@ -9,8 +9,8 @@ varia_graphics_material_t varia_graphics_material_create_from(varia_graphics_pro
 	mat.compiled = false;
 	mat.program = program;
 
-	vds_array_initialize_direct(&mat.uniforms, &mat.uniforms_backing_storage[0], VARIA_GRAPHICS_MATERIAL_MAX_UNIFORMS);
-	vds_array_initialize_direct(&mat.samplers, &mat.samplers_backing_storage[0], VARIA_GRAPHICS_MATERIAL_MAX_SAMPLERS);
+	vds_array_initialize_direct(&mat.uniforms, &mat._uniforms_backing_storage[0], VARIA_GRAPHICS_MATERIAL_MAX_UNIFORMS);
+	vds_array_initialize_direct(&mat.samplers, &mat._samplers_backing_storage[0], VARIA_GRAPHICS_MATERIAL_MAX_SAMPLERS);
 
 	return mat;
 }
