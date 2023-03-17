@@ -1,3 +1,6 @@
+#pragma once
+
+
 #include "MathTypes.hpp"
 
 #include "varia/Vcommon.hpp"
@@ -86,6 +89,54 @@ VARIA_INLINE vec2 mat3_mulvec2(mat3 left, vec2 right)
 	float w = 1.0f / left.m[8];
 	out.x = (((left.m[0] * right.x) + (left.m[3] * right.y)) + left.m[2]) * w;
 	out.y = (((left.m[1] * right.x) + (left.m[4] * right.y)) + left.m[5]) * w;
+
+	return out;
+}
+
+VARIA_INLINE vec2q mat3_mulvec2q(mat3 left, vec2q rights)
+{
+	//TODO(zshoals 03-16-2023):> Precompute a 4 wide mat3?
+	vec2q out;
+
+	f32q abcd = f32q_load(&left.m[0]);
+	f32q efgh = f32q_load(&left.m[4]);
+	f32q w = f32q_set_all(1.0f / left.m[8]);
+
+	f32q as = varia_float32x4_shuffle_custom(abcd, abcd, 0, 0, 0, 0);
+	f32q bs = varia_float32x4_shuffle_custom(abcd, abcd, 1, 1, 1, 1);
+	f32q cs = varia_float32x4_shuffle_custom(abcd, abcd, 2, 2, 2, 2);
+	f32q ds = varia_float32x4_shuffle_custom(efgh, efgh, 3, 3, 3, 3);
+
+	f32q es = varia_float32x4_shuffle_custom(efgh, efgh, 0, 0, 0, 0);
+	f32q fs = varia_float32x4_shuffle_custom(efgh, efgh, 1, 1, 1, 1);
+
+	out.xs = (((as * rights.xs) + (ds * rights.ys)) + cs) * w;
+	out.ys = (((bs * rights.xs) + (es * rights.ys)) + fs) * w;
+
+	return out;
+}
+
+VARIA_INLINE mat3 mat3_translation(vec2 trans)
+{
+	mat3 out = mat3_identity();
+
+	out.m[2] = trans.x;
+	out.m[5] = trans.y;
+
+	return out;
+}
+
+VARIA_INLINE mat3 mat3_rotation_z(float radians)
+{
+	mat3 out = mat3_identity();
+
+	float ca = cosf(radians);
+	float sa = sinf(radians);
+
+	out.m[0] = ca;
+	out.m[1] = -sa;
+	out.m[3] = sa;
+	out.m[4] = ca;
 
 	return out;
 }

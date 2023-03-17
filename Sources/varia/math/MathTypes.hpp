@@ -28,8 +28,5 @@ struct alignas(64) mat3
 
 struct alignas(64) mat4
 {
-	float a; float b; float c; float d;
-	float e; float f; float g; float h;
-	float i; float j; float k; float l;
-	float m; float n; float o; float p;
+	float m[16];
 };
