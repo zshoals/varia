@@ -1,5 +1,6 @@
 #pragma once
 
+#include "varia/Vcommon.hpp"
 #include "varia/math/MathConstants.hpp"
 #include <math.h>
 
