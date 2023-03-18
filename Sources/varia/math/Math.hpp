@@ -45,6 +45,16 @@ constexpr VARIA_INLINE int vmath_clamp(int value, int lower, int upper)
 	return value;
 }
 
+constexpr VARIA_INLINE float vmath_wrap_degrees(float degrees)
+{
+	return degrees - (360.0f * floorf(degrees * (1.0f / 360.0f)));
+}
+
+constexpr VARIA_INLINE float vmath_wrap_radians(float radians)
+{
+	return radians - (VARIA_TAU * floorf(radians * (1.0f / VARIA_TAU)));
+}
+
 constexpr VARIA_INLINE float vmath_pow2(float value)
 {
 	return value * value;
