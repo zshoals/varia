@@ -22,7 +22,8 @@ static void varia_local_graphics_program_configure_textured(void)
 		ENSURE_UNREACHABLE("ERROR: Standard vertex or fragment shader is missing!");
 	}
 
-	vds_array_initialize(&texture_program.vertex_structures, varia_memory_get_permanent_allocator(), VARIA_GRAPHICS_PROGRAM_MAX_VERTEX_STRUCTURES);
+	// vds_array_initialize(&texture_program.vertex_structures, varia_memory_get_permanent_allocator(), VARIA_GRAPHICS_PROGRAM_MAX_VERTEX_STRUCTURES);
+	vds_array_initialize_direct(&texture_program.vertex_structures, &texture_program._vertex_structure_backing_storage[0], VARIA_GRAPHICS_PROGRAM_MAX_VERTEX_STRUCTURES);
 
 	kinc_g4_vertex_structure_t position;
 	kinc_g4_vertex_structure_t color;

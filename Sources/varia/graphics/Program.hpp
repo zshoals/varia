@@ -19,6 +19,7 @@ struct varia_graphics_program_t
 	kinc_g4_shader_t fragment_shader;
 
 	vds_array_t<kinc_g4_vertex_structure_t> vertex_structures; //16 of them
+	kinc_g4_vertex_structure_t _vertex_structure_backing_storage[VARIA_GRAPHICS_PROGRAM_MAX_VERTEX_STRUCTURES + 1];
 };
 
 varia_graphics_program_t * varia_graphics_program_get_textured_program(void);
