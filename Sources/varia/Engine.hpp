@@ -17,16 +17,32 @@ struct varia_loop_context_t
 	bool render_limiter_on;
 };
 
-struct varia_engine_configuration_t
+struct varia_kinc_configuration_t
 {
 	kinc_framebuffer_options_t framebuffer;
 	kinc_window_options_t window;
 };
 
-void varia_engine_set_fixed_timestep(double timestep);
-void varia_engine_set_framebuffer_options(kinc_framebuffer_options_t framebuffer_options);
-void varia_engine_set_window_options(kinc_window_options_t window_options);
+struct varia_environment_t
+{
+	float window_width;
+	float window_height;
+};
 
-void varia_engine_fixed_update(void * UNUSED);
-void varia_engine_render(double dt);
-void varia_engine_initialize(void);
+struct varia_engine_context_t
+{
+	varia_environment_t environment;
+	varia_loop_context_t loop_context;
+	varia_kinc_configuration_t kinc_context;
+};
+
+void varia_engine_set_fixed_timestep(varia_engine_context_t * engine, double timestep);
+void varia_engine_set_framebuffer_options(varia_engine_context_t * engine, kinc_framebuffer_options_t framebuffer_options);
+void varia_engine_set_window_options(varia_engine_context_t * engine, kinc_window_options_t window_options);
+
+float varia_engine_get_window_width(varia_engine_context_t * engine);
+float varia_engine_get_window_height(varia_engine_context_t * engine);
+
+void varia_engine_fixed_update(void * engine_context); 
+void varia_engine_render(varia_engine_context_t * engine, double dt);
+void varia_engine_initialize(varia_engine_context_t * engine);

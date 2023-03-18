@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "varia/Engine.hpp"
 
 #include "kinc/system.h"
 #include "varia/Log.hpp"
@@ -6,13 +7,13 @@
 static double accum = 0.0;
 static double lasttime = 0.0;
 
-void game_render(double dt)
+void game_render(varia_engine_context_t * engine, double dt)
 {
 		
 }
 
 
-void game_simulate(double dt)
+void game_simulate(varia_engine_context_t * engine, double dt)
 {
 	// double now = kinc_time();
 	// accum += now - lasttime;
