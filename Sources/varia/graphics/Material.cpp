@@ -271,6 +271,7 @@ varia_graphics_material_t varia_graphics_material_create_default_textured(kinc_g
 {
 	varia_graphics_material_t material = varia_graphics_material_create_from(varia_graphics_program_get_textured_program());
 	varia_graphics_material_add_sampler(&material, "tex", tex);
+	varia_graphics_material_add_uniform_float(&material, "time", 0.0f);
 	varia_graphics_material_add_uniform_mat4(&material, "projectionMatrix", mvp);
 	varia_graphics_material_compile(&material);
 
