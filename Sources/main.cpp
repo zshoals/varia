@@ -1,4 +1,11 @@
+#include "kinc/system.h"
+
 #include "varia/Engine.hpp"
+#include "varia/util/Memory.hpp"
+#include "varia/util/Profiler.hpp"
+#include "varia/Log.hpp"
+
+static varia_engine_context_t engine;
 
 int kickstart(int argc, char** argv) 
 {
@@ -9,54 +16,26 @@ int kickstart(int argc, char** argv)
 		//return 0;
 	#endif
 
-	varia_engine_initialize();
+	//Note(zshoals 03-13-2023):> Varia subsystems >>> NOT <<< dependent on Kinc
+	varia_memory_initialize_allocators
+	(
+		varia_memory_megabytes_to_bytes(128), //Perm
+		varia_memory_megabytes_to_bytes(64), //Scratch
+		varia_memory_megabytes_to_bytes(64) //Image loader
+	);
+	Glog_initialize();
+	varia_profiler_initialize(varia_memory_get_scratch_allocator());
+
+	//Note(zshoals 03-18-2023):> Kinc init
+	kinc_display_init();
+	kinc_init("Varia", 800, 600, NULL, NULL);
+
+	//Note(zshoals 03-18-2023):> Primary engine core init + gameloop start
+	varia_engine_initialize(&engine);
 
 	return 0;
 }
 
 
 
-
-
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-//||       This stuff can be useful later on                             ||
-//||_____________________________________________________________________||
-//||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
-	// char const * config_title = "Varia Project";
-	// int config_window_width = 800;
-	// int config_window_height = 600;
-	// bool config_vsync = true;
-
-	// //Initialize window and framebuffer options here with struct inits
-	// //No crazy construction functions, just do it manually
-	// //Eventually load settings from config file somewhere
-	// int features = 
-	// 	KINC_WINDOW_FEATURE_MINIMIZABLE | 
-	// 	KINC_WINDOW_FEATURE_MAXIMIZABLE | 
-	// 	KINC_WINDOW_FEATURE_RESIZEABLE;  
-
-
-	// kinc_framebuffer_options fbo = {};
-	// {
-	// 	fbo.color_bits = 32;
-	// 	fbo.depth_bits = 16;
-	// 	fbo.frequency = 60; //Only useful in exclusive fullscreen mode, sets maximum refresh rate?
-	// 	fbo.samples_per_pixel = 1;
-	// 	fbo.stencil_bits = 8;
-	// 	fbo.vertical_sync = config_vsync;
-	// }
-
-	// kinc_window_options_t wo = {};
-	// {
-	// 	wo.display_index = kinc_primary_display();
-	// 	wo.width = config_window_width;
-	// 	wo.height = config_window_height;
-	// 	wo.title = config_title;
-	// 	wo.visible = true;
-	// 	wo.window_features = features;
-	// 	wo.x = -1; //Default window position (centered)
-	// 	wo.y = -1; //Default window position (centered)
-	// 	wo.mode = KINC_WINDOW_MODE_WINDOW;
-	// }
 

@@ -1,6 +1,9 @@
 #include "varia/graphics/Camera.hpp"
 
+#include "varia/Engine.hpp"
+
 #include "varia/math/Math.hpp"
+#include "varia/Engine.hpp"
 
 #include "varia/lib/cglm/struct/cam.h"
 #include "varia/lib/cglm/struct/affine.h"
@@ -22,7 +25,7 @@ void varia_graphics_camera_initialize(varia_graphics_camera_t * cam)
 	cam->zoom_factor = 1.0f;
 }
 
-mat4s varia_graphics_camera_as_ortho
+mat4s varia_graphics_camera_as_ortho_full
 (
 	varia_graphics_camera_t * cam,
 	float left,
@@ -47,6 +50,20 @@ mat4s varia_graphics_camera_as_ortho
 	out = glms_mat4_mul(ortho, out);
 
 	return out;
+}
+
+mat4s varia_graphics_camera_as_ortho(varia_graphics_camera_t * cam, varia_environment_t * env)
+{
+	return varia_graphics_camera_as_ortho_full
+	(
+		cam,
+		0.0f, 
+		env->window_width,
+		0.0f,
+		env->window_height,
+		-5.0f,
+		1000000.0f
+	);
 }
 
 void varia_graphics_camera_add_move(varia_graphics_camera_t * cam, vec2s shift)
