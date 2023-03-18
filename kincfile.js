@@ -212,6 +212,7 @@ project.addFiles('Sources/shaders/**');
 project.addFiles('Sources/assets/**');
 project.addIncludeDir('Sources');
 project.addDefine('VARIA_LOG_LOGGING_ENABLED=1');
+project.addDefine('CGLM_NO_ANONYMOUS_STRUCT=1');
 // project.addDefine('VARIA_DISABLE_UNFORCED_ASSERTS=1');
 project.setDebugDir('Deployment');
 
