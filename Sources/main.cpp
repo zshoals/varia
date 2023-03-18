@@ -1,9 +1,11 @@
-#include "kinc/system.h"
-
 #include "varia/Engine.hpp"
+
 #include "varia/util/Memory.hpp"
 #include "varia/util/Profiler.hpp"
 #include "varia/Log.hpp"
+
+#include "kinc/system.h"
+#include "kinc/display.h"
 
 static varia_engine_context_t engine;
 
@@ -16,7 +18,7 @@ int kickstart(int argc, char** argv)
 		//return 0;
 	#endif
 
-	//Note(zshoals 03-13-2023):> Varia subsystems >>> NOT <<< dependent on Kinc
+	//Note(zshoals 03-13-2023):> Varia global subsystems >>> NOT <<< dependent on Kinc
 	varia_memory_initialize_allocators
 	(
 		varia_memory_megabytes_to_bytes(128), //Perm

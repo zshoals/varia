@@ -12,14 +12,6 @@
 #include "varia/tests/Test_Everything.hpp"
 
 #include "game/Game.hpp"
-#include "varia/graphics/Program.hpp"
-#include "varia/graphics/Material.hpp"
-
-
-
-// static varia_engine_configuration_t engine_config;
-// static varia_loop_context_t loop_context;
-// static varia_environment_t environment;
 
 
 
@@ -39,12 +31,12 @@ void varia_engine_set_window_options(varia_engine_context_t * engine, kinc_windo
 }
 
 
-float varia_engine_get_window_width(varia_engine_context_t * engine)
+int varia_engine_get_window_width(varia_engine_context_t * engine)
 {
 	return engine->environment.window_width;
 }
 
-float varia_engine_get_window_height(varia_engine_context_t * engine)
+int varia_engine_get_window_height(varia_engine_context_t * engine)
 {
 	return engine->environment.window_height;
 }
@@ -162,13 +154,12 @@ void varia_engine_initialize(varia_engine_context_t * engine)
 		kinc_window_change_framebuffer(primary, &fbo);
 	}
 
-	//Note(zshoals 03-14-2023):> Varia subsystems dependent on Kinc
-	//TODO(zshoals 03-14-2023):> This shouldn't be here, this should be in some graphics subsystem
-	varia_graphics_program_initialize_defaults();
-
 	//TODO(zshoals 03-17-2023):> These environment vars need to be updated on window resize
 	engine->environment.window_width = kinc_width();
 	engine->environment.window_height = kinc_height();
+
+	//Note(zshoals 03-18-2023):> Graphics subsystem
+	varia_graphics_initialize(&engine->graphics_context);
 
 	//Note(zshoals 03-13-2023):> Dread testing system
 	test_add_every_test_to_dread();
