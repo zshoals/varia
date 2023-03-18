@@ -22,5 +22,4 @@ struct varia_graphics_program_t
 	kinc_g4_vertex_structure_t _vertex_structure_backing_storage[VARIA_GRAPHICS_PROGRAM_MAX_VERTEX_STRUCTURES + 1];
 };
 
-varia_graphics_program_t * varia_graphics_program_get_textured_program(void);
-void varia_graphics_program_initialize_defaults(void);
+void varia_graphics_program_configure_textured(varia_graphics_program_t * texture_program);

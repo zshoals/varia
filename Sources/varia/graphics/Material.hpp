@@ -84,4 +84,4 @@ void varia_graphics_material_update_uniform_mat4(varia_graphics_material_t * mat
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 
-varia_graphics_material_t varia_graphics_material_create_default_textured(kinc_g4_texture_t tex, mat4s mvp);
+varia_graphics_material_t varia_graphics_material_create_default_textured(varia_graphics_program_t * textured, kinc_g4_texture_t tex, mat4s mvp);
