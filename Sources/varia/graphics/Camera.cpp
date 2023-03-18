@@ -5,12 +5,7 @@
 #include "varia/math/Math.hpp"
 #include "varia/Engine.hpp"
 
-#include "varia/lib/cglm/struct/cam.h"
-#include "varia/lib/cglm/struct/affine.h"
-#include "varia/lib/cglm/struct/euler.h"
-#include "varia/lib/cglm/struct/mat4.h"
-#include "varia/lib/cglm/struct/vec3.h"
-
+#include "varia/lib/cglm/struct.h"
 
 void varia_graphics_camera_initialize(varia_graphics_camera_t * cam)
 {
@@ -58,9 +53,9 @@ mat4s varia_graphics_camera_as_ortho(varia_graphics_camera_t * cam, varia_enviro
 	(
 		cam,
 		0.0f, 
-		env->window_width,
+		(float)env->window_width,
 		0.0f,
-		env->window_height,
+		(float)env->window_height,
 		-5.0f,
 		1000000.0f
 	);
