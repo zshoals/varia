@@ -7,6 +7,8 @@
 #include "varia/ds/Option.hpp"
 #include "varia/ds/StaticArray.hpp"
 
+#include "varia/lib/cglm/types-struct.h"
+
 #include "Program.hpp"
 
 #define VARIA_GRAPHICS_MATERIAL_MAX_UNIFORMS 16
@@ -63,17 +65,17 @@ void varia_graphics_material_compile(varia_graphics_material_t * material);
 
 void varia_graphics_material_add_sampler(varia_graphics_material_t * material, char const * identifier, kinc_g4_texture_t tex);
 void varia_graphics_material_add_uniform_float(varia_graphics_material_t * material, char const * identifier, float f);
-void varia_graphics_material_add_uniform_vec2(varia_graphics_material_t * material, char const * identifier, kinc_vector2_t v);
-void varia_graphics_material_add_uniform_vec3(varia_graphics_material_t * material, char const * identifier, kinc_vector3_t v);
-void varia_graphics_material_add_uniform_mat3(varia_graphics_material_t * material, char const * identifier, kinc_matrix3x3_t mat);
-void varia_graphics_material_add_uniform_mat4(varia_graphics_material_t * material, char const * identifier, kinc_matrix4x4_t mat);
+void varia_graphics_material_add_uniform_vec2(varia_graphics_material_t * material, char const * identifier, vec2s v);
+void varia_graphics_material_add_uniform_vec3(varia_graphics_material_t * material, char const * identifier, vec3s v);
+void varia_graphics_material_add_uniform_mat3(varia_graphics_material_t * material, char const * identifier, mat3s mat);
+void varia_graphics_material_add_uniform_mat4(varia_graphics_material_t * material, char const * identifier, mat4s mat);
 
 void varia_graphics_material_update_sampler(varia_graphics_material_t * material, char const * identifier, kinc_g4_texture_t tex);
 void varia_graphics_material_update_uniform_float(varia_graphics_material_t * material, char const * identifier, float f);
-void varia_graphics_material_update_uniform_vec2(varia_graphics_material_t * material, char const * identifier, kinc_vector2_t v);
-void varia_graphics_material_update_uniform_vec3(varia_graphics_material_t * material, char const * identifier, kinc_vector3_t v);
-void varia_graphics_material_update_uniform_mat3(varia_graphics_material_t * material, char const * identifier, kinc_matrix3x3_t mat);
-void varia_graphics_material_update_uniform_mat4(varia_graphics_material_t * material, char const * identifier, kinc_matrix4x4_t mat);
+void varia_graphics_material_update_uniform_vec2(varia_graphics_material_t * material, char const * identifier, vec2s v);
+void varia_graphics_material_update_uniform_vec3(varia_graphics_material_t * material, char const * identifier, vec3s v);
+void varia_graphics_material_update_uniform_mat3(varia_graphics_material_t * material, char const * identifier, mat3s mat);
+void varia_graphics_material_update_uniform_mat4(varia_graphics_material_t * material, char const * identifier, mat4s mat);
 
 
 //||_____________________________________________________________________||
@@ -82,4 +84,4 @@ void varia_graphics_material_update_uniform_mat4(varia_graphics_material_t * mat
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 
-varia_graphics_material_t varia_graphics_material_create_default_textured(kinc_g4_texture_t tex, kinc_matrix4x4_t mvp);
+varia_graphics_material_t varia_graphics_material_create_default_textured(kinc_g4_texture_t tex, mat4s mvp);

@@ -56,7 +56,7 @@ void vds_array_initialize_direct(vds_array_t<T> * arr, T * mem, i64 count_exclud
 {
 	arr->_error_object = mem;
 	arr->_data = mem + 1;
-	arr->_capacity = count;
+	arr->_capacity = count_excluding_error_object;
 	arr->_length = 0;
 }
 

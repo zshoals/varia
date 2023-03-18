@@ -1,5 +1,4 @@
 #include "varia/Engine.hpp"
-#include "varia/math/MathTypes.hpp"
 
 int kickstart(int argc, char** argv) 
 {

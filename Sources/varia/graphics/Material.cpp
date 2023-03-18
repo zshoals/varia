@@ -1,6 +1,7 @@
 #include "varia/graphics/Material.hpp"
 
 #include "varia/graphics/Program.hpp"
+#include "varia/util/Memory.hpp"
 
 
 varia_graphics_material_t varia_graphics_material_create_from(varia_graphics_program_t * program)
@@ -49,7 +50,7 @@ void varia_graphics_material_add_uniform_float(varia_graphics_material_t * mater
 	vds_array_push(&material->uniforms, uniform);
 }
 
-void varia_graphics_material_add_uniform_vec2(varia_graphics_material_t * material, char const * identifier, kinc_vector2_t v)
+void varia_graphics_material_add_uniform_vec2(varia_graphics_material_t * material, char const * identifier, vec2s v)
 {
 	ENSURE(!material->compiled, "varia_graphics_material:> Tried to add a sampler or uniform after compiling a material. Only sampler and uniform updates are permitted.");
 
@@ -58,12 +59,15 @@ void varia_graphics_material_add_uniform_vec2(varia_graphics_material_t * materi
 	uniform.tag = varia_graphics_uniform_type_e::VEC2;
 	uniform.identifier = identifier;
 	uniform.location = kinc_g4_pipeline_get_constant_location(&material->program->pipe, identifier);
-	uniform.vec2 = v;
+
+	kinc_vector2_t kv2;
+	varia_bitcast(&kv2, &v, sizeof(kv2));
+	uniform.vec2 = kv2;
 
 	vds_array_push(&material->uniforms, uniform);
 }
 
-void varia_graphics_material_add_uniform_vec3(varia_graphics_material_t * material, char const * identifier, kinc_vector3_t v)
+void varia_graphics_material_add_uniform_vec3(varia_graphics_material_t * material, char const * identifier, vec3s v)
 {
 	ENSURE(!material->compiled, "varia_graphics_material:> Tried to add a sampler or uniform after compiling a material. Only sampler and uniform updates are permitted.");
 
@@ -72,12 +76,14 @@ void varia_graphics_material_add_uniform_vec3(varia_graphics_material_t * materi
 	uniform.tag = varia_graphics_uniform_type_e::VEC3;
 	uniform.identifier = identifier;
 	uniform.location = kinc_g4_pipeline_get_constant_location(&material->program->pipe, identifier);
-	uniform.vec3 = v;
+	kinc_vector3_t kv3;
+	varia_bitcast(&kv3, &v, sizeof(kv3));
+	uniform.vec3 = kv3;
 
 	vds_array_push(&material->uniforms, uniform);
 }
 
-void varia_graphics_material_add_uniform_mat3(varia_graphics_material_t * material, char const * identifier, kinc_matrix3x3_t mat)
+void varia_graphics_material_add_uniform_mat3(varia_graphics_material_t * material, char const * identifier, mat3s mat)
 {
 	ENSURE(!material->compiled, "varia_graphics_material:> Tried to add a sampler or uniform after compiling a material. Only sampler and uniform updates are permitted.");
 
@@ -86,12 +92,15 @@ void varia_graphics_material_add_uniform_mat3(varia_graphics_material_t * materi
 	uniform.tag = varia_graphics_uniform_type_e::MAT3;
 	uniform.identifier = identifier;
 	uniform.location = kinc_g4_pipeline_get_constant_location(&material->program->pipe, identifier);
-	uniform.mat3 = mat;
+
+	kinc_matrix3x3_t kmat3;
+	varia_bitcast(&kmat3, &mat, sizeof(kmat3));
+	uniform.mat3 = kmat3;
 
 	vds_array_push(&material->uniforms, uniform);
 }
 
-void varia_graphics_material_add_uniform_mat4(varia_graphics_material_t * material, char const * identifier, kinc_matrix4x4_t mat)
+void varia_graphics_material_add_uniform_mat4(varia_graphics_material_t * material, char const * identifier, mat4s mat)
 {
 	ENSURE(!material->compiled, "varia_graphics_material:> Tried to add a sampler or uniform after compiling a material. Only sampler and uniform updates are permitted.");
 
@@ -100,7 +109,10 @@ void varia_graphics_material_add_uniform_mat4(varia_graphics_material_t * materi
 	uniform.tag = varia_graphics_uniform_type_e::MAT4;
 	uniform.identifier = identifier;
 	uniform.location = kinc_g4_pipeline_get_constant_location(&material->program->pipe, identifier);
-	uniform.mat4 = mat;
+
+	kinc_matrix4x4_t kmat4;
+	varia_bitcast(&kmat4, &mat, sizeof(kmat4));
+	uniform.mat4 = kmat4;
 
 	vds_array_push(&material->uniforms, uniform);
 }
@@ -153,18 +165,21 @@ void varia_graphics_material_update_uniform_float(varia_graphics_material_t * ma
 	}
 }
 
-void varia_graphics_material_update_uniform_vec2(varia_graphics_material_t * material, char const * identifier, kinc_vector2_t v)
+void varia_graphics_material_update_uniform_vec2(varia_graphics_material_t * material, char const * identifier, vec2s v)
 {
 	ENSURE(material->compiled, "varia_graphics_material:> Tried to update a sampler or uniform before compiling a material.");
 	vds_option_t<varia_graphics_uniform_t *> search = vds_array_find_get(&material->uniforms, [&identifier](varia_graphics_uniform_t * elem)
 	{
 		int compare = strcmp(elem->identifier, identifier);
-		return (compare == 0);
+		bool typematch = elem->tag == varia_graphics_uniform_type_e::VEC2;
+		return (compare == 0) && typematch;
 	});
 
-	if (search && ( (*search)->tag == varia_graphics_uniform_type_e::VEC2 ))
+	if (search)
 	{
-		(*search)->vec2 = v;
+		kinc_vector2_t kv2;
+		varia_bitcast(&kv2, &v, sizeof(kv2));
+		(*search)->vec2 = kv2;
 	}
 	else
 	{
@@ -172,19 +187,22 @@ void varia_graphics_material_update_uniform_vec2(varia_graphics_material_t * mat
 	}
 }
 
-void varia_graphics_material_update_uniform_vec3(varia_graphics_material_t * material, char const * identifier, kinc_vector3_t v)
+void varia_graphics_material_update_uniform_vec3(varia_graphics_material_t * material, char const * identifier, vec3s v)
 {
 	ENSURE(material->compiled, "varia_graphics_material:> Tried to update a sampler or uniform before compiling a material.");
 
 	vds_option_t<varia_graphics_uniform_t *> search = vds_array_find_get(&material->uniforms, [&identifier](varia_graphics_uniform_t * elem)
 	{
 		int compare = strcmp(elem->identifier, identifier);
-		return (compare == 0);
+		bool typematch = elem->tag == varia_graphics_uniform_type_e::VEC3;
+		return (compare == 0) && typematch;
 	});
 
-	if (search && ( (*search)->tag == varia_graphics_uniform_type_e::VEC3 ))
+	if (search)
 	{
-		(*search)->vec3 = v;
+		kinc_vector3_t kv3;
+		varia_bitcast(&kv3, &v, sizeof(kv3));
+		(*search)->vec3 = kv3;
 	}
 	else
 	{
@@ -192,19 +210,22 @@ void varia_graphics_material_update_uniform_vec3(varia_graphics_material_t * mat
 	}
 }
 
-void varia_graphics_material_update_uniform_mat3(varia_graphics_material_t * material, char const * identifier, kinc_matrix3x3_t mat)
+void varia_graphics_material_update_uniform_mat3(varia_graphics_material_t * material, char const * identifier, mat3s mat)
 {
 	ENSURE(material->compiled, "varia_graphics_material:> Tried to update a sampler or uniform before compiling a material.");
 
 	vds_option_t<varia_graphics_uniform_t *> search = vds_array_find_get(&material->uniforms, [&identifier](varia_graphics_uniform_t * elem)
 	{
 		int compare = strcmp(elem->identifier, identifier);
-		return (compare == 0);
+		bool typematch = elem->tag == varia_graphics_uniform_type_e::MAT3;
+		return (compare == 0) && typematch;
 	});
 
-	if (search && ( (*search)->tag == varia_graphics_uniform_type_e::MAT3 ))
+	if (search)
 	{
-		(*search)->mat3 = mat;
+		kinc_matrix3x3_t kmat3;
+		varia_bitcast(&kmat3, &mat, sizeof(kmat3));
+		(*search)->mat3 = kmat3;
 	}
 	else
 	{
@@ -212,19 +233,22 @@ void varia_graphics_material_update_uniform_mat3(varia_graphics_material_t * mat
 	}
 }
 
-void varia_graphics_material_update_uniform_mat4(varia_graphics_material_t * material, char const * identifier, kinc_matrix4x4_t mat)
+void varia_graphics_material_update_uniform_mat4(varia_graphics_material_t * material, char const * identifier, mat4s mat)
 {
 	ENSURE(material->compiled, "varia_graphics_material:> Tried to update a sampler or uniform before compiling a material.");
 
 	vds_option_t<varia_graphics_uniform_t *> search = vds_array_find_get(&material->uniforms, [&identifier](varia_graphics_uniform_t * elem)
 	{
 		int compare = strcmp(elem->identifier, identifier);
-		return (compare == 0);
+		bool typematch = elem->tag == varia_graphics_uniform_type_e::MAT4;
+		return (compare == 0) && typematch;
 	});
 
-	if (search && ( (*search)->tag == varia_graphics_uniform_type_e::MAT4 ))
+	if (search)
 	{
-		(*search)->mat4 = mat;
+		kinc_matrix4x4_t kmat4;
+		varia_bitcast(&kmat4, &mat, sizeof(kmat4));
+		(*search)->mat4 = kmat4;
 	}
 	else
 	{
@@ -243,7 +267,7 @@ void varia_graphics_material_update_uniform_mat4(varia_graphics_material_t * mat
 
 
 
-varia_graphics_material_t varia_graphics_material_create_default_textured(kinc_g4_texture_t tex, kinc_matrix4x4_t mvp)
+varia_graphics_material_t varia_graphics_material_create_default_textured(kinc_g4_texture_t tex, mat4s mvp)
 {
 	varia_graphics_material_t material = varia_graphics_material_create_from(varia_graphics_program_get_textured_program());
 	varia_graphics_material_add_sampler(&material, "tex", tex);
