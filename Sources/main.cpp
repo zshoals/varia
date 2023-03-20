@@ -7,6 +7,8 @@
 #include "kinc/system.h"
 #include "kinc/display.h"
 
+#include "varia/ds/StaticStringMap2.hpp"
+
 static varia_engine_context_t engine;
 
 int kickstart(int argc, char** argv) 
@@ -27,6 +29,22 @@ int kickstart(int argc, char** argv)
 	);
 	Glog_initialize();
 	varia_profiler_initialize(varia_memory_get_scratch_allocator());
+
+	vds_string_map_t<int> bob;
+	vds_string_map_initialize(&bob, varia_memory_get_permanent_allocator(), 4);
+	vds_string_map_set(&bob, "Herro!", 1337);
+
+	vds_option_t<int *> item = bob["Herro"];
+	if (item)
+	{
+		Glog_string("OMFG!!! FOUND IT!!!!");
+		Glog_print();
+	}
+	else
+	{
+		Glog_string("OH NO!!!!!! FUCK!!!!!!!!!!!");
+		Glog_print();
+	}
 
 	//Note(zshoals 03-18-2023):> Kinc init
 	kinc_display_init();

@@ -46,16 +46,16 @@ constexpr VARIA_INLINE int vmath_clamp(int value, int lower, int upper)
 }
 
 //Note(zshoals 03-19-2023):> Bumbled around until I figured it out!
-constexpr VARIA_INLINE int64_t vmath_wrap_i64(int64_t n, int64_t shift, int64_t lower_range, int64_t upper_range)
+VARIA_INLINE int64_t vmath_wrap_i64(int64_t n, int64_t shift, int64_t lower_range, int64_t upper_range)
 {
 	int64_t up_minus_low = upper_range - lower_range;
-	return upper_range - up_minus_low - ( labs(n + shift) % (up_minus_low) ); 
+	return (upper_range - up_minus_low) - ( llabs(n + shift) % up_minus_low ); 
 }
 
-constexpr VARIA_INLINE int32_t vmath_wrap_i32(int32_t n, int32_t shift, int32_t lower_range, int32_t upper_range)
+VARIA_INLINE int32_t vmath_wrap_i32(int32_t n, int32_t shift, int32_t lower_range, int32_t upper_range)
 {
 	int32_t up_minus_low = upper_range - lower_range;
-	return upper_range - up_minus_low - ( abs(n + shift) % (up_minus_low) ); 
+	return (upper_range - up_minus_low) - ( abs(n + shift) % up_minus_low ); 
 }
 
 VARIA_INLINE float vmath_wrap_degrees(float degrees)
