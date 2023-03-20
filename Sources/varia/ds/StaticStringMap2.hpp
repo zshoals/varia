@@ -35,7 +35,9 @@ void vds_string_map_initialize(vds_string_map_t<T> * map, vds_allocator_t * allo
 
 static constexpr int64_t vds_string_map_get_hashkey(char const * key, int64_t capacity)
 {
-	int64_t hashvalue = cstr_hash(key) & (~0x80000000);
+	//Note(zshoals 03-19-2023):> SIGNED 0x8000000etc. may be a "trap representation" with bitwise operands....ugh...
+	//Use highest TWO bits instead (aka 0xC00000etc.) to mask off the signbit
+	int64_t hashvalue = cstr_hash(key) & (~0xC000000000000000);
 	return hashvalue % capacity;
 }
 

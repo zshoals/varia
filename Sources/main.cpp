@@ -33,8 +33,18 @@ int kickstart(int argc, char** argv)
 	vds_string_map_t<int> bob;
 	vds_string_map_initialize(&bob, varia_memory_get_permanent_allocator(), 4);
 	vds_string_map_set(&bob, "Herro!", 1337);
+	vds_string_map_set(&bob, "Herro!", 1337);
+	vds_string_map_set(&bob, "Herro!", 1337);
+	vds_string_map_set(&bob, "Herro!", 1337);
+	vds_string_map_set(&bob, "Herro!", 1337);
+	vds_string_map_set(&bob, "Herro!", 1337);
+	vds_string_map_set(&bob, "Herro!", 1337);
+	vds_string_map_set(&bob, "gjrggrdgr", 436);
+	vds_string_map_set(&bob, "gGDDDDD", 43444444);
+	vds_string_map_set(&bob, "pokemon gotta catch em all", 2222);
+	vds_string_map_set(&bob, "FUUUUUU", 999999);
 
-	vds_option_t<int *> item = bob["Herro"];
+	vds_option_t<int *> item = bob["pokemon gotta catch em all"];
 	if (item)
 	{
 		Glog_string("OMFG!!! FOUND IT!!!!");
