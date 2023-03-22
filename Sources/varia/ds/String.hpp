@@ -99,54 +99,35 @@ static inline vds_string_t vds_string_append(vds_string_t left, vds_string_t rig
 	return out;
 }
 
-//TODO(zshoals 03-21-2023):> Make this work with multi-byte characters, this will not split properly on say, some japanese glyph
-static inline vds_string_t vds_string_get_first_split(vds_string_t base, vds_string_t splitter, vds_allocator_t * alloc)
+vds_array_t<vds_string_t> vds_string_split_all(vds_string_t sequence, vds_string_t splitter, vds_allocator_t * alloc)
 {
-	int64_t segment_len = 0;
-	int64_t const splitter_len = splitter._len;
-	int64_t const end_len = base._len;
+	int64_t segment_begin = 0;
+	int64_t segment_end = 0;
+	int64_t subsection_len = 0;
 
-	while (segment_len < end_len)
+	vds_array_t<vds_string_t> splits;
+	vds_array_initialize(&splits, alloc, 32);
+
+	while (segment_end < sequence._len)
 	{
-		if ( (base._str[segment_len] == splitter._str[0]) && ((segment_len + splitter_len) < end_len) )
+		if (sequence._str[segment_end] == splitter._str[0])
 		{
-			if (strncmp(&base._str[segment_len], splitter._str, splitter_len) == 0) { break; }
-			++segment_len;
+			vds_string_t sub = vds_string_create_range(sequence._str, segment_begin, segment_end, alloc);
+			vds_array_push(&splits, sub);
+			++segment_end;
+			segment_begin = segment_end;
 		}
 		else
 		{
-			++segment_len;
+			++segment_end;
 		}
 	}
 
-	return vds_string_create_range(base._str, 0, segment_len, alloc);
-}
-
-static inline vds_string_t vds_string_split(vds_string_t base, vds_string_t splitter, vds_allocator_t * alloc)
-{
-	int64_t segment_len = 0;
-	int64_t const splitter_len = splitter._len;
-	int64_t const end_len = base._len;
-
-	while (segment_len < end_len)
+	if (segment_end - segment_begin > 0)
 	{
-		if ( (base._str[segment_len] == splitter._str[0]) && ((segment_len + splitter_len) < end_len) )
-		{
-			if (strncmp(&base._str[segment_len], splitter._str, splitter_len) == 0) 
-			{ 
-				segment_len += splitter_len; 
-				break;
-			}
-			else
-			{
-				++segment_len;
-			}
-		}
-		else
-		{
-			++segment_len;
-		}
+		vds_string_t sub = vds_string_create_range(sequence._str, segment_begin, segment_end, alloc);
+		vds_array_push(&splits, sub);
 	}
 
-	return vds_string_create_range(base._str, segment_len, end_len, alloc);
+	return splits;
 }
