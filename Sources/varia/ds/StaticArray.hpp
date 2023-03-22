@@ -129,7 +129,25 @@ T const * vds_array_pop(vds_array_t<T> * arr)
 	{
 		--arr->_length;
 
-		return &arr->_data[arr->_length]
+		return &arr->_data[arr->_length];
+	}
+	else
+	{
+		Glog_string("vds_array_t:> Popped an empty array at "); Glog_time(); Glog_newline();
+
+		return arr->_error_object;
+	}
+}
+
+template <typename T>
+T const * vds_array_swap_and_pop(vds_array_t<T> * arr, int64_t swap_idx)
+{
+	if (arr->_length > 0)
+	{
+		vds_array_swap(arr, swap_idx, arr->_length - 1);
+
+		--arr->_length;
+		return &arr->_data[arr->_length];
 	}
 	else
 	{
@@ -224,6 +242,8 @@ vds_array_t<T> vds_array_subsect(vds_array_t<T> * arr, i64 begin, i64 end)
 		(end >= arr->_capacity)
 	)
 	{
+		//TODO(zshoals 03-20-2023):> Not safe at all; what if the original element gets obliterated?
+		//Actually maybe it's ok...unsure
 		sub._data = arr->_error_object;
 		sub._error_object = arr->_error_object;
 		sub._capacity = 0;
