@@ -29,3 +29,9 @@ VARIA_INLINE constexpr uint64_t cstr_hash(void const * key)
 {
     return cfasthash(key, strlen((char const * )key));
 }
+
+VARIA_INLINE constexpr int64_t cstr_hash_as_positive(void const * key)
+{
+	//Note(zshoals 03-21-2023):> Mask off the sign bit
+    return ((int64_t)cstr_hash(key)) & 0x7FFFFFFFFFFFFFFF;
+}
