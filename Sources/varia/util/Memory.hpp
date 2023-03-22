@@ -17,6 +17,12 @@ constexpr size_t VARIA_MEMORY_CONSTANTS_DEFAULT_ALIGNMENT = 16;
 vds_allocator_t * varia_memory_get_permanent_allocator(void);
 vds_allocator_t * varia_memory_get_scratch_allocator(void);
 vds_allocator_t * varia_memory_get_image_allocator(void);
+
+//Note(zshoals 03-20-2023):> Aliases for varia_memory_get_***_allocator()
+vds_allocator_t * permanent_allocator(void);
+vds_allocator_t * scratch_allocator(void);
+vds_allocator_t * image_allocator(void);
+
 void varia_memory_initialize_allocators(i64 permanent_size_bytes, i64 scratch_size_bytes, i64 image_size_bytes);
 void varia_memory_reset_scratch_allocator(void);
 void varia_memory_reset_image_allocator(void);

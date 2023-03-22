@@ -25,6 +25,21 @@ vds_allocator_t * varia_memory_get_image_allocator(void)
 	return &_image;	
 }
 
+vds_allocator_t * permanent_allocator(void)
+{
+	return varia_memory_get_permanent_allocator();
+}
+
+vds_allocator_t * scratch_allocator(void)
+{
+	return varia_memory_get_scratch_allocator();
+}
+
+vds_allocator_t * image_allocator(void)
+{
+	return varia_memory_get_image_allocator();
+}
+
 
 void varia_memory_initialize_allocators(i64 permanent_size_bytes, i64 scratch_size_bytes, i64 image_size_bytes)
 {
