@@ -86,11 +86,11 @@ static inline bool vds_string_equals(vds_string_t left, vds_string_t right)
 
 static inline vds_string_t vds_string_append(vds_string_t left, vds_string_t right, vds_allocator_t * alloc)
 {
-	int64_t byte_len = left._len + right._len + 1;
-	char * write_location = (char *)vds_allocator_allocate_aligned(alloc, byte_len, 1);
+	int64_t str_len = left._len + right._len;
+	char * write_location = (char *)vds_allocator_allocate_aligned(alloc, str_len + 1, 1);
 	memcpy(write_location, left._str, left._len);
 	memcpy(write_location + left._len, right._str, right._len);
-	write_location[byte_len] = '\0';
+	write_location[str_len] = '\0';
 
 	vds_string_t out;
 	out._str = write_location;
