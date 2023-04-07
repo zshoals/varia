@@ -25,7 +25,7 @@ vds_allocator_t * varia_memory_get_image_allocator(void)
 	return &_image;	
 }
 
-vds_allocator_t * permanent_allocator(void)
+vds_allocator_t * perm_allocator(void)
 {
 	return varia_memory_get_permanent_allocator();
 }

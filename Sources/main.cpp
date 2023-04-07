@@ -8,6 +8,7 @@
 #include "kinc/display.h"
 
 #include "varia/ds/StaticStringMap2.hpp"
+#include "varia/ds/String.hpp"
 
 static varia_engine_context_t engine;
 
@@ -23,38 +24,34 @@ int kickstart(int argc, char** argv)
 	//Note(zshoals 03-13-2023):> Varia global subsystems >>> NOT <<< dependent on Kinc
 	varia_memory_initialize_allocators
 	(
-		varia_memory_megabytes_to_bytes(128), //Perm
+		varia_memory_megabytes_to_bytes(128), //Perm 
 		varia_memory_megabytes_to_bytes(64), //Scratch
 		varia_memory_megabytes_to_bytes(64) //Image loader
 	);
 	Glog_initialize();
 	varia_profiler_initialize(varia_memory_get_scratch_allocator());
 
-	vds_string_map_t<int> bob;
-	vds_string_map_initialize(&bob, varia_memory_get_permanent_allocator(), 4);
-	vds_string_map_set(&bob, "Herro!", 1337);
-	vds_string_map_set(&bob, "Herro!", 1337);
-	vds_string_map_set(&bob, "Herro!", 1337);
-	vds_string_map_set(&bob, "Herro!", 1337);
-	vds_string_map_set(&bob, "Herro!", 1337);
-	vds_string_map_set(&bob, "Herro!", 1337);
-	vds_string_map_set(&bob, "Herro!", 1337);
-	vds_string_map_set(&bob, "gjrggrdgr", 436);
-	vds_string_map_set(&bob, "gGDDDDD", 43444444);
-	vds_string_map_set(&bob, "pokemon gotta catch em all", 2222);
-	vds_string_map_set(&bob, "FUUUUUU", 999999);
 
-	vds_option_t<int *> item = bob["pokemon gotta catch em all"];
-	if (item)
+
+	//TODO(zshoals 03-21-2023):> We want to split every arg
+	//And we want to collect any arg meeting any criteria...
+	vds_string_t jack = vstr("-jack -nowindow -bob -nologo -res 1920 1080 - (error here)", perm_allocator());
+	vds_string_t split = vstr(" ", perm_allocator());
+	vds_array_t<vds_string_t> splits = vds_string_split_all(jack, split, perm_allocator());
+
+	vds_array_iterate_cf(&splits, [](vds_string_t * elem, int64_t i, vds_controlflow_e * flow)
 	{
-		Glog_string("OMFG!!! FOUND IT!!!!");
-		Glog_print();
-	}
-	else
-	{
-		Glog_string("OH NO!!!!!! FUCK!!!!!!!!!!!");
-		Glog_print();
-	}
+		Glog_string(vds_string_raw(*elem));
+		Glog_newline();
+
+		vds_string_t nologo = vstr("-bob", perm_allocator());
+		if (vds_string_equals(*elem, nologo)) { *flow = vds_controlflow_e::Break; }
+	});
+
+	Glog_print();
+	Glog_clear_buffer();
+
+
 
 	//Note(zshoals 03-18-2023):> Kinc init
 	kinc_display_init();

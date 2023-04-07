@@ -4,6 +4,7 @@
 #include "varia/ds/Allocator.hpp"
 #include "varia/util/Memory.hpp"
 #include "varia/ds/Option.hpp"
+#include "varia/ds/ControlFlow.hpp"
 
 #include "varia/Log.hpp"
 #include "varia/Validation.hpp"
@@ -185,6 +186,19 @@ void vds_array_iterate(vds_array_t<T> * arr, FUNC f)
 	{
 		T * element = &arr->_data[i];
 		f(element, i);
+	}
+}
+
+template <typename T, typename FUNC>
+void vds_array_iterate_cf(vds_array_t<T> * arr, FUNC f)
+{
+	i64 const len = arr->_length;
+	vds_controlflow_e flowstate = vds_controlflow_e::Continue;
+	for (i64 i = 0; i < len; ++i)
+	{
+		if (flowstate == vds_controlflow_e::Break) { break; }
+		T * element = &arr->_data[i];
+		f(element, i, &flowstate);
 	}
 }
 

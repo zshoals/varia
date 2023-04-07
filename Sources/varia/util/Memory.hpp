@@ -19,7 +19,7 @@ vds_allocator_t * varia_memory_get_scratch_allocator(void);
 vds_allocator_t * varia_memory_get_image_allocator(void);
 
 //Note(zshoals 03-20-2023):> Aliases for varia_memory_get_***_allocator()
-vds_allocator_t * permanent_allocator(void);
+vds_allocator_t * perm_allocator(void);
 vds_allocator_t * scratch_allocator(void);
 vds_allocator_t * image_allocator(void);
 
