@@ -3,25 +3,6 @@
 #include "kinc/display.h"
 
 #include "varia/vcommon.hpp"
-#include "varia/ds/Allocator.hpp"
-#include "varia/util/Memory.hpp"
-#include "varia/logging.hpp"
-#include "varia/ds/StringView.hpp"
-#include "varia/ds/StaticArray.hpp"
-
-#include <stdlib.h>
-
-#include "varia/io/File.hpp"
-#include "varia/util/Elapsed.hpp"
-
-#include "dread/Dread.hpp"
-#include "varia/tests/Test_Everything.hpp"
-
-#include "varia/simd/f32q.hpp"
-#include "varia/math/Vec2q.hpp"
-
-#include "varia/log.hpp"
-
 
 int kickstart(int argc, char** argv) 
 {
@@ -81,42 +62,6 @@ int kickstart(int argc, char** argv)
 
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
-
-
-	vds_allocator_t mem;
-	void * buffer = calloc(1, varia_memory_kilobytes_to_bytes(1));
-	vds_allocator_initialize(&mem, buffer, varia_memory_kilobytes_to_bytes(1));
-
-	vds_array_t<f32, 1024> float_arr;
-	vds_array_initialize(&float_arr);
-	vds_array_for_each_with_index(&float_arr, [](f32 * elem, size_t i)
-	{
-		*elem = i;
-	});
-
-	int a = 35032;
-	int b = 4694369;
-
-
-	Glog_initialize();
-
-	Glog_string("Please Work");
-	Glog_string("Please Work");
-	Glog_string("Please Work");
-	Glog_string("Please Work");
-	Glog_string("Please Work");
-	Glog_string("Please");
-	Glog_print();
-	Glog_print();
-	Glog_clear_buffer();
-	Glog_string("THIS IS A TEST");
-	Glog_float(0.64364f);
-	Glog_newline();
-	Glog_uint32(643963999U);
-	Glog_print();
-	Glog_clear_buffer();
-
-	Glog_print();
 
 	test_add_every_test_to_dread();
 	dread_run_tests(dread_verbosity_e::Quiet);
