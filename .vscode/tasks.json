@@ -60,14 +60,14 @@
 		{
 			"label": "Varia: Debug Compile",
 			"type": "shell",
-			"command": "C:/Users/Zanarias/Desktop/Programming_Projects/Varia/build_debug.bat",
+			"command": "C:/Users/ZPC/Desktop/Programming_Projects/Varia/build_debug.bat",
 			"group": "build",
 			"problemMatcher": "$msCompile"
 		},
 		{
 			"label": "Varia: Release Compile",
 			"type": "shell",
-			"command": "C:/Users/Zanarias/Desktop/Programming_Projects/Varia/build_release.bat",
+			"command": "C:/Users/ZPC/Desktop/Programming_Projects/Varia/build_release.bat",
 			"group": "build",
 			"problemMatcher": "$msCompile"
 		}
