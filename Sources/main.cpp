@@ -23,7 +23,7 @@ int kickstart(int argc, char** argv)
 
 	kinc_display_init();
 
-	char const * config_title = "Tectonic Project";
+	char const * config_title = "Varia Project";
 	int config_window_width = 800;
 	int config_window_height = 600;
 	bool config_vsync = true;
@@ -62,9 +62,6 @@ int kickstart(int argc, char** argv)
 
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
-
-	test_add_every_test_to_dread();
-	dread_run_tests(dread_verbosity_e::Quiet);
 
 	kinc_start();
 
