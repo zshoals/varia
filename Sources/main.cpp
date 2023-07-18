@@ -3,7 +3,8 @@
 #include "kinc/display.h"
 #include "kinc/log.h"
 
-#include "varia/vcommon.hpp"
+#include "varia/VCommon.hpp"
+#include "varia/VGameloop.hpp"
 #include "varia/ds/VDS-Array.hpp"
 
 int kickstart(int argc, char** argv) 
@@ -39,7 +40,7 @@ int kickstart(int argc, char** argv)
 		KINC_WINDOW_FEATURE_RESIZEABLE;  
 
 
-	kinc_framebuffer_options fbo = {};
+	kinc_framebuffer_options fbo = ZERO_INIT();
 	{
 		fbo.color_bits = 32;
 		fbo.depth_bits = 16;
@@ -49,7 +50,7 @@ int kickstart(int argc, char** argv)
 		fbo.vertical_sync = config_vsync;
 	}
 
-	kinc_window_options_t wo = {};
+	kinc_window_options_t wo = ZERO_INIT();
 	{
 		wo.display_index = kinc_primary_display();
 		wo.width = config_window_width;
@@ -62,26 +63,20 @@ int kickstart(int argc, char** argv)
 		wo.mode = KINC_WINDOW_MODE_WINDOW;
 	}
 
-
-	kinc_init("Varia", 800, 600, NULL, NULL);
-
-	VDS_Array<Integer_32, 128> ints = ZERO_INIT();
-
-	int counter = 0;
-	vds_array_iterate(&ints, [&counter](int * const element)
+	static Game_Context game = ZERO_INIT();
 	{
-		counter += 1;
-		*element = counter;
-	});
+		//[Timing Defaults]
+		game.timing.fixed_timestep_interval = 1.0 / 480.0;
+		game.timing.max_frametime = 1.0 / 4.0;
+		game.timing.max_frametime_overrun_threshold = 10;
 
-	for_range_var(i, 128)
-	{
-		kinc_log(KINC_LOG_LEVEL_INFO, "Value: %d", vds_array_copy_of(&ints, i));
+		//[Gamestate Defaults]
+		game.gamestate.dt = game.timing.fixed_timestep_interval;
+		game.gamestate.timescale = 1.0;
 	}
-
-	int const * item = vds_array_const_address_of(&ints, 55);
-	kinc_log(KINC_LOG_LEVEL_INFO, "WTF? %d", *item);
-
+	
+	kinc_init(config_title, config_window_width, config_window_height, NULL, NULL);
+	kinc_set_update_callback(&v_gameloop_entrypoint, &game);
 	kinc_start();
 
 	return 0;
