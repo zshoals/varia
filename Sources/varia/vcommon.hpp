@@ -5,6 +5,11 @@
 
 #include "varia/ds/VDS-Types.hpp"
 
+#include <assert.h>
+#define VARIA_ASSERT(COND, MSG)\
+	if (!(COND)) { __debugbreak(); assert(0 && MSG); }
+
+#define VARIA_UNREACHABLE(MSG) VARIA_ASSERT(0, MSG)
 
 #ifdef _MSC_VER
 	#define VARIA_INLINE static __forceinline
@@ -23,8 +28,6 @@
 
 #define VARIA_ITERATION_GUARD(ITERATION_VARIABLE, MAX_COUNT)\
 	if ((ITERATION_VARIABLE) > (MAX_COUNT)) { __debugbreak(); }
-
-
 
 #define ZERO_INIT() {}
 
