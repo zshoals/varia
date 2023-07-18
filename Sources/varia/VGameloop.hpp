@@ -2,6 +2,12 @@
 
 #include "varia/VCommon.hpp"
 
+struct Gameloop_Performance
+{
+    Float_64 total_realtime_fixed_update_time;
+    Float_64 previous_frametime_differential;
+};
+
 struct Gameloop_Timing
 {
     Float_64 accumulator;
@@ -31,6 +37,8 @@ struct Gamestate
 struct Game_Context
 {
     Gameloop_Timing timing;
+    Gameloop_Performance time_perf;
+
     Gamestate gamestate;
 };
  
