@@ -15,6 +15,9 @@ void vds_internal_array_bounds_check(VDS_Array<T, SIZE> const * arr, Integer_64 
     VDS_ASSERT(index >= 0 && index < SIZE, "Index out of range");
 }
 
+//NOTE(<zshoals> 07-18-2023): Force this value to be comptime
+#define vds_array_capacity(ARRPTR) VDS_COUNT_OF(ARRPTR)
+
 template <typename T, Integer_64 SIZE>
 void vds_array_init(VDS_Array<T, SIZE> * arr)
 {
