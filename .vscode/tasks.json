@@ -10,10 +10,9 @@
 			"args": [
 				"windows",
 				"--compile",
-				"--debug",
+				"--debug"
 			],
 			"group": "build",
-			// Use the standard MS compiler pattern to detect errors, warnings and infos
 			"problemMatcher": "$msCompile"
 		},
 		{
@@ -24,11 +23,9 @@
 				"windows",
 				"--noshaders",
 				"--compile",
-				"--debug",
-
+				"--debug"
 			],
 			"group": "build",
-			// Use the standard MS compiler pattern to detect errors, warnings and infos
 			"problemMatcher": "$msCompile"
 		},
 		{
@@ -38,12 +35,9 @@
 			"args": [
 				"windows",
 				"--noshaders",
-				"--compile",
-				// "--debug",
-
+				"--compile"
 			],
 			"group": "build",
-			// Use the standard MS compiler pattern to detect errors, warnings and infos
 			"problemMatcher": "$msCompile"
 		},
 		{
@@ -52,7 +46,7 @@
 			"command": "C:/HaxeLibraries/Kinc/make.bat",
 			"args": [
 				"windows",
-				"--noshaders",
+				"--noshaders"
 			],
 			"group": "build",
 			"problemMatcher": "$msCompile"
@@ -61,7 +55,18 @@
 			"label": "Varia: Debug Compile",
 			"type": "shell",
 			"command": "C:/Users/ZPC/Desktop/Programming_Projects/Varia/build_debug.bat",
-			"group": "build",
+			"group": {
+				"kind": "build",
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				// "revealProblems": "onProblem",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
 			"problemMatcher": "$msCompile"
 		},
 		{
