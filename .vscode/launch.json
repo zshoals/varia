@@ -12,6 +12,7 @@
 			"cwd": "c:\\Users\\ZPC\\Desktop\\Programming_Projects\\Varia\\Deployment",
 			"preLaunchTask": "Kinc: Build for Windows (VS2022)",
 			"console": "newExternalWindow",
+			"internalConsoleOptions": "openOnSessionStart",
 			"logging": {
 				"moduleLoad": false,
 				"trace": true
@@ -25,6 +26,7 @@
 			"cwd": "c:\\Users\\ZPC\\Desktop\\Programming_Projects\\Varia\\Deployment",
 			"preLaunchTask": "Kinc: Build for Windows (VS2022) NoShaders",
 			"console": "newExternalWindow",
+			"internalConsoleOptions": "openOnSessionStart",
 			"logging": {
 				"moduleLoad": false,
 				"trace": true
@@ -38,6 +40,7 @@
 			"cwd": "c:\\Users\\ZPC\\Desktop\\Programming_Projects\\Varia\\Deployment",
 			"preLaunchTask": "Kinc (Release): Build for Windows (VS2022) NoShaders",
 			"console": "newExternalWindow",
+			"internalConsoleOptions": "openOnSessionStart",
 			"logging": {
 				"moduleLoad": false,
 				"trace": true
@@ -51,6 +54,7 @@
 			"cwd": "c:\\Users\\ZPC\\Desktop\\Programming_Projects\\Varia\\Deployment",
 			"preLaunchTask": "Varia: Debug Compile",
 			"console": "newExternalWindow",
+			"internalConsoleOptions": "openOnSessionStart",
 			"logging": {
 				"moduleLoad": false,
 				"trace": true
@@ -64,6 +68,7 @@
 			"cwd": "c:\\Users\\ZPC\\Desktop\\Programming_Projects\\Varia\\Deployment",
 			"preLaunchTask": "Varia: Release Compile",
 			"console": "newExternalWindow",
+			"internalConsoleOptions": "openOnSessionStart",
 			"logging": {
 				"moduleLoad": false,
 				"trace": true
