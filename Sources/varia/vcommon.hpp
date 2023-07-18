@@ -2,27 +2,8 @@
 
 //Includes types and capabilities that are basically used everywhere
 
-//:::::::::Basic Types::::::::::
 
-#include <stdint.h>
-
-typedef int8_t   integer_8;
-typedef int16_t  integer_16;
-typedef int32_t  integer_32;
-typedef int64_t  integer_64;
-
-typedef uint8_t  signless_8;
-typedef uint16_t signless_16;
-typedef uint32_t signless_32;
-typedef uint64_t signless_64;
-
-typedef float    float_32;
-typedef double   float_64;
-
-typedef unsigned char uchar;
-typedef unsigned char byte;
-
-//::::::::::::::::::::::::::::::
+#include "varia/ds/VDS-Types.hpp"
 
 
 #ifdef _MSC_VER
@@ -45,6 +26,8 @@ typedef unsigned char byte;
 
 
 
+#define ZERO_INIT() {}
+
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 //||                   For range loops for convenience                   ||
@@ -54,16 +37,16 @@ typedef unsigned char byte;
 //Note: For now, only support positive values
 #define for_range(STOP)\
 	assert(STOP >= 0);\
-	for (integer_64 VARIA_MACRO_VAR(_i) = 0; VARIA_MACRO_VAR(_i) < (STOP); VARIA_MACRO_VAR(_i) += 1)
+	for (Integer_64 VARIA_MACRO_VAR(_i) = 0; VARIA_MACRO_VAR(_i) < (STOP); VARIA_MACRO_VAR(_i) += 1)
 
 #define for_range_var(CAPTURE, STOP)\
 	assert(STOP >= 0);\
-	for (integer_64 (CAPTURE) = 0; (CAPTURE) < (STOP); (CAPTURE) += 1)
+	for (Integer_64 (CAPTURE) = 0; (CAPTURE) < (STOP); (CAPTURE) += 1)
 
 #define for_reverse_range(START)\
 	assert(START > 0);\
-	for (integer_64 VARIA_MACRO_VAR(_i) = (START) - 1; VARIA_MACRO_VAR(_i) >= 0; VARIA_MACRO_VAR(_i) -= 1)
+	for (Integer_64 VARIA_MACRO_VAR(_i) = (START) - 1; VARIA_MACRO_VAR(_i) >= 0; VARIA_MACRO_VAR(_i) -= 1)
 
 #define for_reverse_range_var(CAPTURE, START)\
 	assert(START > 0);\
-	for (integer_64 (CAPTURE) = (START) - 1; (CAPTURE) >= 0; (CAPTURE) -= 1)
+	for (Integer_64 (CAPTURE) = (START) - 1; (CAPTURE) >= 0; (CAPTURE) -= 1)
