@@ -31,6 +31,38 @@
 
 #define ZERO_INIT() {}
 
+//NOTE(<zshoals> 07-18-2023): There's a chance there's some crazy C++ subtleties missing by using these functions
+//	use them at your own risk
+template <typename T>
+T * address_of(T & element)
+{
+	return &(element);
+}
+
+template <typename T>
+T const * address_of(T const & element)
+{
+	return &(element);
+}
+
+template <typename T>
+T const * const_address_of(T const & element)
+{
+	return &(element);
+}
+
+template <typename T>
+T & dereference(T * const element)
+{
+	return *(element);
+}
+
+template <typename T>
+T const & dereference(T const * const element)
+{
+	return *(element);
+}
+
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 //||                   For range loops for convenience                   ||
