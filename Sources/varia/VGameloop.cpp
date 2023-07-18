@@ -1,5 +1,6 @@
 #include "VCommon.hpp"
 #include "VGameloop.hpp"
+#include "VGamestateQuery.hpp"
 #include "kinc/system.h"
 #include "kinc/log.h"
 #include "kinc/graphics4/graphics.h"
@@ -7,7 +8,7 @@
 
 static void v_gameloop_tick(Gamestate * gs)
 {
-    gs->player.x += (float)(100.0 * v_gamestate_adjusted_time(gs));
+    gs->player.x += (float)(100.0 * v_gamestate_adjusted_delta(gs));
 }
 
 static void v_gameloop_render(Game_Context * gctx)
@@ -33,8 +34,8 @@ static void v_gameloop_render(Game_Context * gctx)
 static void v_gameloop_fixed_update(Game_Context * gctx)
 {
     Gameloop_Timing * timing = address_of(gctx->timing);
-    double ktime = kinc_time();
-    double time_since_last_update = ktime - timing->previous_frametime;
+    Float_64 ktime = kinc_time();
+    Float_64 time_since_last_update = ktime - timing->previous_frametime;
     gctx->time_perf.previous_frametime_differential = time_since_last_update;
     timing->previous_frametime = ktime;
 
@@ -55,9 +56,20 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
         timing->recent_frametime_overrun_count = 0;
     }
 
-    if (timing->recent_frametime_overrun_count >= timing->max_frametime_overrun_threshold)
+    if 
+    (
+        gctx->loop_config.enable_excessive_frametime_exit &&
+        timing->recent_frametime_overrun_count >= timing->max_frametime_overrun_threshold
+    )
     {
         VARIA_UNREACHABLE("Repeatedly exceeding the maximum permissible frametime; likely in a logic death spiral. Aborting program.");
+
+        kinc_log(KINC_LOG_LEVEL_ERROR, "Repeatedly exceeding the maximum permissible frametime; likely in a logic death spiral. Aborting program.");
+        kinc_stop();
+    }
+    else
+    {
+        timing->recent_frametime_overrun_count = 0;
     }
 
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -85,10 +97,4 @@ void v_gameloop_entrypoint(void * data)
     Game_Context * context = static_cast<Game_Context *>(data);
     v_gameloop_fixed_update(context);
     v_gameloop_render(context);
-}
-
-//[Gamestate Queries]
-Float_64 v_gamestate_adjusted_time(Gamestate const * gs)
-{
-    return gs->dt * gs->timescale;
 }

@@ -67,12 +67,19 @@ int kickstart(int argc, char** argv)
 	{
 		//[Timing Defaults]
 		game.timing.fixed_timestep_interval = 1.0 / 480.0;
-		game.timing.max_frametime = 1.0 / 4.0;
+		game.timing.max_frametime = 1.0 / 16.0;
 		game.timing.max_frametime_overrun_threshold = 10;
+
+		//[Gameloop Configuration]
+		game.loop_config.enable_excessive_frametime_exit = true;
 
 		//[Gamestate Defaults]
 		game.gamestate.dt = game.timing.fixed_timestep_interval;
 		game.gamestate.timescale = 1.0;
+
+		//[Kinc Settings]
+		game.kinc.window = wo;
+		game.kinc.framebuffer = fbo;
 	}
 	
 	kinc_init(config_title, config_window_width, config_window_height, NULL, NULL);

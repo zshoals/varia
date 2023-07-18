@@ -1,6 +1,7 @@
 #pragma once
 
 #include "varia/VCommon.hpp"
+#include "kinc/window.h"
 
 struct Gameloop_Performance
 {
@@ -21,6 +22,17 @@ struct Gameloop_Timing
     Integer_32 max_frametime_overrun_threshold;
 };
 
+struct Gameloop_Config
+{
+    bool enable_excessive_frametime_exit;
+};
+
+struct Kinc_Settings
+{
+    kinc_window_options_t window;
+    kinc_framebuffer_options_t framebuffer;
+};
+
 struct Player
 {
     Float_32 x;
@@ -36,11 +48,13 @@ struct Gamestate
 
 struct Game_Context
 {
+    Kinc_Settings kinc;
+
     Gameloop_Timing timing;
     Gameloop_Performance time_perf;
+    Gameloop_Config loop_config;
 
     Gamestate gamestate;
 };
  
 void v_gameloop_entrypoint(void * data);
-Float_64 v_gamestate_adjusted_time(Gamestate const * gs);
