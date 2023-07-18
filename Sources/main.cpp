@@ -1,8 +1,10 @@
 #include "kinc/window.h"
 #include "kinc/system.h"
 #include "kinc/display.h"
+#include "kinc/log.h"
 
 #include "varia/vcommon.hpp"
+#include "varia/ds/VDS-Array.hpp"
 
 int kickstart(int argc, char** argv) 
 {
@@ -62,6 +64,23 @@ int kickstart(int argc, char** argv)
 
 
 	kinc_init("Varia", 800, 600, NULL, NULL);
+
+	VDS_Array<Integer_32, 128> ints = ZERO_INIT();
+
+	int counter = 0;
+	vds_array_iterate(&ints, [&counter](int * const element)
+	{
+		counter += 1;
+		*element = counter;
+	});
+
+	for_range_var(i, 128)
+	{
+		kinc_log(KINC_LOG_LEVEL_INFO, "Value: %d", vds_array_copy_of(&ints, i));
+	}
+
+	int const * item = vds_array_const_address_of(&ints, 55);
+	kinc_log(KINC_LOG_LEVEL_INFO, "WTF? %d", *item);
 
 	kinc_start();
 
