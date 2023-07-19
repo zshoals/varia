@@ -15,16 +15,26 @@ static void v_print_timing_info(Game_Context * gctx)
 {
     // kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->gamedata.player.x);
 
-    kinc_log(KINC_LOG_LEVEL_INFO, ":::::::::::::::::::");
-    kinc_log(KINC_LOG_LEVEL_INFO, "Cycles:      %d", gctx->gamestate.frame_cycles);
-    kinc_log(KINC_LOG_LEVEL_INFO, "RenderFrms:  %d", gctx->gamestate.rendered_frames);
-    kinc_log(KINC_LOG_LEVEL_INFO, "FixDelta:    %f", gctx->gamestate.logic_dt);
-    kinc_log(KINC_LOG_LEVEL_INFO, "RenderDelta: %.12f", gctx->gamestate.render_dt);
-    kinc_log(KINC_LOG_LEVEL_INFO, "LastRender:  %f", gctx->timing.previous_rendertime);
-    kinc_log(KINC_LOG_LEVEL_INFO, "Gametime:    %f", gctx->gamestate.logic_gameclock);
-    kinc_log(KINC_LOG_LEVEL_INFO, "VarGametime: %f", gctx->gamestate.render_gameclock);
-    kinc_log(KINC_LOG_LEVEL_INFO, "Update time: %f", gctx->time_perf.total_realtime_fixed_update_time);
-    kinc_log(KINC_LOG_LEVEL_INFO, ":::::::::::::::::::\n");
+    kinc_log(KINC_LOG_LEVEL_INFO, 
+        ":::::::::::::::::::\n\
+Cycles:      %d\n\
+RenderFrms:  %d\n\
+FixDelta:    %f\n\
+RenderDelta  %f\n\
+LastRender:  %f\n\
+Gametime:    %f\n\
+VarGametime: %f\n\
+Update Time: %f\n\
+:::::::::::::::::::\n",
+        gctx->gamestate.frame_cycles,
+        gctx->gamestate.rendered_frames,
+        gctx->gamestate.logic_dt,
+        gctx->gamestate.render_dt,
+        gctx->timing.previous_rendertime,
+        gctx->gamestate.logic_gameclock,
+        gctx->gamestate.render_gameclock,
+        gctx->time_perf.total_realtime_fixed_update_time
+    );
 }
 
 static void v_gameloop_tick(Gamestate * gs)
