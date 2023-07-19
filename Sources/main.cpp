@@ -76,6 +76,8 @@ int kickstart(int argc, char** argv)
 
 		//[Gameloop Configuration]
 		game.gamestate.loop_config.enable_excessive_frametime_exit = true;
+		game.gamestate.loop_config.enable_framerate_limit = true;
+		game.gamestate.loop_config.render_frames_per_second_limit = 1.0 / 300.0;
 
 		//[Kinc Settings]
 		game.gamestate.kinc.window = wo;

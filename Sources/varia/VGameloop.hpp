@@ -11,19 +11,26 @@ struct Gameloop_Performance
 
 struct Gameloop_Timing
 {
-    Float_64 accumulator;
-
     Float_64 previous_frametime;
+
+    //Logic
+    Float_64 logic_accumulator;
 
     Float_64 fixed_timestep_interval;
     Float_64 max_frametime;
 
     Integer_32 recent_frametime_overrun_count;
     Integer_32 max_frametime_overrun_threshold;
+
+    //Render
+    Float_64 render_accumulator;
 };
 
 struct Gameloop_Config
 {
+    Float_64 render_frames_per_second_limit;
+    Boolean enable_framerate_limit;
+
     Boolean enable_excessive_frametime_exit;
 };
 

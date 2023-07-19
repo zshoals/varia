@@ -17,6 +17,23 @@ static void v_gameloop_tick(Gamestate * gs)
 
 static void v_gameloop_render(Game_Context * gctx)
 {
+    //Frame limiting check
+    if //vertical sync off, framelimiter on, haven't reached the accumulator threshold yet
+    ( 
+        !(gctx->gamestate.kinc.framebuffer.vertical_sync) &&
+        gctx->gamestate.loop_config.enable_framerate_limit &&
+        gctx->timing.render_accumulator <= gctx->gamestate.loop_config.render_frames_per_second_limit
+    )
+    {
+        //Don't render a frame as we haven't exceeded the framerate limit yet
+        return;
+    }
+
+    //We are finally rendering a frame, reset the render accumulator
+    gctx->timing.render_accumulator = 0.0;
+
+    //[BEGIN] Rendering
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     Gamestate * gs = address_of(gctx->gamestate);
     //NOTE(<zshoals> 07-18-2023): I LITERALLY PUT THIS IN
     //  TO ABORT THE PROGRAM AFTER 20 SECONDS!!!!!
@@ -39,14 +56,6 @@ static void v_gameloop_render(Game_Context * gctx)
 static void v_gameloop_fixed_update(Game_Context * gctx)
 {
     Gameloop_Timing * timing = address_of(gctx->timing);
-    Float_64 ktime = kinc_time();
-    Float_64 time_since_last_update = ktime - timing->previous_frametime;
-    gctx->time_perf.previous_frametime_differential = time_since_last_update;
-    timing->previous_frametime = ktime;
-
-
-    timing->accumulator += time_since_last_update;
-
 
     //[BEGIN] Max frametime checks / program exit if we get into a nasty death spiral situation
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -62,10 +71,10 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
         kinc_log(KINC_LOG_LEVEL_ERROR, "Repeatedly exceeding the maximum permissible frametime; likely in a logic death spiral. Aborting program.");
         kinc_stop();
     }
-    else if (timing->accumulator > timing->max_frametime)
+    else if (timing->logic_accumulator > timing->max_frametime)
     {
         timing->recent_frametime_overrun_count += 1;
-        timing->accumulator = timing->max_frametime;
+        timing->logic_accumulator = timing->max_frametime;
     }
     else
     {
@@ -80,9 +89,9 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     gctx->time_perf.total_realtime_fixed_update_time = kinc_time();
-    while (timing->accumulator >= timing->fixed_timestep_interval)
+    while (timing->logic_accumulator >= timing->fixed_timestep_interval)
     {
-        timing->accumulator -= timing->fixed_timestep_interval;
+        timing->logic_accumulator -= timing->fixed_timestep_interval;
 
         Gamestate * gs = address_of(gctx->gamestate);
         gs->current_gametime += gctx->timing.fixed_timestep_interval;
@@ -97,6 +106,33 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
 void v_gameloop_entrypoint(void * data)
 {
     Game_Context * context = static_cast<Game_Context *>(data);
-    v_gameloop_fixed_update(context);
-    v_gameloop_render(context);
+    Gameloop_Timing * timing = address_of(context->timing);
+
+    Float_64 ktime = kinc_time();
+    Float_64 time_since_last_update = ktime - timing->previous_frametime;
+    context->time_perf.previous_frametime_differential = time_since_last_update;
+
+    //Logic Step
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    {
+        timing->logic_accumulator += time_since_last_update;
+
+        v_gameloop_fixed_update(context);
+    }
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    //Render Step
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    {
+        //NOTE(<zshoals> 07-19-2023): Acquire a more accurate last update time, as some realtime has passed while updating
+        //  however, don't actually use it for performance tracking...probably unnecessary
+        time_since_last_update = kinc_time() - timing->previous_frametime;
+        timing->render_accumulator += time_since_last_update;
+
+        v_gameloop_render(context);
+    }
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    //Finally record the previous frametime which was taken BEFORE updating and rendering
+    timing->previous_frametime = ktime;
 }
