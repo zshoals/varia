@@ -57,9 +57,11 @@ struct Gamestate
     Gameloop_Config loop_config;
     Kinc_Settings kinc;
 
-    Float_64 dt;
+    Float_64 logic_dt;
+    Float_64 render_dt;
+    Float_64 logic_gameclock;
+    Float_64 render_gameclock;
     Float_64 timescale;
-    Float_64 current_gametime;
 
     //Actual gamedata
     Gamedata gamedata;

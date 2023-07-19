@@ -71,7 +71,7 @@ int kickstart(int argc, char** argv)
 		game.timing.max_frametime_overrun_threshold = 10;
 
 		//[Gamestate Defaults]
-		game.gamestate.dt = game.timing.fixed_timestep_interval;
+		game.gamestate.logic_dt = game.timing.fixed_timestep_interval;
 		game.gamestate.timescale = 1.0;
 
 		//[Gameloop Configuration]

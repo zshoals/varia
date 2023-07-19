@@ -12,7 +12,7 @@
 
 static void v_gameloop_tick(Gamestate * gs)
 {
-    gs->gamedata.player.x += (float)(100.0 * v_gamestate_adjusted_delta(gs));
+    gs->gamedata.player.x += (float)(100.0 * v_gamestate_logic_adjusted_delta(gs));
 }
 
 static void v_gameloop_render(Game_Context * gctx)
@@ -35,17 +35,12 @@ static void v_gameloop_render(Game_Context * gctx)
     //[BEGIN] Rendering
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     Gamestate * gs = address_of(gctx->gamestate);
-    //NOTE(<zshoals> 07-18-2023): I LITERALLY PUT THIS IN
-    //  TO ABORT THE PROGRAM AFTER 20 SECONDS!!!!!
-    if (gs->current_gametime >= 20.0)
-    {
-        kinc_stop();
-    }
 
-    kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->gamedata.player.x);
-    kinc_log(KINC_LOG_LEVEL_INFO, "Update time: %f", gctx->time_perf.total_realtime_fixed_update_time);
+    // kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->gamedata.player.x);
+    // kinc_log(KINC_LOG_LEVEL_INFO, "Update time: %f", gctx->time_perf.total_realtime_fixed_update_time);
     kinc_log(KINC_LOG_LEVEL_INFO, "Frametime:   %f", gctx->time_perf.previous_frametime_differential);
-    kinc_log(KINC_LOG_LEVEL_INFO, "Gametime:    %f", gctx->gamestate.current_gametime);
+    kinc_log(KINC_LOG_LEVEL_INFO, "Gametime:    %f", gctx->gamestate.logic_gameclock);
+    kinc_log(KINC_LOG_LEVEL_INFO, "VarGametime: %f", gctx->gamestate.render_gameclock);
 
     kinc_g4_begin(0);
     kinc_g4_end(0);
@@ -94,7 +89,7 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
         timing->logic_accumulator -= timing->fixed_timestep_interval;
 
         Gamestate * gs = address_of(gctx->gamestate);
-        gs->current_gametime += gctx->timing.fixed_timestep_interval;
+        gs->logic_gameclock += gctx->timing.fixed_timestep_interval;
 
         v_gameloop_tick(gs);
     }
@@ -124,10 +119,13 @@ void v_gameloop_entrypoint(void * data)
     //Render Step
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        //NOTE(<zshoals> 07-19-2023): Acquire a more accurate last update time, as some realtime has passed while updating
+        //NOTE(<zshoals> 07-19-2023): Acquire a more accurate last update time, as some realtime has passed while updating the gamestate
         //  however, don't actually use it for performance tracking...probably unnecessary
         time_since_last_update = kinc_time() - timing->previous_frametime;
         timing->render_accumulator += time_since_last_update;
+
+        context->gamestate.render_dt = time_since_last_update;
+        context->gamestate.render_gameclock += time_since_last_update;
 
         v_gameloop_render(context);
     }
