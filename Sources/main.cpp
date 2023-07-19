@@ -29,7 +29,7 @@ int kickstart(int argc, char** argv)
 	char const * config_title = "Varia Project";
 	int config_window_width = 800;
 	int config_window_height = 600;
-	bool config_vsync = true;
+	bool config_vsync = false;
 
 	//Initialize window and framebuffer options here with struct inits
 	//No crazy construction functions, just do it manually
@@ -66,7 +66,7 @@ int kickstart(int argc, char** argv)
 	static Game_Context game = ZERO_INIT();
 	{
 		//[Timing Defaults]
-		game.timing.fixed_timestep_interval = 1.0 / 480.0;
+		game.timing.fixed_timestep_interval = 1.0 / 120.0;
 		game.timing.max_frametime = 1.0 / 16.0;
 		game.timing.max_frametime_overrun_threshold = 10;
 
@@ -84,7 +84,7 @@ int kickstart(int argc, char** argv)
 		game.gamestate.kinc.framebuffer = fbo;
 	}
 	
-	kinc_init(config_title, config_window_width, config_window_height, NULL, NULL);
+	kinc_init(config_title, config_window_width, config_window_height, &wo, &fbo);
 	kinc_set_update_callback(&v_gameloop_entrypoint, &game);
 	kinc_start();
 

@@ -6,15 +6,15 @@
 struct Gameloop_Performance
 {
     Float_64 total_realtime_fixed_update_time;
-    Float_64 previous_frametime_differential;
 };
 
 struct Gameloop_Timing
 {
-    Float_64 previous_frametime;
+    Float_64 previous_realtime;
 
     //Logic
     Float_64 logic_accumulator;
+    Float_64 previous_logictime;
 
     Float_64 fixed_timestep_interval;
     Float_64 max_frametime;
@@ -24,6 +24,7 @@ struct Gameloop_Timing
 
     //Render
     Float_64 render_accumulator;
+    Float_64 previous_rendertime;
 };
 
 struct Gameloop_Config
@@ -57,6 +58,8 @@ struct Gamestate
     Gameloop_Config loop_config;
     Kinc_Settings kinc;
 
+    Integer_64 frame_cycles; //Total update + render combos 
+    Integer_64 rendered_frames;
     Float_64 logic_dt;
     Float_64 render_dt;
     Float_64 logic_gameclock;
@@ -73,6 +76,7 @@ struct Game_Context
     Gameloop_Performance time_perf;
 
     Gamestate gamestate;
+    Gamestate extrapolated_gamestate; //Exclusively for the renderer
 };
  
 void v_gameloop_entrypoint(void * data);

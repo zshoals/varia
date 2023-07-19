@@ -9,13 +9,30 @@
 
 //Game System Imports
 
+static Float_64 timeout = 0.0;
+
+static void v_print_timing_info(Game_Context * gctx)
+{
+    // kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->gamedata.player.x);
+
+    kinc_log(KINC_LOG_LEVEL_INFO, ":::::::::::::::::::");
+    kinc_log(KINC_LOG_LEVEL_INFO, "Cycles:      %d", gctx->gamestate.frame_cycles);
+    kinc_log(KINC_LOG_LEVEL_INFO, "RenderFrms:  %d", gctx->gamestate.rendered_frames);
+    kinc_log(KINC_LOG_LEVEL_INFO, "FixDelta:    %f", gctx->gamestate.logic_dt);
+    kinc_log(KINC_LOG_LEVEL_INFO, "RenderDelta: %.12f", gctx->gamestate.render_dt);
+    kinc_log(KINC_LOG_LEVEL_INFO, "LastRender:  %f", gctx->timing.previous_rendertime);
+    kinc_log(KINC_LOG_LEVEL_INFO, "Gametime:    %f", gctx->gamestate.logic_gameclock);
+    kinc_log(KINC_LOG_LEVEL_INFO, "VarGametime: %f", gctx->gamestate.render_gameclock);
+    kinc_log(KINC_LOG_LEVEL_INFO, "Update time: %f", gctx->time_perf.total_realtime_fixed_update_time);
+    kinc_log(KINC_LOG_LEVEL_INFO, ":::::::::::::::::::\n");
+}
 
 static void v_gameloop_tick(Gamestate * gs)
 {
     gs->gamedata.player.x += (float)(100.0 * v_gamestate_logic_adjusted_delta(gs));
 }
 
-static void v_gameloop_render(Game_Context * gctx)
+static Boolean v_gameloop_render(Game_Context * gctx)
 {
     //Frame limiting check
     if //vertical sync off, framelimiter on, haven't reached the accumulator threshold yet
@@ -26,29 +43,25 @@ static void v_gameloop_render(Game_Context * gctx)
     )
     {
         //Don't render a frame as we haven't exceeded the framerate limit yet
-        return;
+        return false;
     }
 
-    //We are finally rendering a frame, reset the render accumulator
-    gctx->timing.render_accumulator = 0.0;
 
     //[BEGIN] Rendering
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     Gamestate * gs = address_of(gctx->gamestate);
 
-    // kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->gamedata.player.x);
-    // kinc_log(KINC_LOG_LEVEL_INFO, "Update time: %f", gctx->time_perf.total_realtime_fixed_update_time);
-    kinc_log(KINC_LOG_LEVEL_INFO, "Frametime:   %f", gctx->time_perf.previous_frametime_differential);
-    kinc_log(KINC_LOG_LEVEL_INFO, "Gametime:    %f", gctx->gamestate.logic_gameclock);
-    kinc_log(KINC_LOG_LEVEL_INFO, "VarGametime: %f", gctx->gamestate.render_gameclock);
-
     kinc_g4_begin(0);
     kinc_g4_end(0);
 
     kinc_g4_swap_buffers();
+    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    v_print_timing_info(gctx);
+    return true;
 }
 
-static void v_gameloop_fixed_update(Game_Context * gctx)
+static Boolean v_gameloop_fixed_update(Game_Context * gctx)
 {
     Gameloop_Timing * timing = address_of(gctx->timing);
 
@@ -83,9 +96,12 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
     //[BEGIN] Primary fixed update loop
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+    Boolean actually_ticked_this_update = false;
+
     gctx->time_perf.total_realtime_fixed_update_time = kinc_time();
     while (timing->logic_accumulator >= timing->fixed_timestep_interval)
     {
+        actually_ticked_this_update = true;
         timing->logic_accumulator -= timing->fixed_timestep_interval;
 
         Gamestate * gs = address_of(gctx->gamestate);
@@ -95,6 +111,8 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
     }
     gctx->time_perf.total_realtime_fixed_update_time = kinc_time() - gctx->time_perf.total_realtime_fixed_update_time;
 
+    return actually_ticked_this_update;
+
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 }
 
@@ -103,34 +121,44 @@ void v_gameloop_entrypoint(void * data)
     Game_Context * context = static_cast<Game_Context *>(data);
     Gameloop_Timing * timing = address_of(context->timing);
 
-    Float_64 ktime = kinc_time();
-    Float_64 time_since_last_update = ktime - timing->previous_frametime;
-    context->time_perf.previous_frametime_differential = time_since_last_update;
+    Float_64 realtime = kinc_time();
+    Float_64 realtime_advance = kinc_time() - timing->previous_realtime;
 
     //Logic Step
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        timing->logic_accumulator += time_since_last_update;
+        timing->logic_accumulator += realtime_advance;
 
-        v_gameloop_fixed_update(context);
+        Boolean logic_was_updated = v_gameloop_fixed_update(context);
+        if (logic_was_updated)
+        {
+            timing->previous_logictime = kinc_time();
+        }
     }
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     //Render Step
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        //NOTE(<zshoals> 07-19-2023): Acquire a more accurate last update time, as some realtime has passed while updating the gamestate
-        //  however, don't actually use it for performance tracking...probably unnecessary
-        time_since_last_update = kinc_time() - timing->previous_frametime;
-        timing->render_accumulator += time_since_last_update;
+        timing->render_accumulator += realtime_advance;
 
-        context->gamestate.render_dt = time_since_last_update;
-        context->gamestate.render_gameclock += time_since_last_update;
+        //NOTE(<zshoals> 07-19-2023): Extrapolated time, how far ahead the render time is from the last recent world step
+        context->gamestate.render_dt = kinc_time() - timing->previous_logictime;
 
-        v_gameloop_render(context);
+        Boolean frame_was_rendered = v_gameloop_render(context);
+        if (frame_was_rendered)
+        {
+            context->gamestate.render_gameclock += kinc_time() - timing->previous_rendertime;
+            kinc_log(KINC_LOG_LEVEL_INFO, "Accum: %f", context->timing.render_accumulator);
+            timing->previous_rendertime = kinc_time();
+
+            context->timing.render_accumulator = 0.0;
+
+            context->gamestate.rendered_frames += 1;
+        }
     }
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    //Finally record the previous frametime which was taken BEFORE updating and rendering
-    timing->previous_frametime = ktime;
+    timing->previous_realtime = realtime;
+    context->gamestate.frame_cycles += 1;
 }
