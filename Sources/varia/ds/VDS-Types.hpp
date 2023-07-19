@@ -4,6 +4,8 @@
 
 #include <stdint.h>
 
+typedef bool     Boolean;
+
 typedef int8_t   Integer_8;
 typedef int16_t  Integer_16;
 typedef int32_t  Integer_32;

@@ -24,7 +24,7 @@ struct Gameloop_Timing
 
 struct Gameloop_Config
 {
-    bool enable_excessive_frametime_exit;
+    Boolean enable_excessive_frametime_exit;
 };
 
 struct Kinc_Settings
@@ -39,20 +39,29 @@ struct Player
     Float_32 y;
 };
 
+struct Gamedata
+{
+    Player player;
+};
+
 struct Gamestate
 {
+    //Gamestate configuration that can be modified at runtime
+    Gameloop_Config loop_config;
+    Kinc_Settings kinc;
+
     Float_64 dt;
     Float_64 timescale;
-    Player player;
+    Float_64 current_gametime;
+
+    //Actual gamedata
+    Gamedata gamedata;
 };
 
 struct Game_Context
 {
-    Kinc_Settings kinc;
-
     Gameloop_Timing timing;
     Gameloop_Performance time_perf;
-    Gameloop_Config loop_config;
 
     Gamestate gamestate;
 };

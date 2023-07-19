@@ -1,14 +1,18 @@
-#include "VCommon.hpp"
 #include "VGameloop.hpp"
+
+#include "VCommon.hpp"
 #include "VGamestateQuery.hpp"
 #include "kinc/system.h"
 #include "kinc/log.h"
 #include "kinc/graphics4/graphics.h"
 
 
+//Game System Imports
+
+
 static void v_gameloop_tick(Gamestate * gs)
 {
-    gs->player.x += (float)(100.0 * v_gamestate_adjusted_delta(gs));
+    gs->gamedata.player.x += (float)(100.0 * v_gamestate_adjusted_delta(gs));
 }
 
 static void v_gameloop_render(Game_Context * gctx)
@@ -16,14 +20,15 @@ static void v_gameloop_render(Game_Context * gctx)
     Gamestate * gs = address_of(gctx->gamestate);
     //NOTE(<zshoals> 07-18-2023): I LITERALLY PUT THIS IN
     //  TO ABORT THE PROGRAM AFTER 20 SECONDS!!!!!
-    if (kinc_time() >= 20.0)
+    if (gs->current_gametime >= 20.0)
     {
         kinc_stop();
     }
 
-    kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->player.x);
+    kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->gamedata.player.x);
     kinc_log(KINC_LOG_LEVEL_INFO, "Update time: %f", gctx->time_perf.total_realtime_fixed_update_time);
     kinc_log(KINC_LOG_LEVEL_INFO, "Frametime:   %f", gctx->time_perf.previous_frametime_differential);
+    kinc_log(KINC_LOG_LEVEL_INFO, "Gametime:    %f", gctx->gamestate.current_gametime);
 
     kinc_g4_begin(0);
     kinc_g4_end(0);
@@ -46,19 +51,9 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
     //[BEGIN] Max frametime checks / program exit if we get into a nasty death spiral situation
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    if (timing->accumulator > timing->max_frametime)
-    {
-        timing->recent_frametime_overrun_count += 1;
-        timing->accumulator = timing->max_frametime;
-    }
-    else
-    {
-        timing->recent_frametime_overrun_count = 0;
-    }
-
     if 
     (
-        gctx->loop_config.enable_excessive_frametime_exit &&
+        gctx->gamestate.loop_config.enable_excessive_frametime_exit &&
         timing->recent_frametime_overrun_count >= timing->max_frametime_overrun_threshold
     )
     {
@@ -66,6 +61,11 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
 
         kinc_log(KINC_LOG_LEVEL_ERROR, "Repeatedly exceeding the maximum permissible frametime; likely in a logic death spiral. Aborting program.");
         kinc_stop();
+    }
+    else if (timing->accumulator > timing->max_frametime)
+    {
+        timing->recent_frametime_overrun_count += 1;
+        timing->accumulator = timing->max_frametime;
     }
     else
     {
@@ -85,6 +85,8 @@ static void v_gameloop_fixed_update(Game_Context * gctx)
         timing->accumulator -= timing->fixed_timestep_interval;
 
         Gamestate * gs = address_of(gctx->gamestate);
+        gs->current_gametime += gctx->timing.fixed_timestep_interval;
+
         v_gameloop_tick(gs);
     }
     gctx->time_perf.total_realtime_fixed_update_time = kinc_time() - gctx->time_perf.total_realtime_fixed_update_time;
