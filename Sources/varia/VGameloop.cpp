@@ -16,24 +16,28 @@ static void v_print_timing_info(Game_Context * gctx)
     // kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->gamedata.player.x);
 
     kinc_log(KINC_LOG_LEVEL_INFO, 
-        ":::::::::::::::::::\n\
-Cycles:      %d\n\
-RenderFrms:  %d\n\
-FixDelta:    %f\n\
-RenderDelta  %f\n\
-LastRender:  %f\n\
-Gametime:    %f\n\
-VarGametime: %f\n\
-Update Time: %f\n\
-:::::::::::::::::::\n",
+        ":::::::::::::::::::\n"
+        "Cycles:      %d\n"
+        "RenderFrms:  %d\n"
+        "FixDelta:    %f\n"
+        "FixRecip:    %f\n"
+        "RenderDelta  %f\n"
+        "LastRender:  %f\n"
+        "Gametime:    %f\n"
+        "VarGametime: %f\n"
+        "Update Time: %f\n"
+        "Real Time:   %f\n"
+        ":::::::::::::::::::\n",
         gctx->gamestate.frame_cycles,
         gctx->gamestate.rendered_frames,
         gctx->gamestate.logic_dt,
+        1.0 / gctx->gamestate.logic_dt,
         gctx->gamestate.render_dt,
         gctx->timing.previous_rendertime,
         gctx->gamestate.logic_gameclock,
         gctx->gamestate.render_gameclock,
-        gctx->time_perf.total_realtime_fixed_update_time
+        gctx->time_perf.total_realtime_fixed_update_time,
+        kinc_time()
     );
 }
 
