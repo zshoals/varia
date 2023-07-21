@@ -46,7 +46,19 @@
 			"command": "C:/HaxeLibraries/Kinc/make.bat",
 			"args": [
 				"windows",
-				"--noshaders"
+				"--noshaders",
+				"--debug"
+			],
+			"group": "build",
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "Kinc: Remake Build Files (Release)",
+			"type": "shell",
+			"command": "C:/HaxeLibraries/Kinc/make.bat",
+			"args": [
+				"windows",
+				"--noshaders",
 			],
 			"group": "build",
 			"problemMatcher": "$msCompile"
