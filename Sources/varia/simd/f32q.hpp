@@ -2,7 +2,7 @@
 
 #include "varia/simd/simd_types.h"
 
-#include "varia/vcommon.hpp"
+#include "varia/VShared.hpp"
 #include "varia/math/MathConstants.hpp"
 #include "kinc/simd/float32x4.h"
 #include "simd_trig.h"

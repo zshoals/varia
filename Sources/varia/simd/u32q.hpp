@@ -2,7 +2,7 @@
 
 #include "varia/simd/simd_types.h"
 
-#include "varia/vcommon.hpp"
+#include "varia/VShared.hpp"
 #include "kinc/simd/uint32x4.h"
 
 VARIA_INLINE u32q u32q_load(const u32 *values) { return kinc_uint32x4_intrin_load(values); }
