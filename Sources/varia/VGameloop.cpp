@@ -10,8 +10,6 @@
 
 //Game System Imports
 
-static Float_64 timeout = 0.0;
-
 static void v_print_timing_info(Game_Context * gctx)
 {
     // kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->gamedata.player.x);

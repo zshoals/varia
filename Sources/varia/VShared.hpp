@@ -7,7 +7,7 @@
 
 #include <assert.h>
 #define VARIA_ASSERT(COND, MSG)\
-	if (!(COND)) { __debugbreak(); assert(0 && MSG); }
+	if (!(COND)) { __debugbreak(); assert(0 && (MSG)); }
 
 #define VARIA_UNREACHABLE(MSG) VARIA_ASSERT(0, MSG)
 
@@ -71,17 +71,17 @@ T const & dereference(T const * const element)
 
 //Note: For now, only support positive values
 #define for_range(STOP)\
-	assert(STOP >= 0);\
+	assert((STOP) >= 0);\
 	for (Integer_64 VARIA_MACRO_VAR(_i) = 0; VARIA_MACRO_VAR(_i) < (STOP); VARIA_MACRO_VAR(_i) += 1)
 
 #define for_range_var(CAPTURE, STOP)\
-	assert(STOP >= 0);\
+	assert((STOP) >= 0);\
 	for (Integer_64 (CAPTURE) = 0; (CAPTURE) < (STOP); (CAPTURE) += 1)
 
 #define for_reverse_range(START)\
-	assert(START > 0);\
+	assert((START) > 0);\
 	for (Integer_64 VARIA_MACRO_VAR(_i) = (START) - 1; VARIA_MACRO_VAR(_i) >= 0; VARIA_MACRO_VAR(_i) -= 1)
 
 #define for_reverse_range_var(CAPTURE, START)\
-	assert(START > 0);\
+	assert((START) > 0);\
 	for (Integer_64 (CAPTURE) = (START) - 1; (CAPTURE) >= 0; (CAPTURE) -= 1)
