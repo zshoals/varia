@@ -1,5 +1,6 @@
 #pragma once
 
+#include "varia/VShared.hpp"
 #include "kinc/window.h"
 
 struct Gameloop_Performance
