@@ -1,6 +1,6 @@
 #pragma once
 
-#include "varia/vcommon.hpp"
+#include "varia/VShared.hpp"
 #include <math.h>
 
 //Note(zshoals Dec-11-2022): Attribution to https://github.com/mnemocron/easing-functions
