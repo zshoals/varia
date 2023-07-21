@@ -3,7 +3,7 @@
 #include "kinc/display.h"
 #include "kinc/log.h"
 
-#include "varia/VCommon.hpp"
+#include "varia/VShared.hpp"
 #include "varia/VGameloop.hpp"
 #include "varia/ds/VDS-Array.hpp"
 
@@ -66,7 +66,7 @@ int kickstart(int argc, char** argv)
 	static Game_Context game = ZERO_INIT();
 	{
 		//[Timing Defaults]
-		game.timing.fixed_timestep_interval = 1.0 / 120.0;
+		game.timing.fixed_timestep_interval = 1.0 / 480.0;
 		game.timing.max_frametime = 1.0 / 16.0;
 		game.timing.max_frametime_overrun_threshold = 10;
 
@@ -77,7 +77,7 @@ int kickstart(int argc, char** argv)
 		//[Gameloop Configuration]
 		game.gamestate.loop_config.enable_excessive_frametime_exit = true;
 		game.gamestate.loop_config.enable_framerate_limit = true;
-		game.gamestate.loop_config.render_frames_per_second_limit = 1.0 / 60.0;
+		game.gamestate.loop_config.render_frames_per_second_limit = 1.0 / 144.0;
 
 		//[Kinc Settings]
 		game.gamestate.kinc.window = wo;
