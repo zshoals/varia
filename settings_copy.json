@@ -25,7 +25,6 @@
             "path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe"
         }
     },
-    "editor.inlayHints.enabled": "offUnlessPressed",
     "editor.scrollbar.vertical": "hidden",
     "editor.scrollbar.verticalScrollbarSize": 0,
     "workbench.activityBar.visible": false,
@@ -44,7 +43,10 @@
 
     "workbench.colorCustomizations": {
         "[Verdandi Alter]": {
-            "editorCursor.foreground": "#992d2d"
+            "editorCursor.foreground": "#992d2d",
+            "titleBar.activeBackground": "#0f1216",
+            "statusBar.background": "#0f1216",
+            "scrollbar.shadow": "#ff000000",
         }
     },
     //Firefly Midnight comment override (removes italics)
@@ -52,7 +54,7 @@
         "[FireFly Pro Midnight]": {
             "comments": {
                 "fontStyle": ""
-            }
+        }
         },
         "[Verdandi Alter]": {
             "keywords": "#949ca3",
@@ -61,18 +63,29 @@
             "functions": "#949ca3",
             "variables": "#949ca3",
             "comments": "#6f879e",
+            // "comments": "#62886e",
             "textMateRules": [
                 {
                     "scope": [
+                        "keyword",
                         "keyword.operator",
                         "keyword.other",
                         "keyword.control",
                         "keyword.operator.new",
-                        "variable",
+                        "entity.other.inherited-class",
                         "storage.type",
                         "storage.modifier",
                         "constant.character.escape",
                         "constant.other",
+                        "constant.numeric.hex",
+                        "constant.numeric.integer",
+                        "constant.numeric.octal",
+                        "variable",
+                        "support.variable",
+                        "meta.cast",
+                        "meta.preprocessor",
+                        "meta.preprocessor string",
+                        "constant.language",
                     ],
                     "settings": {
                         "foreground": "#949ca3",
@@ -86,16 +99,27 @@
                         "comment.line",
                     ],
                     "settings": {
+                        // "foreground": "#62886e",
                         "foreground": "#6f879e",
                         "fontStyle": ""
                     }
                 },
+                // {
+                //     "scope": [
+                //         "storage.type",
+                //     ],
+                //     "settings": {
+                //         "foreground": "#9e956f",
+                //         "fontStyle": ""
+                //     }
+                // },
                 {
                     "scope": [
                         "string"
                     ],
                     "settings": {
                         "foreground": "#62886e",
+                        // "foreground": "#6f879e",
                         "fontStyle": ""
                     }
                 }
@@ -186,14 +210,34 @@
     "editor.fontLigatures": false,
     "editor.parameterHints.enabled": false,
     "editor.folding": false,
-    "editor.cursorSmoothCaretAnimation": "on",
-    "editor.smoothScrolling": true,
     "editor.guides.highlightActiveBracketPair": false,
     "editor.foldingHighlight": false,
     "editor.occurrencesHighlight": false,
     "editor.matchBrackets": "never",
-    "editor.fontSize": 14,
+    "editor.fontSize": 16,
     "editor.cursorBlinking": "solid",
     "editor.renderLineHighlight": "none",
-    "editor.scrollbar.horizontal": "hidden"
+    "editor.scrollbar.horizontal": "hidden",
+    "editor.smoothScrolling": true,
+    "editor.selectionHighlight": false,
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "editor.lightbulb.enabled": false,
+    "editor.wordBasedSuggestions": false,
+    "editor.quickSuggestions": {
+        "other": "on",
+        "comments": "off",
+        "strings": "off"
+    },
+    "C_Cpp.codeAnalysis.clangTidy.enabled": false,
+    "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [
+        "bugprone-*",
+        "clang-analyzer-*",
+        "cppcoreguidelines-*"
+    ],
+    "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
+        "cppcoreguidelines-macro-usage",
+        "cppcoreguidelines-pro-type-vararg"
+    ],
+    "C_Cpp.intelliSenseEngine": "Tag Parser",
+    "C_Cpp.autocomplete": "disabled"
 }
