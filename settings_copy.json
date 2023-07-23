@@ -27,7 +27,6 @@
     },
     "editor.scrollbar.vertical": "hidden",
     "editor.scrollbar.verticalScrollbarSize": 0,
-    "workbench.activityBar.visible": false,
     "editor.minimap.enabled": false,
     "breadcrumbs.showFunctions": false,
     "breadcrumbs.symbolPath": "off",
@@ -54,7 +53,7 @@
         "[FireFly Pro Midnight]": {
             "comments": {
                 "fontStyle": ""
-        }
+            }
         },
         "[Verdandi Alter]": {
             "keywords": "#949ca3",
@@ -84,7 +83,7 @@
                         "support.variable",
                         "meta.cast",
                         "meta.preprocessor",
-                        "meta.preprocessor string",
+                        // "meta.preprocessor string",
                         "constant.language",
                     ],
                     "settings": {
@@ -104,25 +103,34 @@
                         "fontStyle": ""
                     }
                 },
-                // {
-                //     "scope": [
-                //         "storage.type",
-                //     ],
-                //     "settings": {
-                //         "foreground": "#9e956f",
-                //         "fontStyle": ""
-                //     }
-                // },
                 {
                     "scope": [
-                        "string"
+                        "string",
                     ],
                     "settings": {
                         "foreground": "#62886e",
                         // "foreground": "#6f879e",
                         "fontStyle": ""
                     }
-                }
+                },
+                {
+                    "scope": [
+                        "keyword.other.unit",
+                    ],
+                    "settings": {
+                        "foreground": "#cfcc8a",
+                        "fontStyle": ""
+                    }
+                },
+                {
+                    "scope": [
+                        "storage.type.struct.cpp",
+                    ],
+                    "settings": {
+                        "foreground": "#9e906b",
+                        "fontStyle": ""
+                    }
+                },
             ]
         },
 
@@ -139,7 +147,7 @@
     ],
 
 
-    //NOTE(zshoals): Don't do this, this causes problems in visual mode
+    //NOTE("): Don't do this, this causes problems in visual mode
     // "vim.visualModeKeyBindings": [
     //     //Escape
     //     {
@@ -209,7 +217,6 @@
     "scm.diffDecorationsGutterVisibility": "hover",
     "editor.fontLigatures": false,
     "editor.parameterHints.enabled": false,
-    "editor.folding": false,
     "editor.guides.highlightActiveBracketPair": false,
     "editor.foldingHighlight": false,
     "editor.occurrencesHighlight": false,
@@ -239,5 +246,8 @@
         "cppcoreguidelines-pro-type-vararg"
     ],
     "C_Cpp.intelliSenseEngine": "Tag Parser",
-    "C_Cpp.autocomplete": "disabled"
+    "C_Cpp.autocomplete": "disabled",
+    "editor.folding": false,
+    "workbench.activityBar.visible": false,
+    "workbench.statusBar.visible": false
 }
