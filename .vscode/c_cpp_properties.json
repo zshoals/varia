@@ -7,10 +7,9 @@
                 "C:\\HaxeLibraries\\Kinc\\Sources",
                 "C:\\HaxeLibraries\\Kinc\\Backends\\System\\Windows\\Sources",
                 "C:\\HaxeLibraries\\Kinc\\Backends\\System\\Microsoft\\Sources",
-                "C:\\HaxeLibraries\\Kinc\\Backends\\System\\Windows\\Libraries\\DirectShow\\BaseClasses",
-                "C:\\HaxeLibraries\\Kinc\\Backends\\Graphics4\\Direct3D11\\Sources",
+                "C:\\HaxeLibraries\\Kinc\\Backends\\Graphics5\\Direct3D12\\Sources",
                 "C:\\HaxeLibraries\\Kinc\\Backends\\Audio2\\WASAPI\\Sources",
-                "C:\\HaxeLibraries\\Kinc\\Backends\\Graphics5\\G5onG4\\Sources"
+                "C:\\HaxeLibraries\\Kinc\\Backends\\Graphics4\\G4onG5\\Sources"
             ],
             "defines": [
                 "VARIA_LOG_LOGGING_ENABLED=1",
@@ -20,20 +19,19 @@
                 "KORE_A1",
                 "KORE_A2",
                 "KORE_LZ4X",
-                "KORE_WINDOWS",
-                "KORE_MICROSOFT",
                 "_CRT_SECURE_NO_WARNINGS",
                 "_WINSOCK_DEPRECATED_NO_WARNINGS",
+                "KINC_NO_DIRECTSHOW",
                 "KORE_DIRECT3D",
-                "KORE_DIRECT3D11",
+                "KORE_DIRECT3D12",
                 "KORE_G4",
                 "KORE_G5",
-                "KORE_G5ONG4"
+                "KORE_G4ONG5"
             ],
-            "compilerPath": "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.35.32215/bin/Hostx64/x64/cl.exe",
-            "cStandard": "c11",
-            "cppStandard": "c++14",
-            "intelliSenseMode": "msvc-x64",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.27.29110/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "${default}",
             "windowsSdkVersion": "10.0.19041.0"
         }
     ],
