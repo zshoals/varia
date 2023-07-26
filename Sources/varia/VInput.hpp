@@ -1,61 +1,56 @@
 #pragma once
 
 #include "varia/VShared.hpp"
+#include "kinc/input/keyboard.h"
 
 
 typedef int Kinc_Keycode;
-typedef void (*Input_Callback)(Input_Gamestate_Data_Proxy * proxy);
 
-struct Input_Gamestate_Data_Proxy
+template <typename DATATYPE>
+struct Virtual_Action
 {
-    //Insert any gamestate stuff into this struct, 
-    //  copy it into here
-    //  copy back out
+    Kinc_Keycode bound_key;
+    void (*on_keydown)(DATATYPE * data);
+    void (*on_keyup)(DATATYPE * data);
+    DATATYPE data;
+};
 
-    Float_32 movement_right_multiplier;
-    Float_32 movement_left_multiplier;
-    Float_32 movement_up_multiplier;
-    Float_32 movement_down_multiplier;
-
-    Boolean player_is_shooting;
-    Boolean player_jumped;
+template <typename DATATYPE>
+void v_input_try_virtual_action_keydown(Kinc_Keycode key, Virtual_Action<DATATYPE> * action)
+{
+    if (action->bound_key == key)
+    {
+        action->on_keydown(address_of(action->data));
+    }
 }
 
-enum class E_Input_Virtual_Action
+template <typename DATATYPE>
+void v_input_try_virtual_action_keyup(Kinc_Keycode key, Virtual_Action<DATATYPE> * action)
 {
-    Move_Right,
-    Move_Left,
-    Move_Up,
-    Move_Down,
-    Jump,
-    Shoot,
+    if (action->bound_key == key)
+    {
+        action->on_keyup(address_of(action->data));
+    }
+}
 
-    MAX_COUNT
+struct Virtual_Move_Right_Data
+{
+    Float_64 movement_multiplier;
 };
 
-struct Input_Virtual_Action
+struct Virtual_Move_Left_Data
 {
-    Input_Callback on_keydown;
-    Input_Callback on_keyup;
-    Kinc_Keycode bound_key;
+    Float_64 movement_multiplier;
 };
 
-struct Input_State
+struct Input_Virtual_Action_State
 {
-    Input_Virtual_Action actions[(Integer_64)(E_Input_Virtual_Action::MAX_COUNT)];
-    Input_Gamestate_Data_Proxy proxy;
+    // Virtual_Move_Right move_right_action;
+    // Virtual_Move_Left move_left_action;
+    Virtual_Action<Virtual_Move_Right_Data> move_right_action;
+    Virtual_Action<Virtual_Move_Left_Data> move_left_action;
 };
 
-Input_Virtual_Action v_input_create_virtual_action(Kinc_Keycode key, Input_Callback on_keydown, Input_Callback on_keyup);
-
-void v_input_set_move_right(Input_State * input, Input_Virtual_Action action);
-void v_input_set_move_left(Input_State * input, Input_Virtual_Action action);
-void v_input_set_move_up(Input_State * input, Input_Virtual_Action action);
-void v_input_set_move_down(Input_State * input, Input_Virtual_Action action);
-void v_input_set_jump(Input_State * input, Input_Virtual_Action action);
-void v_input_set_shoot(Input_State * input, Input_Virtual_Action action);
-
-void v_input_register_processing_functions(Input_State * input);
-
+void v_input_register_processing_functions(Input_Virtual_Action_State * input);
 void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_State * state*/);
 void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_State * state*/);

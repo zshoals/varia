@@ -34,8 +34,8 @@ static void v_print_timing_info(Gamestate * gamestate)
         1.0 / gamestate->logic_dt,
         gamestate->render_dt,
         gamestate->previous_rendertime,
-        gamestate->logic_gameclock,
-        gamestate->render_gameclock,
+        gamestate->logic_cumulative_gameclock,
+        gamestate->render_cumulative_gameclock,
         gamestate->total_realtime_fixed_update_time,
         kinc_time()
     );
@@ -48,15 +48,12 @@ static void v_gameloop_simulate(Gamestate * gs, E_Simulation_Mode mode)
 
 static void v_gameloop_render(Gamestate * gamestate)
 {
-    //[BEGIN] Rendering
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     kinc_g4_begin(0);
     kinc_g4_end(0);
 
     kinc_g4_swap_buffers();
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    v_print_timing_info(gamestate);
+    // v_print_timing_info(gamestate);
 }
 
 void v_gameloop_entrypoint(void * data)
@@ -120,10 +117,11 @@ void v_gameloop_entrypoint(void * data)
         while (logic_world->logic_accumulator >= logic_world->fixed_timestep_interval)
         {
             logic_world->logic_accumulator -= logic_world->fixed_timestep_interval;
-            logic_world->logic_gameclock += logic_world->fixed_timestep_interval;
-            logic_world->previous_logictime = kinc_time();
+            logic_world->logic_cumulative_gameclock += logic_world->fixed_timestep_interval;
 
             v_gameloop_simulate(logic_world, E_Simulation_Mode::Fixed_Step);
+
+            logic_world->previous_logictime = kinc_time();
         }
         logic_world->total_realtime_fixed_update_time = 
             kinc_time() - logic_world->total_realtime_fixed_update_time;
@@ -163,7 +161,7 @@ void v_gameloop_entrypoint(void * data)
             v_gameloop_simulate(visual_world, E_Simulation_Mode::Extrapolate);
             v_gameloop_render(visual_world);
 
-            logic_world->render_gameclock += kinc_time() - logic_world->previous_rendertime;
+            logic_world->render_cumulative_gameclock += kinc_time() - logic_world->previous_rendertime;
             logic_world->previous_rendertime = kinc_time();
 
             logic_world->render_accumulator = 0.0;

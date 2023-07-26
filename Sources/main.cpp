@@ -7,6 +7,24 @@
 #include "varia/VGameloop.hpp"
 #include "varia/ds/VDS-Array.hpp"
 
+#include "varia/VInput.hpp"
+
+void mr_keydown(Virtual_Move_Right_Data * data)
+{
+	kinc_log(KINC_LOG_LEVEL_INFO, "Hello! I was pressed! %f\n", data->movement_multiplier);
+}
+
+void v_initialize_input(Input_Virtual_Action_State * state)
+{
+		Virtual_Move_Right_Data mrdata = { 69.0f };
+		state->move_right_action.bound_key = KINC_KEY_E;
+		state->move_right_action.on_keydown = &mr_keydown;
+		state->move_right_action.on_keyup = &mr_keydown;
+		state->move_right_action.data = mrdata;
+
+		v_input_register_processing_functions(state);
+}
+
 int kickstart(int argc, char** argv) 
 {
 	//=======RUN ALL TESTS======
@@ -82,9 +100,11 @@ int kickstart(int argc, char** argv)
 		//[Kinc Settings]
 		game.logic_world.window = wo;
 		game.logic_world.framebuffer = fbo;
+
 	}
 	
 	kinc_init(config_title, config_window_width, config_window_height, &wo, &fbo);
+	v_initialize_input(address_of(game.logic_world.input));
 	kinc_set_update_callback(&v_gameloop_entrypoint, &game);
 	kinc_start();
 

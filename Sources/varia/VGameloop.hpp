@@ -2,6 +2,7 @@
 
 #include "varia/VShared.hpp"
 #include "kinc/window.h"
+#include "varia/VInput.hpp"
 
 enum class E_Simulation_Mode
 {
@@ -52,9 +53,11 @@ struct Gamestate
     //Performance tracking
     Integer_64 frame_cycles; //Total update + render combos 
     Integer_64 rendered_frames;
-    Float_64 logic_gameclock;
-    Float_64 render_gameclock;
+    Float_64 logic_cumulative_gameclock;
+    Float_64 render_cumulative_gameclock;
 
+    //Input
+    Input_Virtual_Action_State input;
     //Actual gamedata
     Gamedata gamedata;
 };
