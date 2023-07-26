@@ -5,12 +5,13 @@
 #include "kinc/system.h"
 #include "kinc/log.h"
 #include "kinc/graphics4/graphics.h"
+#include <string.h> //Memcpy
 #include <stdio.h>
 
 
 //Game System Imports
 
-static void v_print_timing_info(Game_Context * gctx)
+static void v_print_timing_info(Gamestate * gamestate)
 {
     // kinc_log(KINC_LOG_LEVEL_INFO, "Player X:    %f", gs->gamedata.player.x);
 
@@ -27,43 +28,41 @@ static void v_print_timing_info(Game_Context * gctx)
         "Update Time: %f\n"
         "Real Time:   %f\n"
         ":::::::::::::::::::\n",
-        gctx->gamestate.frame_cycles,
-        gctx->gamestate.rendered_frames,
-        gctx->gamestate.logic_dt,
-        1.0 / gctx->gamestate.logic_dt,
-        gctx->gamestate.render_dt,
-        gctx->timing.previous_rendertime,
-        gctx->gamestate.logic_gameclock,
-        gctx->gamestate.render_gameclock,
-        gctx->time_perf.total_realtime_fixed_update_time,
+        gamestate->frame_cycles,
+        gamestate->rendered_frames,
+        gamestate->logic_dt,
+        1.0 / gamestate->logic_dt,
+        gamestate->render_dt,
+        gamestate->previous_rendertime,
+        gamestate->logic_gameclock,
+        gamestate->render_gameclock,
+        gamestate->total_realtime_fixed_update_time,
         kinc_time()
     );
 }
 
-static void v_gameloop_tick(Gamestate * gs)
+static void v_gameloop_simulate(Gamestate * gs, E_Simulation_Mode mode)
 {
     gs->gamedata.player.x += (float)(100.0 * v_gamestate_logic_adjusted_delta(gs));
 }
 
-static void v_gameloop_render(Game_Context * gctx)
+static void v_gameloop_render(Gamestate * gamestate)
 {
     //[BEGIN] Rendering
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    Gamestate * gs = address_of(gctx->gamestate);
-
     kinc_g4_begin(0);
     kinc_g4_end(0);
 
     kinc_g4_swap_buffers();
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    v_print_timing_info(gctx);
+    v_print_timing_info(gamestate);
 }
 
 void v_gameloop_entrypoint(void * data)
 {
     Game_Context * context = static_cast<Game_Context *>(data);
-    Gameloop_Timing * timing = address_of(context->timing);
+    Gamestate * logic_world = address_of(context->logic_world);
 
     //Process Input?
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -76,21 +75,21 @@ void v_gameloop_entrypoint(void * data)
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     Float_64 realtime = kinc_time();
-    Float_64 realtime_advance = kinc_time() - timing->previous_realtime;
-    timing->previous_realtime = realtime;
+    Float_64 realtime_advance = kinc_time() - logic_world->previous_realtime;
+    logic_world->previous_realtime = realtime;
 
     //Logic Step
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        timing->logic_accumulator += realtime_advance;
+        logic_world->logic_accumulator += realtime_advance;
 
         //[BEGIN] Max frametime checks / program exit if we get into a nasty death spiral situation
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         if 
         (
-            context->gamestate.loop_config.enable_excessive_frametime_exit &&
-            timing->recent_frametime_overrun_count >= timing->max_frametime_overrun_threshold
+            logic_world->enable_excessive_frametime_exit &&
+            logic_world->recent_frametime_overrun_count >= logic_world->max_frametime_overrun_threshold
         )
         {
             VARIA_UNREACHABLE("Repeatedly exceeding the maximum permissible frametime;"
@@ -100,14 +99,14 @@ void v_gameloop_entrypoint(void * data)
                 "likely in a logic death spiral. Aborting program.");
             kinc_stop();
         }
-        else if (timing->logic_accumulator > timing->max_frametime)
+        else if (logic_world->logic_accumulator > logic_world->max_frametime)
         {
-            timing->recent_frametime_overrun_count += 1;
-            timing->logic_accumulator = timing->max_frametime;
+            logic_world->recent_frametime_overrun_count += 1;
+            logic_world->logic_accumulator = logic_world->max_frametime;
         }
         else
         {
-            timing->recent_frametime_overrun_count = 0;
+            logic_world->recent_frametime_overrun_count = 0;
         }
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -117,20 +116,17 @@ void v_gameloop_entrypoint(void * data)
         //[BEGIN] Primary fixed update loop
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-        context->time_perf.total_realtime_fixed_update_time = kinc_time();
-        while (timing->logic_accumulator >= timing->fixed_timestep_interval)
+        logic_world->total_realtime_fixed_update_time = kinc_time();
+        while (logic_world->logic_accumulator >= logic_world->fixed_timestep_interval)
         {
-            timing->logic_accumulator -= timing->fixed_timestep_interval;
+            logic_world->logic_accumulator -= logic_world->fixed_timestep_interval;
+            logic_world->logic_gameclock += logic_world->fixed_timestep_interval;
+            logic_world->previous_logictime = kinc_time();
 
-            Gamestate * gs = address_of(context->gamestate);
-            gs->logic_gameclock += context->timing.fixed_timestep_interval;
-
-            v_gameloop_tick(gs);
-
-            timing->previous_logictime = kinc_time();
+            v_gameloop_simulate(logic_world, E_Simulation_Mode::Fixed_Step);
         }
-        context->time_perf.total_realtime_fixed_update_time = 
-            kinc_time() - context->time_perf.total_realtime_fixed_update_time;
+        logic_world->total_realtime_fixed_update_time = 
+            kinc_time() - logic_world->total_realtime_fixed_update_time;
 
         //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     }
@@ -141,35 +137,41 @@ void v_gameloop_entrypoint(void * data)
     //Render Step
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        timing->render_accumulator += realtime_advance;
+        logic_world->render_accumulator += realtime_advance;
 
         //NOTE(<zshoals> 07-19-2023): Extrapolated time, how far ahead the render time is
         //  from the last recent world step
-        context->gamestate.render_dt = kinc_time() - timing->previous_logictime;
+        logic_world->render_dt = kinc_time() - logic_world->previous_logictime;
 
         //Frame limiting check
         if //vertical sync off, framelimiter on, haven't reached the accumulator threshold yet
         ( 
-            !(context->gamestate.kinc.framebuffer.vertical_sync) &&
-            context->gamestate.loop_config.enable_framerate_limit &&
-            context->timing.render_accumulator <= context->gamestate.loop_config.render_frames_per_second_limit
+            !(logic_world->framebuffer.vertical_sync) &&
+            logic_world->enable_framerate_limit &&
+            logic_world->render_accumulator <= logic_world->fps_limit
         )
         {
             VARIA_NO_OPERATION();
         }
         else
         {
-            v_gameloop_render(context);
+            Gamestate * visual_world = address_of(context->visual_world);
+            //Create an "on demand" gamestate which will not be part of the fixed-step
+            //  logic chain, this gamestate is for visual purposes only
+            memcpy(visual_world, logic_world, sizeof(*logic_world));
 
-            context->gamestate.render_gameclock += kinc_time() - timing->previous_rendertime;
-            timing->previous_rendertime = kinc_time();
+            v_gameloop_simulate(visual_world, E_Simulation_Mode::Extrapolate);
+            v_gameloop_render(visual_world);
 
-            context->timing.render_accumulator = 0.0;
+            logic_world->render_gameclock += kinc_time() - logic_world->previous_rendertime;
+            logic_world->previous_rendertime = kinc_time();
 
-            context->gamestate.rendered_frames += 1;
+            logic_world->render_accumulator = 0.0;
+
+            logic_world->rendered_frames += 1;
         }
     }
     //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-    context->gamestate.frame_cycles += 1;
+    logic_world->frame_cycles += 1;
 }

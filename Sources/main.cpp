@@ -66,22 +66,22 @@ int kickstart(int argc, char** argv)
 	static Game_Context game = ZERO_INIT();
 	{
 		//[Timing Defaults]
-		game.timing.fixed_timestep_interval = 1.0 / 480.0;
-		game.timing.max_frametime = 1.0 / 16.0;
-		game.timing.max_frametime_overrun_threshold = 10;
+		game.logic_world.fixed_timestep_interval = 1.0 / 480.0;
+		game.logic_world.max_frametime = 1.0 / 16.0;
+		game.logic_world.max_frametime_overrun_threshold = 10;
 
 		//[Gamestate Defaults]
-		game.gamestate.logic_dt = game.timing.fixed_timestep_interval;
-		game.gamestate.timescale = 1.0;
+		game.logic_world.logic_dt = game.logic_world.fixed_timestep_interval;
+		game.logic_world.logic_timescale = 1.0;
 
 		//[Gameloop Configuration]
-		game.gamestate.loop_config.enable_excessive_frametime_exit = true;
-		game.gamestate.loop_config.enable_framerate_limit = true;
-		game.gamestate.loop_config.render_frames_per_second_limit = 1.0 / 144.0;
+		game.logic_world.enable_excessive_frametime_exit = true;
+		game.logic_world.enable_framerate_limit = true;
+		game.logic_world.fps_limit = 1.0 / 144.0;
 
 		//[Kinc Settings]
-		game.gamestate.kinc.window = wo;
-		game.gamestate.kinc.framebuffer = fbo;
+		game.logic_world.window = wo;
+		game.logic_world.framebuffer = fbo;
 	}
 	
 	kinc_init(config_title, config_window_width, config_window_height, &wo, &fbo);
