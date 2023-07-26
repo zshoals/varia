@@ -30,7 +30,7 @@
     "editor.minimap.enabled": false,
     "breadcrumbs.showFunctions": false,
     "breadcrumbs.symbolPath": "off",
-    "window.title": "${dirty}${activeEditorShort}${separator}${rootName}${separator}${profileName}${separator}",
+    "window.title": "${dirty}${activeEditorShort}${separator}${separator}${profileName}${separator}",
     "window.menuBarVisibility": "toggle",
     "workbench.editor.showTabs": false,
     "workbench.editor.limit.value": 4,
@@ -61,8 +61,8 @@
             "types": "#949ca3",
             "functions": "#949ca3",
             "variables": "#949ca3",
-            "comments": "#6f879e",
-            // "comments": "#62886e",
+            "comments": "#ada34d",
+            // "comments": "#62886e", old color original -> #6f879e
             "textMateRules": [
                 {
                     "scope": [
@@ -84,6 +84,7 @@
                         "meta.cast",
                         "meta.preprocessor",
                         // "meta.preprocessor string",
+                        "entity.name.scope-resolution.cpp",
                         "constant.language",
                     ],
                     "settings": {
@@ -99,8 +100,8 @@
                     ],
                     "settings": {
                         // "foreground": "#62886e",
-                        "foreground": "#6f879e",
-                        "fontStyle": ""
+                        "foreground": "#ada34d",
+                        "fontStyle": "bold"
                     }
                 },
                 {
@@ -116,6 +117,7 @@
                 {
                     "scope": [
                         "keyword.other.unit",
+                        "meta.encoding.cpp",
                     ],
                     "settings": {
                         "foreground": "#cfcc8a",
@@ -125,6 +127,9 @@
                 {
                     "scope": [
                         "storage.type.struct.cpp",
+                        "storage.type.class.cpp",
+                        "storage.type.enum.enum-key.class.cpp",
+                        "storage.type.enum",
                     ],
                     "settings": {
                         "foreground": "#9e906b",
@@ -156,6 +161,18 @@
     //     },
     // ],
 
+    "vim.visualModeKeyBindings": [
+        //Center screen on page up
+        {
+            "before": ["C-u"],
+            "after": ["C-u", "z", "z"]
+        },
+        //Center screen on page down
+        {
+            "before": ["C-d"],
+            "after": ["C-d", "z", "z"]
+        },
+    ],
 
     "vim.normalModeKeyBindings": [
         //Gap down
@@ -203,6 +220,16 @@
         {
             "before": ["e"],
             "after": ["<leader>", "e"]
+        },
+        //Center screen on page up
+        {
+            "before": ["C-u"],
+            "after": ["C-u", "z", "z"]
+        },
+        //Center screen on page down
+        {
+            "before": ["C-d"],
+            "after": ["C-d", "z", "z"]
         }
     ],
     "vim.camelCaseMotion.enable": true,
@@ -248,6 +275,5 @@
     "C_Cpp.intelliSenseEngine": "Tag Parser",
     "C_Cpp.autocomplete": "disabled",
     "editor.folding": false,
-    "workbench.activityBar.visible": false,
-    "workbench.statusBar.visible": false
+    "workbench.activityBar.visible": false
 }
