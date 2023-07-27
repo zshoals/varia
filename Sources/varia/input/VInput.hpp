@@ -1,22 +1,11 @@
 #pragma once
 
 #include "varia/VShared.hpp"
+#include "varia/input/VVirtualAction.hpp"
+#include "varia/input/VAction_Move_Right.hpp"
+#include "varia/input/VAction_Move_Left.hpp"
+
 #include "kinc/input/keyboard.h"
-
-
-typedef int Kinc_Keycode;
-
-template <typename DATATYPE>
-struct Virtual_Action
-{
-    Kinc_Keycode bound_key;
-    Boolean requires_shift;
-    Boolean requires_control;
-    Boolean requires_alt;
-    void (*on_keydown)(DATATYPE * data);
-    void (*on_keyup)(DATATYPE * data);
-    DATATYPE data;
-};
 
 struct Input_Modifier_State
 {
@@ -57,17 +46,6 @@ void v_input_try_virtual_action_keyup(Kinc_Keycode key, Input_Modifier_State con
     }
 }
 
-struct Action_Move_Right_Data
-{
-    Float_64 movement_multiplier;
-    Boolean shift_toggled;
-};
-
-struct Action_Move_Left_Data
-{
-    Float_64 movement_multiplier;
-};
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 struct Input_Virtual_Action_State
@@ -77,6 +55,11 @@ struct Input_Virtual_Action_State
     Input_Modifier_State modifiers;
 };
 
-void v_input_register_processing_functions(Input_Virtual_Action_State * input);
+
+
+void v_input_trigger_all_keyup_actions(Input_Virtual_Action_State * input);
+
+Action_Move_Right_Data v_input_extract_move_right_data(Input_Virtual_Action_State const * input);
+
 void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_State * state*/);
 void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_State * state*/);

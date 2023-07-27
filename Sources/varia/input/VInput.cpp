@@ -1,10 +1,14 @@
-#include "varia/VInput.hpp"
+#include "varia/input/VInput.hpp"
 
 #include "varia/VShared.hpp"
 
 #include "kinc/input/keyboard.h"
 #include "kinc/input/mouse.h"
 
+//Assign standard keybinds here?
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/)
 {
@@ -32,9 +36,23 @@ void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action
     v_input_try_virtual_action_keyup(key, const_address_of(state->modifiers), address_of(state->move_left_action));
 }
 
-void v_input_register_processing_functions(Input_Virtual_Action_State * input)
+//State transfer operations
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//TODO(<zshoals> 07-27-2023): We can make this data configurable, HOWEVER
+//  We can also just embed it directly into the keyup/keydown functions
+
+// void v_input_apply_move_right_data(Input_Virtual_Action_State * input, Action_Move_Right_Data new_data)
+// {
+//     input->move_right_action.data = new_data;
+// }
+
+Action_Move_Right_Data v_input_extract_move_right_data(Input_Virtual_Action_State const * input)
 {
-    kinc_keyboard_set_key_down_callback(&v_input_keydown_callback, input);
-    kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, input);
-    //Mouse callbacks?
+    return input->move_right_action.data;
+}
+
+void v_input_trigger_all_keyup_actions(Input_Virtual_Action_State * input)
+{
+    input->move_right_action.on_keyup(address_of(input->move_right_action.data));
+    // input->move_left_action.on_keyup();
 }

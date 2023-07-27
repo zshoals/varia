@@ -1,8 +1,8 @@
 #pragma once
 
 #include "varia/VShared.hpp"
+#include "varia/input/VInput.hpp"
 #include "kinc/window.h"
-#include "varia/VInput.hpp"
 
 enum class E_Simulation_Mode
 {
@@ -58,6 +58,11 @@ struct Gamestate
 
     //Input
     Input_Virtual_Action_State input;
+
+
+    //Other stuff
+    Float_64 display_time_multiplier;
+
     //Actual gamedata
     Gamedata gamedata;
 };
@@ -68,4 +73,4 @@ struct Game_Context
     Gamestate visual_world; //Exclusively for the renderer
 };
  
-void v_gameloop_entrypoint(void * data);
+void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t fbo);

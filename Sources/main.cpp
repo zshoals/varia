@@ -4,34 +4,9 @@
 #include "kinc/log.h"
 
 #include "varia/VShared.hpp"
-#include "varia/VGameloop.hpp"
 #include "varia/ds/VDS-Array.hpp"
 
-#include "varia/VInput.hpp"
-
-void mr_keydown(Action_Move_Right_Data * data)
-{
-	kinc_log(KINC_LOG_LEVEL_INFO, "Hello! I was pressed! %f", data->movement_multiplier);
-}
-
-void mr_keyup(Action_Move_Right_Data * data)
-{
-	kinc_log(KINC_LOG_LEVEL_INFO, "Goodbye! I was released! %f", data->movement_multiplier);
-}
-
-void v_initialize_input(Input_Virtual_Action_State * state)
-{
-		Action_Move_Right_Data mrdata = { 69.0f };
-		state->move_right_action.bound_key = KINC_KEY_R;
-		state->move_right_action.requires_control = true;
-		state->move_right_action.requires_shift = true;
-		state->move_right_action.requires_alt = false;
-		state->move_right_action.on_keydown = &mr_keydown;
-		state->move_right_action.on_keyup = &mr_keyup;
-		state->move_right_action.data = mrdata;
-
-		v_input_register_processing_functions(state);
-}
+#include "varia/VGameloop.hpp"
 
 int kickstart(int argc, char** argv) 
 {
@@ -89,32 +64,7 @@ int kickstart(int argc, char** argv)
 		wo.mode = KINC_WINDOW_MODE_WINDOW;
 	}
 
-	static Game_Context game = ZERO_INIT();
-	{
-		//[Timing Defaults]
-		game.logic_world.fixed_timestep_interval = 1.0 / 480.0;
-		game.logic_world.max_frametime = 1.0 / 16.0;
-		game.logic_world.max_frametime_overrun_threshold = 10;
-
-		//[Gamestate Defaults]
-		game.logic_world.logic_dt = game.logic_world.fixed_timestep_interval;
-		game.logic_world.logic_timescale = 1.0;
-
-		//[Gameloop Configuration]
-		game.logic_world.enable_excessive_frametime_exit = true;
-		game.logic_world.enable_framerate_limit = true;
-		game.logic_world.fps_limit = 1.0 / 144.0;
-
-		//[Kinc Settings]
-		game.logic_world.window = wo;
-		game.logic_world.framebuffer = fbo;
-
-	}
-	
-	kinc_init(config_title, config_window_width, config_window_height, &wo, &fbo);
-	v_initialize_input(address_of(game.logic_world.input));
-	kinc_set_update_callback(&v_gameloop_entrypoint, &game);
-	kinc_start();
+	v_gameloop_initialize(wo, fbo);
 
 	return 0;
 }
