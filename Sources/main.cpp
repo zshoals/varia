@@ -9,17 +9,25 @@
 
 #include "varia/VInput.hpp"
 
-void mr_keydown(Virtual_Move_Right_Data * data)
+void mr_keydown(Action_Move_Right_Data * data)
 {
-	kinc_log(KINC_LOG_LEVEL_INFO, "Hello! I was pressed! %f\n", data->movement_multiplier);
+	kinc_log(KINC_LOG_LEVEL_INFO, "Hello! I was pressed! %f", data->movement_multiplier);
+}
+
+void mr_keyup(Action_Move_Right_Data * data)
+{
+	kinc_log(KINC_LOG_LEVEL_INFO, "Goodbye! I was released! %f", data->movement_multiplier);
 }
 
 void v_initialize_input(Input_Virtual_Action_State * state)
 {
-		Virtual_Move_Right_Data mrdata = { 69.0f };
-		state->move_right_action.bound_key = KINC_KEY_E;
+		Action_Move_Right_Data mrdata = { 69.0f };
+		state->move_right_action.bound_key = KINC_KEY_R;
+		state->move_right_action.requires_control = true;
+		state->move_right_action.requires_shift = true;
+		state->move_right_action.requires_alt = false;
 		state->move_right_action.on_keydown = &mr_keydown;
-		state->move_right_action.on_keyup = &mr_keydown;
+		state->move_right_action.on_keyup = &mr_keyup;
 		state->move_right_action.data = mrdata;
 
 		v_input_register_processing_functions(state);
