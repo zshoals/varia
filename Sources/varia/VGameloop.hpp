@@ -14,6 +14,8 @@ enum class E_Simulation_Mode
 struct Gamestate
 {
     //Kinc configuration options
+    Boolean window_requires_reapplication;
+    Boolean framebuffer_requires_reapplication;
     kinc_window_options_t window;
     kinc_framebuffer_options_t framebuffer;
 

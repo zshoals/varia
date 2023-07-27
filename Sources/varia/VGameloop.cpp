@@ -10,12 +10,33 @@
 
 #include "kinc/system.h"
 #include "kinc/log.h"
-#include "kinc/graphics4/graphics.h"
-
-#include <stdio.h>
 
 
 //Game System Imports
+
+static void v_system_callback_focus_lost(void * data)
+{
+    System_Event_Queue * events = static_cast<System_Event_Queue *>(data);
+
+    System_Event e = ZERO_INIT();
+    {
+        e.tag = E_System_Event_Type::System_Window_Lost_Focus;
+    }
+
+    v_system_event_queue_push(events, e);
+}
+
+static void v_system_callback_focus_gained(void * data)
+{
+    System_Event_Queue * events = static_cast<System_Event_Queue *>(data);
+
+    System_Event e = ZERO_INIT();
+    {
+        e.tag = E_System_Event_Type::System_Window_Gained_Focus;
+    }
+
+    v_system_event_queue_push(events, e);
+}
 
 static void v_print_timing_info(Gamestate * gamestate)
 {
@@ -88,7 +109,6 @@ void v_gameloop_entrypoint(void * data)
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
         System_Event_Queue * events = address_of(context->system_events);
-        v_system_event_queue_push(events, {});
 
         while (v_system_event_queue_has_events(events))
         {
@@ -97,17 +117,67 @@ void v_gameloop_entrypoint(void * data)
             switch (e.tag)
             {
                 default:
+                {
                     VARIA_UNREACHABLE("Unhandled system event.");
                     break;
+                }
+                case E_System_Event_Type::Gameplay_Move_Right:
+                {
+                    break;
+                }
+                case E_System_Event_Type::Gameplay_Move_Left:
+                {
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Vertical_Sync_Enable:
+                {
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Lost_Focus:
+                {
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Lost Focus");
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Gained_Focus:
+                {
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Gained focus");
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Request_Fullscreen:
+                {
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Request_Windowed:
+                {
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Request_Resize:
+                {
+                    break;
+                }
             }
+
+            v_system_event_queue_pop(events);
         }
+
+        v_system_event_queue_clear(events);
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-    //Process important commands (Kinc state configuration)??
+    //Process important commands (Kinc state configuration updates, for example)
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    //        Nothing yet
+    {
+        if (logic_world->window_requires_reapplication)
+        {
+            //TODO(<zshoals> 07-27-2023): Stuff?
+        }
+
+        if (logic_world->framebuffer_requires_reapplication)
+        {
+            //TODO(<zshoals> 07-27-2023): Stuff?
+        }
+    }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -285,7 +355,10 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //Set Kinc's Environment Callbacks
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
+        System_Event_Queue * events = address_of(game.system_events);
         //Window focus gained/loss, etc.
+        kinc_set_foreground_callback(&v_system_callback_focus_gained, events);
+        kinc_set_background_callback(&v_system_callback_focus_lost, events);
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

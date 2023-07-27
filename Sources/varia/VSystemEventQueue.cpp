@@ -23,6 +23,7 @@ void v_system_event_queue_pop(System_Event_Queue * events)
 {
     VARIA_ASSERT(events->current_head <= SYSTEM_EVENT_QUEUE_MAX_SIZE, "Event queue head overrun; didn't reset queue?");
     events->current_head += 1;
+    events->item_count -= 1;
 }
 
 void v_system_event_queue_clear(System_Event_Queue * events)
