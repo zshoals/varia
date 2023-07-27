@@ -38,18 +38,13 @@ void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action
 
 //State transfer operations
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//TODO(<zshoals> 07-27-2023): We can make this data configurable, HOWEVER
-//  We can also just embed it directly into the keyup/keydown functions
-
-// void v_input_apply_move_right_data(Input_Virtual_Action_State * input, Action_Move_Right_Data new_data)
-// {
-//     input->move_right_action.data = new_data;
-// }
 
 Action_Move_Right_Data v_input_extract_move_right_data(Input_Virtual_Action_State const * input)
 {
     return input->move_right_action.data;
 }
+
+
 
 void v_input_trigger_all_keyup_actions(Input_Virtual_Action_State * input)
 {
