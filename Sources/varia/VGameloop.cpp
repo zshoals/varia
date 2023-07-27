@@ -2,6 +2,7 @@
 
 #include "varia/VShared.hpp"
 #include "varia/VGameContext.hpp"
+#include "varia/VSystemEventQueue.hpp"
 #include "varia/VSimulation.hpp"
 #include "varia/VGamestateQuery.hpp"
 #include "varia/utility/VMemcpy.hpp"
@@ -81,6 +82,26 @@ void v_gameloop_entrypoint(void * data)
         logic_world->display_time_multiplier = input->move_right_action.data.movement_multiplier;
     }
 
+    //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    //Process the System Event Loop
+    //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    {
+        System_Event_Queue * events = address_of(context->system_events);
+        v_system_event_queue_push(events, {});
+
+        while (v_system_event_queue_has_events(events))
+        {
+            System_Event e = v_system_event_queue_get_first_event(events);
+
+            switch (e.tag)
+            {
+                default:
+                    VARIA_UNREACHABLE("Unhandled system event.");
+                    break;
+            }
+        }
+    }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -257,6 +278,14 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
         //TODO(<zshoals> 07-27-2023): This probably needs to happen on alt tab as well
         //  aka window focus loss
         v_input_trigger_all_keyup_actions(input);
+    }
+    //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+    //Set Kinc's Environment Callbacks
+    //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    {
+        //Window focus gained/loss, etc.
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

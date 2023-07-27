@@ -46,6 +46,7 @@ Action_Move_Right_Data v_input_extract_move_right_data(Input_Virtual_Action_Stat
 
 
 
+//This can only be called after ALL actions have had their keyup callback assigned
 void v_input_trigger_all_keyup_actions(Input_Virtual_Action_State * input)
 {
     input->move_right_action.on_keyup(address_of(input->move_right_action.data));
