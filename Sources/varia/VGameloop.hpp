@@ -10,17 +10,6 @@ enum class E_Simulation_Mode
     Extrapolate
 };
 
-struct Player
-{
-    Float_32 x;
-    Float_32 y;
-};
-
-struct Gamedata
-{
-    Player player;
-};
-
 //Gamestate configuration that can be modified at runtime
 struct Gamestate
 {
@@ -63,14 +52,8 @@ struct Gamestate
     //Other stuff
     Float_64 display_time_multiplier;
 
-    //Actual gamedata
-    Gamedata gamedata;
+    //Actual gamedata below...which we don't have any of yet :)
 };
 
-struct Game_Context
-{
-    Gamestate logic_world;
-    Gamestate visual_world; //Exclusively for the renderer
-};
  
 void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t fbo);

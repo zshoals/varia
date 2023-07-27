@@ -1,6 +1,8 @@
 #include "VGameloop.hpp"
 
 #include "varia/VShared.hpp"
+#include "varia/VGameContext.hpp"
+#include "varia/VSimulation.hpp"
 #include "varia/VGamestateQuery.hpp"
 #include "varia/utility/VMemcpy.hpp"
 #include "varia/input/VInput.hpp"
@@ -46,18 +48,24 @@ static void v_print_timing_info(Gamestate * gamestate)
 
 static void v_gameloop_simulate(Gamestate * gs, E_Simulation_Mode mode)
 {
-    gs->gamedata.player.x += (float)(100.0 * v_gamestate_logic_adjusted_delta(gs));
+    v_simulation_simulate(gs, mode);
 }
 
-static void v_gameloop_render(Gamestate * gamestate)
+static void v_gameloop_build_graphics_intermediate_representation
+(
+    Graphics_Intermediate_Representation * ir_out, 
+    Gamestate const * visual_world
+)
 {
-    kinc_g4_begin(0);
-    kinc_g4_end(0);
+    //TODO(<zshoals> 07-27-2023): Build IR before rendering
+    //....obviously
 
-    kinc_g4_swap_buffers();
+    ir_out->renderables[0] = 68306; //Dummy test stuff ignore me remove me asap
+}
 
-    // v_print_timing_info(gamestate);
-    kinc_log(KINC_LOG_LEVEL_INFO, "Time: %f", (float)kinc_time() * gamestate->display_time_multiplier);
+static void v_gameloop_render(Graphics_Renderer * gfx, Graphics_Intermediate_Representation const * ir)
+{
+    v_graphics_renderer_render(gfx, ir);
 }
 
 void v_gameloop_entrypoint(void * data)
@@ -176,8 +184,10 @@ void v_gameloop_entrypoint(void * data)
             //  logic chain, this gamestate is for visual purposes only
             memcpy(visual_world, logic_world, sizeof(*logic_world));
 
-            v_gameloop_simulate(visual_world, E_Simulation_Mode::Extrapolate);
-            v_gameloop_render(visual_world);
+            v_gameloop_simulate(visual_world, E_Simulation_Mode::Extrapolate); 
+            Graphics_Intermediate_Representation * ir_out = address_of(context->ir_storage);
+            v_gameloop_build_graphics_intermediate_representation(ir_out, visual_world);
+            v_gameloop_render(address_of(context->gfx), ir_out);
 
             logic_world->render_cumulative_gameclock += kinc_time() - logic_world->previous_rendertime;
             logic_world->previous_rendertime = kinc_time();
@@ -215,7 +225,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
 		game.logic_world.framebuffer = fbo;
 	}
 	
-	kinc_init
+    kinc_init
     (
         game.logic_world.window.title, 
         game.logic_world.window.width, 
@@ -227,11 +237,13 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //Initialize Input
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        kinc_keyboard_set_key_down_callback(&v_input_keydown_callback, address_of(game.logic_world.input));
-        kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, address_of(game.logic_world.input));
+        Input_Virtual_Action_State * input = address_of(game.logic_world.input);
+
+        kinc_keyboard_set_key_down_callback(&v_input_keydown_callback, input);
+        kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, input);
         //TODO(<zshoals> 07-27-2023): Mouse stuff?
 
-        Virtual_Action<Action_Move_Right_Data> * move_right = address_of(game.logic_world.input.move_right_action);
+        Virtual_Action<Action_Move_Right_Data> * move_right = address_of(input->move_right_action);
         {
             move_right->bound_key = KINC_KEY_R;
             move_right->requires_shift = false;
@@ -240,6 +252,11 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
             move_right->on_keydown = &v_action_move_right_keydown;
             move_right->on_keyup = &v_action_move_right_keyup;
         }
+
+        //Reset all parameters to their default up state
+        //TODO(<zshoals> 07-27-2023): This probably needs to happen on alt tab as well
+        //  aka window focus loss
+        v_input_trigger_all_keyup_actions(input);
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
