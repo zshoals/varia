@@ -9,8 +9,10 @@
 #include "varia/input/VInput.hpp"
 #include "varia/VSystemCallbacks.hpp"
 
+#include "kinc/display.h"
 #include "kinc/system.h"
 #include "kinc/log.h"
+#include "kinc/threads/thread.h"
 
 
 
@@ -115,12 +117,26 @@ void v_gameloop_entrypoint(void * data)
                 }
                 case E_System_Event_Type::System_Window_Lost_Focus:
                 {
-                    kinc_log(KINC_LOG_LEVEL_INFO, "Lost Focus");
+                    Input_Event_Emitter emitter = ZERO_INIT();
+                    {
+                        emitter.input = address_of(context->input);
+                        emitter.events = events;
+                    }
+
+                    //TODO(<zshoals> 07-28-2023): This doesn't completely solve the problem;
+                    //  Kinc seems to ignore the next keypress, leading to a double release
+                    //  however this at least seems to stop any alt-tab exploit
+                    v_input_trigger_all_keyup_actions(address_of(emitter));
+                    logic_world->enable_sleep_in_loop = true;
+
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Lost Focus; all keys released, sleeping loop enabled");
+
                     break;
                 }
                 case E_System_Event_Type::System_Window_Gained_Focus:
                 {
-                    kinc_log(KINC_LOG_LEVEL_INFO, "Gained focus");
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Gained focus, sleeping loop disabled");
+                    logic_world->enable_sleep_in_loop = false;
                     break;
                 }
                 case E_System_Event_Type::System_Window_Request_Fullscreen:
@@ -277,6 +293,11 @@ void v_gameloop_entrypoint(void * data)
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     logic_world->frame_cycles += 1;
+
+    if (logic_world->enable_sleep_in_loop)
+    {
+        kinc_thread_sleep(1);
+    }
 }
 
 void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t fbo)
@@ -300,7 +321,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
 		//[Kinc Settings]
 		game.logic_world.window = wo;
 		game.logic_world.framebuffer = fbo;
-        game.kinc_primary_display_index = kinc_primary_display();
+        game.logic_world.kinc_primary_display_index = kinc_primary_display();
 	}
 	
     kinc_init
@@ -311,6 +332,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
         address_of(game.logic_world.window),
         address_of(game.logic_world.framebuffer)
     );
+    kinc_threads_init();
 
     //Initialize Input
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

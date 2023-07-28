@@ -37,6 +37,7 @@ struct Gamestate
     Integer_32 max_frametime_overrun_threshold;
 
     //Loop configuration
+    Boolean enable_sleep_in_loop; //Sleep the loop when alt-tabbed/other low performance requirement states
     Boolean enable_framerate_limit;
     Float_64 fps_limit;
     Boolean enable_excessive_frametime_exit;
