@@ -99,7 +99,7 @@ void v_gameloop_entrypoint(void * data)
                 case E_System_Event_Type::Gameplay_Move_Right_Released:
                 {
                     Float_64 data = kinc_time();
-                    kinc_log(KINC_LOG_LEVEL_INFO, "Release detected! %f!", data);
+                    kinc_log(KINC_LOG_LEVEL_INFO, "RELEASE FUCK YOU detected! %f!", data);
                     break;
                 }
                 case E_System_Event_Type::Gameplay_Move_Left_Pressed:
@@ -112,6 +112,10 @@ void v_gameloop_entrypoint(void * data)
                 }
                 //Kinc State Events
                 case E_System_Event_Type::System_Window_Vertical_Sync_Enable:
+                {
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Vertical_Sync_Disable:
                 {
                     break;
                 }
@@ -348,12 +352,12 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
         kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, address_of(emitter));
         //TODO(<zshoals> 07-27-2023): Mouse stuff?
 
-        Action_Move_Right * move_right = address_of(input->move_right_action);
         {
-            move_right->keybind.bound_key = KINC_KEY_R;
-            move_right->keybind.requires_shift = false;
-            move_right->keybind.requires_control = false;
-            move_right->keybind.requires_alt = false;
+            Action_Move_Right * move_right = address_of(input->move_right_action);
+            move_right->bound_key = KINC_KEY_R;
+            move_right->requires_shift = false;
+            move_right->requires_control = false;
+            move_right->requires_alt = false;
         }
 
         //Reset all parameters to their default up state

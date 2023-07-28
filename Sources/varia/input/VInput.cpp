@@ -17,7 +17,7 @@ void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Event_Emitte
     if (key == KINC_KEY_ALT) { state->modifiers.alt_down = true; }
 
     //Gameplay::Move Right PRESSED
-    if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action.keybind))
+    if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action))
     {
         System_Event e = ZERO_INIT();
         e.tag = E_System_Event_Type::Gameplay_Move_Right_Pressed;
@@ -40,7 +40,7 @@ void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Event_Emitter 
     if (key == KINC_KEY_ALT) { state->modifiers.alt_down = false; }
 
     //Gameplay::Move Right RELEASED
-    if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action.keybind))
+    if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action))
     {
         System_Event e = ZERO_INIT();
         e.tag = E_System_Event_Type::Gameplay_Move_Right_Released;
