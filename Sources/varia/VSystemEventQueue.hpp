@@ -1,6 +1,7 @@
 #pragma once
 
 #include "varia/VShared.hpp"
+#include "varia/input/VEventMoveRight.hpp"
 
 enum class E_System_Event_Type
 {
@@ -18,17 +19,13 @@ enum class E_System_Event_Type
     System_Window_Request_Resize,
 };
 
-struct System_Event_Data_Empty
-{
-    //Intentionally empty, data is encoded as the raw event
-};
-
 struct System_Event
 {
     E_System_Event_Type tag;
     union
     {
-        System_Event_Data_Empty empty;
+        Event_Move_Right_Pressed_Data move_right_pressed_data;
+        Event_Move_Right_Released_Data move_right_released_data;
     };
 };
 

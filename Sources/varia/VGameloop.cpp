@@ -100,7 +100,6 @@ void v_gameloop_entrypoint(void * data)
 
     {
         Input_Virtual_Action_State * input = address_of(context->input);
-        logic_world->display_time_multiplier = input->move_right_action.data.movement_multiplier;
     }
 
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -124,12 +123,14 @@ void v_gameloop_entrypoint(void * data)
                 //Inputtable Events....?
                 case E_System_Event_Type::Gameplay_Move_Right_Pressed:
                 {
-
+                    Float_64 data = e.move_right_pressed_data.state;
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Press detected! %f!", data);
                     break;
                 }
                 case E_System_Event_Type::Gameplay_Move_Right_Released:
                 {
-
+                    Float_64 data = e.move_right_released_data.state;
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Release detected! %f!", data);
                     break;
                 }
                 case E_System_Event_Type::Gameplay_Move_Left_Pressed:
@@ -341,25 +342,30 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
         Input_Virtual_Action_State * input = address_of(game.input);
+        Input_Event_Emitter emitter = ZERO_INIT();
+        {
+            emitter.input = input;
+            emitter.events = address_of(game.system_events);
+        }
 
-        kinc_keyboard_set_key_down_callback(&v_input_keydown_callback, input);
-        kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, input);
+        kinc_keyboard_set_key_down_callback(&v_input_keydown_callback, address_of(emitter));
+        kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, address_of(emitter));
         //TODO(<zshoals> 07-27-2023): Mouse stuff?
 
-        Virtual_Action<Action_Move_Right_Data> * move_right = address_of(input->move_right_action);
+        Event_Move_Right * move_right = address_of(input->move_right_action);
         {
-            move_right->bound_key = KINC_KEY_R;
-            move_right->requires_shift = false;
-            move_right->requires_control = false;
-            move_right->requires_alt = false;
-            move_right->on_keydown = &v_action_move_right_keydown;
-            move_right->on_keyup = &v_action_move_right_keyup;
+            move_right->keybind.bound_key = KINC_KEY_R;
+            move_right->keybind.requires_shift = false;
+            move_right->keybind.requires_control = false;
+            move_right->keybind.requires_alt = false;
+            move_right->pressed_data = { 1.0f };
+            move_right->released_data = { 0.0f };
         }
 
         //Reset all parameters to their default up state
         //TODO(<zshoals> 07-27-2023): This probably needs to happen on alt tab as well
         //  aka window focus loss
-        v_input_trigger_all_keyup_actions(input);
+        v_input_trigger_all_keyup_actions(address_of(emitter));
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

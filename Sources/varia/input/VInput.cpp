@@ -5,50 +5,68 @@
 #include "kinc/input/keyboard.h"
 #include "kinc/input/mouse.h"
 
-//Assign standard keybinds here?
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/)
+void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Event_Emitter * state*/)
 {
-    Input_Virtual_Action_State * state = static_cast<Input_Virtual_Action_State *>(data);
+    Input_Event_Emitter * emitter = static_cast<Input_Event_Emitter *>(data);
+    Input_Virtual_Action_State * state = emitter->input;
+    System_Event_Queue * events = emitter->events;
 
     //NOTE(<zshoals> 07-27-2023): Special casing modifier keys because it's way easier this way...
     if (key == KINC_KEY_SHIFT) { state->modifiers.shift_down = true; }
     if (key == KINC_KEY_CONTROL) { state->modifiers.control_down = true; }
     if (key == KINC_KEY_ALT) { state->modifiers.alt_down = true; }
 
-    v_input_try_virtual_action_keydown(key, const_address_of(state->modifiers), address_of(state->move_right_action));
-    v_input_try_virtual_action_keydown(key, const_address_of(state->modifiers), address_of(state->move_left_action));
+    //Gameplay::Move Right PRESSED
+    if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action.keybind))
+    {
+        System_Event e = ZERO_INIT();
+        e.tag = E_System_Event_Type::Gameplay_Move_Right_Pressed;
+        e.move_right_pressed_data = state->move_right_action.pressed_data;
+
+        v_system_event_queue_push(events, e);
+    }
+    //if....other keybinds...
+
 }
 
-void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/)
+void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Event_Emitter * state*/)
 {
-    Input_Virtual_Action_State * state = static_cast<Input_Virtual_Action_State *>(data);
+    Input_Event_Emitter * emitter = static_cast<Input_Event_Emitter *>(data);
+    Input_Virtual_Action_State * state = emitter->input;
+    System_Event_Queue * events = emitter->events;
 
     //NOTE(<zshoals> 07-27-2023): Special casing modifier keys because it's way easier this way...
     if (key == KINC_KEY_SHIFT) { state->modifiers.shift_down = false; }
     if (key == KINC_KEY_CONTROL) { state->modifiers.control_down = false; }
     if (key == KINC_KEY_ALT) { state->modifiers.alt_down = false; }
 
-    v_input_try_virtual_action_keyup(key, const_address_of(state->modifiers), address_of(state->move_right_action));
-    v_input_try_virtual_action_keyup(key, const_address_of(state->modifiers), address_of(state->move_left_action));
+    //Gameplay::Move Right RELEASED
+    if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action.keybind))
+    {
+        System_Event e = ZERO_INIT();
+        e.tag = E_System_Event_Type::Gameplay_Move_Right_Released;
+        e.move_right_released_data = state->move_right_action.released_data;
+
+        v_system_event_queue_push(events, e);
+    }
+    //if....other keybinds...
 }
-
-//State transfer operations
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-Action_Move_Right_Data v_input_extract_move_right_data(Input_Virtual_Action_State const * input)
-{
-    return input->move_right_action.data;
-}
-
 
 
 //This can only be called after ALL actions have had their keyup callback assigned
-void v_input_trigger_all_keyup_actions(Input_Virtual_Action_State * input)
+void v_input_trigger_all_keyup_actions(Input_Event_Emitter * emitter)
 {
-    input->move_right_action.on_keyup(address_of(input->move_right_action.data));
-    // input->move_left_action.on_keyup();
+    Input_Virtual_Action_State const * state = emitter->input;
+
+    System_Event e[32] = ZERO_INIT();
+
+    //Yes...we're just going to manually build this list...
+    e[0].tag = E_System_Event_Type::Gameplay_Move_Right_Released;
+    e[0].move_right_released_data = state->move_right_action.released_data;
+
+    Integer_64 constexpr max_items = 1;
+    for_range_var(i, max_items)
+    {
+        v_system_event_queue_push(emitter->events, e[i]);
+    }
 }
