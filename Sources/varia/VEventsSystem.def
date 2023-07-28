@@ -1,7 +1,0 @@
-X(System_Window_Vertical_Sync_Enable)
-X(System_Window_Vertical_Sync_Disable)
-X(System_Window_Gained_Focus)
-X(System_Window_Lost_Focus)
-X(System_Window_Request_Fullscreen)
-X(System_Window_Request_Windowed)
-X(System_Window_Request_Resize)
