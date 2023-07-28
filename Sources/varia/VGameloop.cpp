@@ -113,10 +113,14 @@ void v_gameloop_entrypoint(void * data)
                 //Kinc State Events
                 case E_System_Event_Type::System_Window_Vertical_Sync_Enable:
                 {
+                    logic_world->framebuffer.vertical_sync = true;
+                    logic_world->framebuffer_requires_reapplication = true;
                     break;
                 }
                 case E_System_Event_Type::System_Window_Vertical_Sync_Disable:
                 {
+                    logic_world->framebuffer.vertical_sync = false;
+                    logic_world->framebuffer_requires_reapplication = true;
                     break;
                 }
                 case E_System_Event_Type::System_Window_Lost_Focus:
@@ -145,14 +149,17 @@ void v_gameloop_entrypoint(void * data)
                 }
                 case E_System_Event_Type::System_Window_Request_Fullscreen:
                 {
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Fullscreen Event Unimplemented");
                     break;
                 }
                 case E_System_Event_Type::System_Window_Request_Windowed:
                 {
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Windowed Event Unimplemented");
                     break;
                 }
                 case E_System_Event_Type::System_Window_Request_Resize:
                 {
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Window Resize Event Unimplemented");
                     break;
                 }
             }
@@ -176,12 +183,14 @@ void v_gameloop_entrypoint(void * data)
         {
             //TODO(<zshoals> 07-27-2023): Stuff?
 
+            logic_world->window_requires_reapplication = false;
         }
 
         if (logic_world->framebuffer_requires_reapplication)
         {
             //TODO(<zshoals> 07-27-2023): Stuff?
             kinc_window_change_framebuffer(logic_world->kinc_primary_display_index, address_of(logic_world->framebuffer));
+            logic_world->framebuffer_requires_reapplication = false;
         }
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -353,11 +362,18 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
         //TODO(<zshoals> 07-27-2023): Mouse stuff?
 
         {
-            Action_Move_Right * move_right = address_of(input->move_right_action);
-            move_right->bound_key = KINC_KEY_R;
-            move_right->requires_shift = false;
-            move_right->requires_control = false;
-            move_right->requires_alt = false;
+            Virtual_Key * key = address_of(input->move_right_action);
+            key->bound_key = KINC_KEY_R;
+            key->requires_shift = false;
+            key->requires_control = false;
+            key->requires_alt = false;
+        }
+        {
+            Virtual_Key * key = address_of(input->move_left_action);
+            key->bound_key = KINC_KEY_E;
+            key->requires_shift = false;
+            key->requires_control = false;
+            key->requires_alt = false;
         }
 
         //Reset all parameters to their default up state

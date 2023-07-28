@@ -7,8 +7,6 @@
 
 #include "kinc/input/keyboard.h"
 
-typedef Virtual_Key Action_Move_Right;
-
 struct Input_Modifier_State
 {
     Boolean control_down;
@@ -18,7 +16,9 @@ struct Input_Modifier_State
 
 struct Input_Virtual_Action_State
 {
-    Action_Move_Right move_right_action;
+    #define X(ActionEnum, Name) Virtual_Key Name;
+    #include "varia/VEventsInputtable.def"
+    #undef X
 
     Input_Modifier_State modifiers;
 };

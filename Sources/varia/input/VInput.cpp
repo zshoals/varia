@@ -16,14 +16,22 @@ void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Event_Emitte
     if (key == KINC_KEY_CONTROL) { state->modifiers.control_down = true; }
     if (key == KINC_KEY_ALT) { state->modifiers.alt_down = true; }
 
-    //Gameplay::Move Right PRESSED
-    if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action))
-    {
-        System_Event e = ZERO_INIT();
-        e.tag = E_System_Event_Type::Gameplay_Move_Right_Pressed;
+    #define X(ActionName, Name)\
+        if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->Name))\
+        {\
+            System_Event e = ZERO_INIT();\
+            e.tag = E_System_Event_Type::VARIA_CONCAT(ActionName, _Pressed);\
+            v_system_event_queue_push(events, e);\
+        }
+    #include "varia/VEventsInputtable.def"
+    #undef X
+    // if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action))
+    // {
+    //     System_Event e = ZERO_INIT();
+    //     e.tag = E_System_Event_Type::Gameplay_Move_Right_Pressed;
 
-        v_system_event_queue_push(events, e);
-    }
+    //     v_system_event_queue_push(events, e);
+    // }
     //if....other keybinds...
 
 }
@@ -39,14 +47,24 @@ void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Event_Emitter 
     if (key == KINC_KEY_CONTROL) { state->modifiers.control_down = false; }
     if (key == KINC_KEY_ALT) { state->modifiers.alt_down = false; }
 
-    //Gameplay::Move Right RELEASED
-    if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action))
-    {
-        System_Event e = ZERO_INIT();
-        e.tag = E_System_Event_Type::Gameplay_Move_Right_Released;
+    #define X(ActionName, Name)\
+        if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->Name))\
+        {\
+            System_Event e = ZERO_INIT();\
+            e.tag = E_System_Event_Type::VARIA_CONCAT(ActionName, _Released);\
+            v_system_event_queue_push(events, e);\
+        }
+    #include "varia/VEventsInputtable.def"
+    #undef X
 
-        v_system_event_queue_push(events, e);
-    }
+    //Gameplay::Move Right RELEASED
+    // if(v_input_virtual_key_matches_keypress(key, state->modifiers, state->move_right_action))
+    // {
+    //     System_Event e = ZERO_INIT();
+    //     e.tag = E_System_Event_Type::Gameplay_Move_Right_Released;
+
+    //     v_system_event_queue_push(events, e);
+    // }
     //if....other keybinds...
 }
 

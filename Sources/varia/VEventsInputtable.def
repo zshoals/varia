@@ -1,0 +1,3 @@
+//Event Name || InputState Name || Default Keybind || 
+X(Gameplay_Move_Right, move_right_action)
+X(Gameplay_Move_Left, move_left_action)

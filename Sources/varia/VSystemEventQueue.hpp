@@ -4,18 +4,24 @@
 
 enum class E_System_Event_Type
 {
-    Gameplay_Move_Right_Pressed,
-    Gameplay_Move_Right_Released,
-    Gameplay_Move_Left_Pressed,
-    Gameplay_Move_Left_Released,
+    // Gameplay_Move_Right_Pressed,
+    // Gameplay_Move_Right_Released,
+    // Gameplay_Move_Left_Pressed,
+    // Gameplay_Move_Left_Released,
 
-    System_Window_Vertical_Sync_Enable,
-    System_Window_Vertical_Sync_Disable,
-    System_Window_Lost_Focus,
-    System_Window_Gained_Focus,
-    System_Window_Request_Fullscreen,
-    System_Window_Request_Windowed,
-    System_Window_Request_Resize,
+    // System_Window_Vertical_Sync_Enable,
+    // System_Window_Vertical_Sync_Disable,
+    // System_Window_Lost_Focus,
+    // System_Window_Gained_Focus,
+    // System_Window_Request_Fullscreen,
+    // System_Window_Request_Windowed,
+    // System_Window_Request_Resize,
+    #define X(EventName, Name) EventName ## _Pressed, EventName ## _Released,
+    #include "varia/VEventsInputtable.def"
+    #undef X
+    #define X(EventName) EventName,
+    #include "varia/VEventsSystem.def"
+    #undef X
 };
 
 struct System_Event
