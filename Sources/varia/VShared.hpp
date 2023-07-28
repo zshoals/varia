@@ -65,6 +65,11 @@ T const & dereference(T const * const element)
 	return *(element);
 }
 
+static inline void varia_toggle(Boolean * b)
+{
+	*b = *b ? false : true;
+}
+
 //https://stackoverflow.com/a/8357462
 template <typename E>
 constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
