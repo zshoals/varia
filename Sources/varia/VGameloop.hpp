@@ -47,10 +47,6 @@ struct Gamestate
     Float_64 logic_cumulative_gameclock;
     Float_64 render_cumulative_gameclock;
 
-    //Input
-    //TODO(<zshoals> 07-27-2023): This might actually belong in the game context
-    Input_Virtual_Action_State input;
-
     //Other stuff
     Float_64 display_time_multiplier;
 

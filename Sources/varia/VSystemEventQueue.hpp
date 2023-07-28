@@ -4,8 +4,10 @@
 
 enum class E_System_Event_Type
 {
-    Gameplay_Move_Right,
-    Gameplay_Move_Left,
+    Gameplay_Move_Right_Pressed,
+    Gameplay_Move_Right_Released,
+    Gameplay_Move_Left_Pressed,
+    Gameplay_Move_Left_Released,
 
     System_Window_Vertical_Sync_Enable,
     System_Window_Vertical_Sync_Disable,

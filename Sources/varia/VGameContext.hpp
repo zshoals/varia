@@ -6,6 +6,7 @@
 
 struct Game_Context
 {
+    Input_Virtual_Action_State input;
     System_Event_Queue system_events;
     Gamestate logic_world;
     Gamestate visual_world; //Exclusively for the renderer

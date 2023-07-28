@@ -95,11 +95,11 @@ void v_gameloop_entrypoint(void * data)
     Game_Context * context = static_cast<Game_Context *>(data);
     Gamestate * logic_world = address_of(context->logic_world);
 
-    //Update World Data From Key/Mouse Inputs
+    //Emit Key/Mouse Input Events
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     {
-        Input_Virtual_Action_State * input = address_of(logic_world->input);
+        Input_Virtual_Action_State * input = address_of(context->input);
         logic_world->display_time_multiplier = input->move_right_action.data.movement_multiplier;
     }
 
@@ -121,14 +121,26 @@ void v_gameloop_entrypoint(void * data)
                     VARIA_UNREACHABLE("Unhandled system event.");
                     break;
                 }
-                case E_System_Event_Type::Gameplay_Move_Right:
+                //Inputtable Events....?
+                case E_System_Event_Type::Gameplay_Move_Right_Pressed:
+                {
+
+                    break;
+                }
+                case E_System_Event_Type::Gameplay_Move_Right_Released:
+                {
+
+                    break;
+                }
+                case E_System_Event_Type::Gameplay_Move_Left_Pressed:
                 {
                     break;
                 }
-                case E_System_Event_Type::Gameplay_Move_Left:
+                case E_System_Event_Type::Gameplay_Move_Left_Released:
                 {
                     break;
                 }
+                //Kinc State Events
                 case E_System_Event_Type::System_Window_Vertical_Sync_Enable:
                 {
                     break;
@@ -226,7 +238,7 @@ void v_gameloop_entrypoint(void * data)
         
 
 
-        //Primary fixed update loop
+        //Fixed update loop
         //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         logic_world->total_realtime_fixed_update_time = kinc_time();
@@ -328,7 +340,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //Initialize Input
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        Input_Virtual_Action_State * input = address_of(game.logic_world.input);
+        Input_Virtual_Action_State * input = address_of(game.input);
 
         kinc_keyboard_set_key_down_callback(&v_input_keydown_callback, input);
         kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, input);
