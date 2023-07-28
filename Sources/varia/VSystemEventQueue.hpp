@@ -1,7 +1,6 @@
 #pragma once
 
 #include "varia/VShared.hpp"
-#include "varia/input/VEventMoveRight.hpp"
 
 enum class E_System_Event_Type
 {
@@ -22,11 +21,13 @@ enum class E_System_Event_Type
 struct System_Event
 {
     E_System_Event_Type tag;
-    union
-    {
-        Event_Move_Right_Pressed_Data move_right_pressed_data;
-        Event_Move_Right_Released_Data move_right_released_data;
-    };
+    //NOTE(<zshoals> 07-28-2023): Let's try and avoid passing data; instead,
+    //  this will simply be located "globally" in the event processor, for better or worse
+    // union
+    // {
+    //     Event_Move_Right_Pressed_Data move_right_pressed_data;
+    //     Event_Move_Right_Released_Data move_right_released_data;
+    // };
 };
 
 

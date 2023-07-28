@@ -2,7 +2,7 @@
 
 #include "varia/VShared.hpp"
 #include "varia/input/VVirtualKey.hpp"
-#include "varia/input/VEventMoveRight.hpp"
+#include "varia/input/VActionMoveRight.hpp"
 #include "varia/VSystemEventQueue.hpp"
 
 #include "kinc/input/keyboard.h"
@@ -16,7 +16,7 @@ struct Input_Modifier_State
 
 struct Input_Virtual_Action_State
 {
-    Event_Move_Right move_right_action;
+    Action_Move_Right move_right_action;
     //Action_Move_Left move_left_action;
 
     Input_Modifier_State modifiers;

@@ -7,36 +7,12 @@
 #include "varia/VGamestateQuery.hpp"
 #include "varia/utility/VMemcpy.hpp"
 #include "varia/input/VInput.hpp"
+#include "varia/VSystemCallbacks.hpp"
 
 #include "kinc/system.h"
 #include "kinc/log.h"
 
 
-//Game System Imports
-
-static void v_system_callback_focus_lost(void * data)
-{
-    System_Event_Queue * events = static_cast<System_Event_Queue *>(data);
-
-    System_Event e = ZERO_INIT();
-    {
-        e.tag = E_System_Event_Type::System_Window_Lost_Focus;
-    }
-
-    v_system_event_queue_push(events, e);
-}
-
-static void v_system_callback_focus_gained(void * data)
-{
-    System_Event_Queue * events = static_cast<System_Event_Queue *>(data);
-
-    System_Event e = ZERO_INIT();
-    {
-        e.tag = E_System_Event_Type::System_Window_Gained_Focus;
-    }
-
-    v_system_event_queue_push(events, e);
-}
 
 static void v_print_timing_info(Gamestate * gamestate)
 {
@@ -95,15 +71,6 @@ void v_gameloop_entrypoint(void * data)
     Game_Context * context = static_cast<Game_Context *>(data);
     Gamestate * logic_world = address_of(context->logic_world);
 
-    //Emit Key/Mouse Input Events
-    //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    {
-        Input_Virtual_Action_State * input = address_of(context->input);
-    }
-
-    //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     //Process the System Event Loop
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
@@ -123,13 +90,13 @@ void v_gameloop_entrypoint(void * data)
                 //Inputtable Events....?
                 case E_System_Event_Type::Gameplay_Move_Right_Pressed:
                 {
-                    Float_64 data = e.move_right_pressed_data.state;
+                    Float_64 data = kinc_time();
                     kinc_log(KINC_LOG_LEVEL_INFO, "Press detected! %f!", data);
                     break;
                 }
                 case E_System_Event_Type::Gameplay_Move_Right_Released:
                 {
-                    Float_64 data = e.move_right_released_data.state;
+                    Float_64 data = kinc_time();
                     kinc_log(KINC_LOG_LEVEL_INFO, "Release detected! %f!", data);
                     break;
                 }
@@ -181,14 +148,20 @@ void v_gameloop_entrypoint(void * data)
     //Process important commands (Kinc state configuration updates, for example)
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
+        //NOTE(<zshoals> 07-28-2023): This might be an expensive operation that isn't needed
+        //  a lot of these "system query" type operations are weirdly expensive
+        // logic_world->kinc_primary_display_index = kinc_primary_display();
+
         if (logic_world->window_requires_reapplication)
         {
             //TODO(<zshoals> 07-27-2023): Stuff?
+
         }
 
         if (logic_world->framebuffer_requires_reapplication)
         {
             //TODO(<zshoals> 07-27-2023): Stuff?
+            kinc_window_change_framebuffer(logic_world->kinc_primary_display_index, address_of(logic_world->framebuffer));
         }
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -327,6 +300,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
 		//[Kinc Settings]
 		game.logic_world.window = wo;
 		game.logic_world.framebuffer = fbo;
+        game.kinc_primary_display_index = kinc_primary_display();
 	}
 	
     kinc_init
@@ -352,14 +326,12 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
         kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, address_of(emitter));
         //TODO(<zshoals> 07-27-2023): Mouse stuff?
 
-        Event_Move_Right * move_right = address_of(input->move_right_action);
+        Action_Move_Right * move_right = address_of(input->move_right_action);
         {
             move_right->keybind.bound_key = KINC_KEY_R;
             move_right->keybind.requires_shift = false;
             move_right->keybind.requires_control = false;
             move_right->keybind.requires_alt = false;
-            move_right->pressed_data = { 1.0f };
-            move_right->released_data = { 0.0f };
         }
 
         //Reset all parameters to their default up state
@@ -374,7 +346,6 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
         System_Event_Queue * events = address_of(game.system_events);
-        //Window focus gained/loss, etc.
         kinc_set_foreground_callback(&v_system_callback_focus_gained, events);
         kinc_set_background_callback(&v_system_callback_focus_lost, events);
     }

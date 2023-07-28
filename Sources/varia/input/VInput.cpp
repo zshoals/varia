@@ -21,7 +21,6 @@ void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Event_Emitte
     {
         System_Event e = ZERO_INIT();
         e.tag = E_System_Event_Type::Gameplay_Move_Right_Pressed;
-        e.move_right_pressed_data = state->move_right_action.pressed_data;
 
         v_system_event_queue_push(events, e);
     }
@@ -45,7 +44,6 @@ void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Event_Emitter 
     {
         System_Event e = ZERO_INIT();
         e.tag = E_System_Event_Type::Gameplay_Move_Right_Released;
-        e.move_right_released_data = state->move_right_action.released_data;
 
         v_system_event_queue_push(events, e);
     }
@@ -53,16 +51,14 @@ void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Event_Emitter 
 }
 
 
-//This can only be called after ALL actions have had their keyup callback assigned
 void v_input_trigger_all_keyup_actions(Input_Event_Emitter * emitter)
 {
     Input_Virtual_Action_State const * state = emitter->input;
 
     System_Event e[32] = ZERO_INIT();
 
-    //Yes...we're just going to manually build this list...
+    //NOTE(<zshoals> 07-28-2023): Yes...we're just going to manually build this list...
     e[0].tag = E_System_Event_Type::Gameplay_Move_Right_Released;
-    e[0].move_right_released_data = state->move_right_action.released_data;
 
     Integer_64 constexpr max_items = 1;
     for_range_var(i, max_items)

@@ -16,6 +16,7 @@ struct Gamestate
     //Kinc configuration options
     Boolean window_requires_reapplication;
     Boolean framebuffer_requires_reapplication;
+    int kinc_primary_display_index;
     kinc_window_options_t window;
     kinc_framebuffer_options_t framebuffer;
 
@@ -46,9 +47,6 @@ struct Gamestate
     Integer_64 rendered_frames;
     Float_64 logic_cumulative_gameclock;
     Float_64 render_cumulative_gameclock;
-
-    //Other stuff
-    Float_64 display_time_multiplier;
 
     //Actual gamedata below...which we don't have any of yet :)
 };
