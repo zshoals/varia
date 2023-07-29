@@ -7,7 +7,7 @@
 
 typedef int Kinc_Keycode;
 
-enum class E_Gameplay_Actions
+enum class E_Gameplay_Action
 {
     Move_Right,
     Move_Left,
@@ -49,15 +49,36 @@ struct Input_Modifier_State
 #define GAMEPLAY_EVENT_QUEUE_MAX_SIZE 128
 struct Input_Virtual_Action_State
 {
-    Input_Virtual_Key virtual_keys[E_Gameplay_Actions::MAX_COUNT];
+    Input_Virtual_Key virtual_keys[E_Gameplay_Action::MAX_COUNT];
 
     VDS_Reset_Queue_Storage<E_Gameplay_Event, GAMEPLAY_EVENT_QUEUE_MAX_SIZE> events;
 
-    Input_Modifier_State modifiers;
+    Input_Modifier_State _modifiers;
 };
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+void v_input_initialize(Input_Virtual_Action_State * input);
+
+void v_input_configure_move_right_action(Input_Virtual_Action_State * state, Kinc_Keycode key, Boolean use_shift, Boolean use_control, Boolean use_alt);
+void v_input_configure_move_left_action(Input_Virtual_Action_State * state, Kinc_Keycode key, Boolean use_shift, Boolean use_control, Boolean use_alt);
+
 void v_input_trigger_all_keyup_actions(Input_Virtual_Action_State * state);
 void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/);
 void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/);
+
+template <typename FUNC>
+void v_input_process_events(Input_Virtual_Action_State * state, FUNC f)
+{
+    VDS_Reset_Queue<E_Gameplay_Event> events = vds_reset_queue_make_interface(address_of(state->events));
+    VDS_Reset_Queue<E_Gameplay_Event> * events_location = address_of(events);
+
+    while (vds_reset_queue_has_elements(events_location))
+    {
+        E_Gameplay_Event e = vds_reset_queue_get_first_element(events_location);
+        f(e);
+        vds_reset_queue_pop(events_location);
+    }
+
+    vds_reset_queue_reset(events_location);
+}
