@@ -42,12 +42,6 @@ T * address_of(T & element)
 }
 
 template <typename T>
-T const * address_of(T const & element)
-{
-	return &(element);
-}
-
-template <typename T>
 T const * const_address_of(T const & element)
 {
 	return &(element);
