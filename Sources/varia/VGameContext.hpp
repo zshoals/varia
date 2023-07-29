@@ -4,6 +4,7 @@
 #include "varia/graphics/VRenderer.hpp"
 #include "varia/VSystemEvents.hpp"
 #include "varia/ds/VDS-ResetQueue.hpp"
+#include "varia/ds/VDS-Buffer.hpp"
 
 struct Game_Context
 {
@@ -17,4 +18,7 @@ struct Game_Context
 
     Graphics_Renderer gfx;
     Graphics_Intermediate_Representation ir_storage;
+
+    VDS_Buffer<68 * 1000 * 1000> image_loading_buffer; //68mb
+    VDS_Buffer<20 * 1000 * 1000> file_loading_buffer; //20mb
 };
