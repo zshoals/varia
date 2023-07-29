@@ -1,13 +1,43 @@
 #pragma once
 
 #include "varia/VShared.hpp"
-#include "varia/input/VVirtualKey.hpp"
-#include "varia/input/VActionMoveRight.hpp"
-#include "varia/VSystemEventQueue.hpp"
+#include "varia/ds/VDS-ResetQueue.hpp"
 
 #include "kinc/input/keyboard.h"
 
-typedef Virtual_Key Action_Move_Right;
+typedef int Kinc_Keycode;
+
+enum class E_Gameplay_Actions
+{
+    Move_Right,
+    Move_Left,
+
+    MAX_COUNT //The way we use this means it acts like 
+};
+
+enum class E_Gameplay_Event
+{
+    UNHANDLED_EVENT,
+
+    No_Action,
+
+    Move_Right_Pressed,
+    Move_Right_Released,
+
+    Move_Left_Pressed,
+    Move_Left_Released,
+
+};
+
+struct Input_Virtual_Key
+{
+    Kinc_Keycode bound_key;
+    Boolean requires_shift;
+    Boolean requires_control;
+    Boolean requires_alt;
+    E_Gameplay_Event event_pressed;
+    E_Gameplay_Event event_released;
+};
 
 struct Input_Modifier_State
 {
@@ -16,38 +46,18 @@ struct Input_Modifier_State
     Boolean alt_down;
 };
 
+#define GAMEPLAY_EVENT_QUEUE_MAX_SIZE 128
 struct Input_Virtual_Action_State
 {
-    Action_Move_Right move_right_action;
+    Input_Virtual_Key virtual_keys[E_Gameplay_Actions::MAX_COUNT];
+
+    VDS_Reset_Queue_Storage<E_Gameplay_Event, GAMEPLAY_EVENT_QUEUE_MAX_SIZE> events;
 
     Input_Modifier_State modifiers;
 };
 
-struct Input_Event_Emitter
-{
-    Input_Virtual_Action_State * input;
-    System_Event_Queue * events;
-};
-
-static inline Boolean v_input_virtual_key_matches_keypress(Kinc_Keycode keycode, Input_Modifier_State modifiers, Virtual_Key virtual_key)
-{
-    Boolean has_shift = (virtual_key.requires_shift) ? modifiers.shift_down : true;
-    Boolean has_control = (virtual_key.requires_control) ? modifiers.control_down : true;
-    Boolean has_alt = (virtual_key.requires_alt) ? modifiers.alt_down : true;
-
-    Boolean has_modifiers = (has_shift & has_control & has_alt);
-
-    if (virtual_key.bound_key == keycode && has_modifiers)
-    {
-        return true;
-    }
-
-    return false;
-}
-
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-void v_input_trigger_all_keyup_actions(Input_Event_Emitter * emitter);
-
-void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Event_Emitter* state*/);
-void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Event_Emitter * state*/);
+void v_input_trigger_all_keyup_actions(Input_Virtual_Action_State * state);
+void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/);
+void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/);

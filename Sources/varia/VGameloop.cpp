@@ -2,7 +2,6 @@
 
 #include "varia/VShared.hpp"
 #include "varia/VGameContext.hpp"
-#include "varia/VSystemEventQueue.hpp"
 #include "varia/VSimulation.hpp"
 #include "varia/VGamestateQuery.hpp"
 #include "varia/utility/VMemcpy.hpp"
@@ -73,41 +72,78 @@ void v_gameloop_entrypoint(void * data)
     Game_Context * context = static_cast<Game_Context *>(data);
     Gamestate * logic_world = address_of(context->logic_world);
 
-    //Process the System Event Loop
+    //Process the Input Event Loop
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        System_Event_Queue * events = address_of(context->system_events);
+        VDS_Reset_Queue<E_Gameplay_Event> events = vds_reset_queue_make_interface(address_of(context->input.events));
+        VDS_Reset_Queue<E_Gameplay_Event> * events_location = address_of(events);
 
-        while (v_system_event_queue_has_events(events))
+        while (vds_reset_queue_has_elements(events_location))
         {
-            System_Event e = v_system_event_queue_get_first_event(events);
+            E_Gameplay_Event e = vds_reset_queue_get_first_element(events_location);
 
-            switch (e.tag)
+            switch (e)
             {
                 default:
                 {
                     VARIA_UNREACHABLE("Unhandled system event.");
                     break;
                 }
-                //Inputtable Events....?
-                case E_System_Event_Type::Gameplay_Move_Right_Pressed:
+                case E_Gameplay_Event::No_Action:
+                {
+                    break;
+                }
+                case E_Gameplay_Event::Move_Right_Pressed:
                 {
                     Float_64 data = kinc_time();
-                    kinc_log(KINC_LOG_LEVEL_INFO, "Press detected! %f!", data);
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Right Press detected! %f!", data);
                     break;
                 }
-                case E_System_Event_Type::Gameplay_Move_Right_Released:
+                case E_Gameplay_Event::Move_Right_Released:
                 {
                     Float_64 data = kinc_time();
-                    kinc_log(KINC_LOG_LEVEL_INFO, "RELEASE FUCK YOU detected! %f!", data);
+                    kinc_log(KINC_LOG_LEVEL_INFO, "RIGHT RELEASE FUCK YOU detected! %f!", data);
                     break;
                 }
-                case E_System_Event_Type::Gameplay_Move_Left_Pressed:
+                case E_Gameplay_Event::Move_Left_Pressed:
                 {
+                    Float_64 data = kinc_time();
+                    kinc_log(KINC_LOG_LEVEL_INFO, "Left Press detected! %f!", data);
                     break;
                 }
-                case E_System_Event_Type::Gameplay_Move_Left_Released:
+                case E_Gameplay_Event::Move_Left_Released:
                 {
+                    Float_64 data = kinc_time();
+                    kinc_log(KINC_LOG_LEVEL_INFO, "LEFT RELEASE FUCK YOU detected! %f!", data);
+                    break;
+                }
+            }
+
+            vds_reset_queue_pop(events_location);
+        }
+
+        vds_reset_queue_reset(events_location);
+    }
+    
+    //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+
+    //Process the System Event Loop
+    //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    {
+        VDS_Reset_Queue<E_System_Event_Type> events = vds_reset_queue_make_interface(address_of(context->system_events));
+        VDS_Reset_Queue<E_System_Event_Type> * events_location = address_of(events);
+
+        while (vds_reset_queue_has_elements(events_location))
+        {
+            E_System_Event_Type e = vds_reset_queue_get_first_element(events_location);
+
+            switch (e)
+            {
+                default:
+                {
+                    VARIA_UNREACHABLE("Unhandled system event.");
                     break;
                 }
                 //Kinc State Events
@@ -121,16 +157,11 @@ void v_gameloop_entrypoint(void * data)
                 }
                 case E_System_Event_Type::System_Window_Lost_Focus:
                 {
-                    Input_Event_Emitter emitter = ZERO_INIT();
-                    {
-                        emitter.input = address_of(context->input);
-                        emitter.events = events;
-                    }
-
                     //TODO(<zshoals> 07-28-2023): This doesn't completely solve the problem;
                     //  Kinc seems to ignore the next keypress, leading to a double release
                     //  however this at least seems to stop any alt-tab exploit
-                    v_input_trigger_all_keyup_actions(address_of(emitter));
+                    //  Also, keypresses generated here won't be handled until the next frame
+                    v_input_trigger_all_keyup_actions(address_of(context->input));
                     logic_world->enable_sleep_in_loop = true;
 
                     kinc_log(KINC_LOG_LEVEL_INFO, "Lost Focus; all keys released, sleeping loop enabled");
@@ -141,6 +172,7 @@ void v_gameloop_entrypoint(void * data)
                 {
                     kinc_log(KINC_LOG_LEVEL_INFO, "Gained focus, sleeping loop disabled");
                     logic_world->enable_sleep_in_loop = false;
+
                     break;
                 }
                 case E_System_Event_Type::System_Window_Request_Fullscreen:
@@ -157,10 +189,10 @@ void v_gameloop_entrypoint(void * data)
                 }
             }
 
-            v_system_event_queue_pop(events);
+            vds_reset_queue_pop(events_location);
         }
 
-        v_system_event_queue_clear(events);
+        vds_reset_queue_reset(events_location);
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -342,28 +374,34 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
         Input_Virtual_Action_State * input = address_of(game.input);
-        Input_Event_Emitter emitter = ZERO_INIT();
-        {
-            emitter.input = input;
-            emitter.events = address_of(game.system_events);
-        }
-
-        kinc_keyboard_set_key_down_callback(&v_input_keydown_callback, address_of(emitter));
-        kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, address_of(emitter));
+        kinc_keyboard_set_key_down_callback(&v_input_keydown_callback, input);
+        kinc_keyboard_set_key_up_callback(&v_input_keyup_callback, input);
         //TODO(<zshoals> 07-27-2023): Mouse stuff?
 
+        //Move Right Action
         {
-            Action_Move_Right * move_right = address_of(input->move_right_action);
-            move_right->bound_key = KINC_KEY_R;
-            move_right->requires_shift = false;
-            move_right->requires_control = false;
-            move_right->requires_alt = false;
+            Input_Virtual_Key & key = input->virtual_keys[(Integer_64)E_Gameplay_Actions::Move_Right];
+            key.bound_key = KINC_KEY_D;
+            key.requires_shift = false;
+            key.requires_control = false;
+            key.requires_alt = false;
+            key.event_pressed = E_Gameplay_Event::Move_Right_Pressed;
+            key.event_released = E_Gameplay_Event::Move_Right_Released;
+        }
+        //Move Left Action
+        {
+            Input_Virtual_Key & key = input->virtual_keys[(Integer_64)E_Gameplay_Actions::Move_Left];
+            key.bound_key = KINC_KEY_A;
+            key.requires_shift = false;
+            key.requires_control = false;
+            key.requires_alt = false;
+            key.event_pressed = E_Gameplay_Event::Move_Left_Pressed;
+            key.event_released = E_Gameplay_Event::Move_Left_Released;
         }
 
+
         //Reset all parameters to their default up state
-        //TODO(<zshoals> 07-27-2023): This probably needs to happen on alt tab as well
-        //  aka window focus loss
-        v_input_trigger_all_keyup_actions(address_of(emitter));
+        v_input_trigger_all_keyup_actions(input);
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -371,9 +409,11 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //Set Kinc's Environment Callbacks
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        System_Event_Queue * events = address_of(game.system_events);
-        kinc_set_foreground_callback(&v_system_callback_focus_gained, events);
-        kinc_set_background_callback(&v_system_callback_focus_lost, events);
+        VDS_Reset_Queue<E_System_Event_Type> events = vds_reset_queue_make_interface(address_of(game.system_events));
+        VDS_Reset_Queue<E_System_Event_Type> * events_location = address_of(events);
+
+        kinc_set_foreground_callback(&v_system_callback_focus_gained, events_location);
+        kinc_set_background_callback(&v_system_callback_focus_lost, events_location);
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
