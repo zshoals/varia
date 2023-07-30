@@ -265,10 +265,13 @@ void v_gameloop_entrypoint(void * data)
         logic_world->total_realtime_fixed_update_time = kinc_time();
         while (logic_world->logic_accumulator >= logic_world->fixed_timestep_interval)
         {
+            logic_world->logic_adjusted_dt = logic_world->logic_dt * logic_world->logic_timescale;
+
             logic_world->logic_accumulator -= logic_world->fixed_timestep_interval;
             logic_world->logic_cumulative_gameclock += logic_world->fixed_timestep_interval;
 
-            v_gameloop_simulate(logic_world, E_Simulation_Mode::Fixed_Step);
+            logic_world->simulation_mode = E_Simulation_Mode::Fixed_Step;
+            v_gameloop_simulate(logic_world, logic_world->simulation_mode);
 
             logic_world->previous_logictime = kinc_time();
         }
@@ -290,6 +293,7 @@ void v_gameloop_entrypoint(void * data)
         //NOTE(<zshoals> 07-19-2023): Extrapolated time, how far ahead the render time is
         //  from the last recent world step
         logic_world->render_dt = kinc_time() - logic_world->previous_logictime;
+        logic_world->render_adjusted_dt = logic_world->render_dt * logic_world->logic_timescale;
 
         //Frame limiting check
         if //vertical sync off, framelimiter on, haven't reached the accumulator threshold yet
@@ -308,7 +312,8 @@ void v_gameloop_entrypoint(void * data)
             //  logic chain, this gamestate is for visual purposes only
             memcpy(visual_world, logic_world, sizeof(*logic_world));
 
-            v_gameloop_simulate(visual_world, E_Simulation_Mode::Extrapolate); 
+            visual_world->simulation_mode = E_Simulation_Mode::Extrapolate;
+            v_gameloop_simulate(visual_world, visual_world->simulation_mode); 
             Graphics_Intermediate_Representation * ir_out = address_of(context->ir_storage);
             v_gameloop_build_graphics_intermediate_representation(ir_out, visual_world);
             v_gameloop_render(address_of(context->gfx), ir_out);
@@ -330,6 +335,8 @@ void v_gameloop_entrypoint(void * data)
         kinc_thread_sleep(1);
     }
 }
+
+
 
 void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t fbo)
 {

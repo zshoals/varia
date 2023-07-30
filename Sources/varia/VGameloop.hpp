@@ -6,6 +6,7 @@
 
 enum class E_Simulation_Mode
 {
+    Pause,
     Fixed_Step,
     Extrapolate
 };
@@ -13,6 +14,9 @@ enum class E_Simulation_Mode
 //Gamestate configuration that can be modified at runtime
 struct Gamestate
 {
+    //Diagnostics
+    E_Simulation_Mode simulation_mode;
+
     //Kinc configuration options
     Boolean window_requires_reapplication;
     Boolean framebuffer_requires_reapplication;
@@ -24,10 +28,12 @@ struct Gamestate
     Float_64 logic_timescale;
     Float_64 fixed_timestep_interval;
     Float_64 logic_dt;
+    Float_64 logic_adjusted_dt;
     Float_64 logic_accumulator;
     Float_64 previous_logictime;
     Float_64 previous_realtime;
     Float_64 render_dt;
+    Float_64 render_adjusted_dt;
     Float_64 render_accumulator;
     Float_64 previous_rendertime;
 
