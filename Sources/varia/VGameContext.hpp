@@ -19,9 +19,7 @@ enum class E_Game_Context_Save_Slot
 struct Game_Context
 {
     Input_Virtual_Action_State input;
-
-    #define SYSTEM_EVENT_QUEUE_MAX_SIZE 128
-    VDS_Reset_Queue_Storage<E_System_Event_Type, SYSTEM_EVENT_QUEUE_MAX_SIZE> system_events;
+    System_Events system_events;
 
     Gamestate logic_world;
     Gamestate visual_world; //Exclusively for the renderer

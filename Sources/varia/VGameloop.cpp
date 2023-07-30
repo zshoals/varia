@@ -127,13 +127,8 @@ void v_gameloop_entrypoint(void * data)
     //Process the System Event Loop
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        VDS_Reset_Queue<E_System_Event_Type> events = vds_reset_queue_make_interface(address_of(context->system_events));
-        VDS_Reset_Queue<E_System_Event_Type> * events_location = address_of(events);
-
-        while (vds_reset_queue_has_elements(events_location))
+        v_system_events_process(address_of(context->system_events), [&](E_System_Event_Type e)
         {
-            E_System_Event_Type e = vds_reset_queue_get_first_element(events_location);
-
             switch (e)
             {
                 default:
@@ -183,11 +178,7 @@ void v_gameloop_entrypoint(void * data)
                     break;
                 }
             }
-
-            vds_reset_queue_pop(events_location);
-        }
-
-        vds_reset_queue_reset(events_location);
+        });
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -391,12 +382,8 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //Set Kinc's Environment Callbacks
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        VDS_Reset_Queue<E_System_Event_Type> events = vds_reset_queue_make_interface(address_of(game.system_events));
-        VDS_Reset_Queue<E_System_Event_Type> * events_location = address_of(events);
-
-        kinc_set_foreground_callback(&v_system_callback_focus_gained, events_location);
-        kinc_set_background_callback(&v_system_callback_focus_lost, events_location);
-        //TODO(<zshoals> 07-28-2023): Fill in all of them I guess
+        System_Events * events = address_of(game.system_events);
+        v_system_events_initialize(events);
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
