@@ -139,10 +139,12 @@ void v_gameloop_entrypoint(void * data)
                 //Kinc State Events
                 case E_System_Event_Type::System_Window_Vertical_Sync_Enable:
                 {
+                    logic_world->pending_framebuffer_changes.vertical_sync = true;
                     break;
                 }
                 case E_System_Event_Type::System_Window_Vertical_Sync_Disable:
                 {
+                    logic_world->pending_framebuffer_changes.vertical_sync = false;
                     break;
                 }
                 case E_System_Event_Type::System_Window_Lost_Focus:
@@ -167,14 +169,45 @@ void v_gameloop_entrypoint(void * data)
                 }
                 case E_System_Event_Type::System_Window_Request_Fullscreen:
                 {
+                    logic_world->pending_window_changes.mode = KINC_WINDOW_MODE_FULLSCREEN;
                     break;
                 }
                 case E_System_Event_Type::System_Window_Request_Windowed:
                 {
+                    //TODO(<zshoals> 07-30-2023): We might need to store the old window position
+                    //  and size and stuff here too if we change back to windowed mode from fullscreen
+                    logic_world->pending_window_changes.mode = KINC_WINDOW_MODE_WINDOW;
                     break;
                 }
                 case E_System_Event_Type::System_Window_Request_Resize:
                 {
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Attempting_Changes:
+                {
+                    logic_world->pending_window_changes = logic_world->window;
+                    logic_world->pending_framebuffer_changes = logic_world->framebuffer;
+
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Discarding_Changes:
+                {
+                    logic_world->pending_window_changes = logic_world->window;
+                    logic_world->pending_framebuffer_changes = logic_world->framebuffer;
+
+                    break;
+                }
+                case E_System_Event_Type::System_Window_Apply_Changes:
+                {
+                    //TODO(<zshoals> 07-27-2023): There might be other useful settings, such as
+                    //  changing the window title...but they're kind of optional
+                    kinc_window_change_mode(logic_world->kinc_primary_display_index, logic_world->pending_window_changes.mode);
+                    kinc_window_change_features(logic_world->kinc_primary_display_index, logic_world->pending_window_changes.window_features);
+                    kinc_window_change_framebuffer(logic_world->kinc_primary_display_index, address_of(logic_world->pending_framebuffer_changes));
+
+                    logic_world->window = logic_world->pending_window_changes;
+                    logic_world->framebuffer = logic_world->pending_framebuffer_changes;
+
                     break;
                 }
             }
@@ -188,19 +221,8 @@ void v_gameloop_entrypoint(void * data)
     {
         //NOTE(<zshoals> 07-28-2023): This might be an expensive operation that isn't needed
         //  a lot of these "system query" type operations are weirdly expensive
+
         // logic_world->kinc_primary_display_index = kinc_primary_display();
-
-        if (logic_world->window_requires_reapplication)
-        {
-            //TODO(<zshoals> 07-27-2023): Stuff?
-
-        }
-
-        if (logic_world->framebuffer_requires_reapplication)
-        {
-            //TODO(<zshoals> 07-27-2023): Stuff?
-            kinc_window_change_framebuffer(logic_world->kinc_primary_display_index, address_of(logic_world->framebuffer));
-        }
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
@@ -350,6 +372,8 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
 		//[Kinc Settings]
 		game.logic_world.window = wo;
 		game.logic_world.framebuffer = fbo;
+        game.logic_world.pending_window_changes = wo;
+        game.logic_world.pending_framebuffer_changes = fbo;
         game.logic_world.kinc_primary_display_index = kinc_primary_display();
 	}
 	

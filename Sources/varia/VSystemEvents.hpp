@@ -12,6 +12,10 @@ enum class E_System_Event_Type
     System_Window_Request_Fullscreen,
     System_Window_Request_Windowed,
     System_Window_Request_Resize,
+
+    System_Window_Attempting_Changes,
+    System_Window_Discarding_Changes,
+    System_Window_Apply_Changes,
 };
 
 struct System_Events

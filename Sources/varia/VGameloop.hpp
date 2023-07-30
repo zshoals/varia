@@ -19,10 +19,12 @@ struct Gamestate
 
     //Kinc configuration options
     Boolean window_requires_reapplication;
-    Boolean framebuffer_requires_reapplication;
     int kinc_primary_display_index;
     kinc_window_options_t window;
     kinc_framebuffer_options_t framebuffer;
+
+    kinc_window_options_t pending_window_changes;
+    kinc_framebuffer_options_t pending_framebuffer_changes;
 
     //Logic and Render timing data
     Float_64 logic_timescale;

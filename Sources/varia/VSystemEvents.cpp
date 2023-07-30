@@ -19,7 +19,10 @@ static void v_system_callback_focus_gained(void * data)
 void v_system_events_initialize(System_Events * events)
 {
     //TODO(<zshoals> 07-30-2023): This is bad; we're setting global state
-    // via a non-static/non-global object...
+    //  via a non-static/non-global object...
+    //  We could reset all of these callbacks every time we process the event loop, that way we
+    //  could "properly" support multiple system event loops...not like that's ever going to be something
+    //  we need to do...
     kinc_set_background_callback(&v_system_callback_focus_lost, events);
     kinc_set_foreground_callback(&v_system_callback_focus_gained, events);
 }
