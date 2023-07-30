@@ -1,8 +1,8 @@
 #include "varia/VSimulation.hpp"
 
-void v_simulation_simulate(Gamestate * gs, E_Simulation_Mode mode)
+void v_simulation_simulate(Gamestate * gs, E_Simulating simulating, E_Simulation_Mode mode)
 {
-    if (mode == E_Simulation_Mode::Pause)
+    if (simulating == E_Simulating::Pause)
     {
         return;
     }

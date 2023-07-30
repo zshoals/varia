@@ -3,7 +3,6 @@
 #include "varia/VShared.hpp"
 #include "varia/VGameContext.hpp"
 #include "varia/VSimulation.hpp"
-#include "varia/VGamestateQuery.hpp"
 #include "varia/utility/VMemcpy.hpp"
 #include "varia/input/VInput.hpp"
 #include "varia/VSystemCallbacks.hpp"
@@ -45,9 +44,9 @@ static void v_print_timing_info(Gamestate * gamestate)
     );
 }
 
-static void v_gameloop_simulate(Gamestate * gs, E_Simulation_Mode mode)
+static void v_gameloop_simulate(Gamestate * gs, E_Simulating simulating, E_Simulation_Mode mode)
 {
-    v_simulation_simulate(gs, mode);
+    v_simulation_simulate(gs, simulating, mode);
 }
 
 static void v_gameloop_build_graphics_intermediate_representation
@@ -281,10 +280,13 @@ void v_gameloop_entrypoint(void * data)
             logic_world->logic_adjusted_dt = logic_world->logic_dt * logic_world->logic_timescale;
 
             logic_world->logic_accumulator -= logic_world->fixed_timestep_interval;
+
+            //TODO(<zshoals> 07-30-2023): Gameclocks should be updated inside simulating because
+            //  we might pause the simulation lul
             logic_world->logic_cumulative_gameclock += logic_world->fixed_timestep_interval;
 
             logic_world->simulation_mode = E_Simulation_Mode::Fixed_Step;
-            v_gameloop_simulate(logic_world, logic_world->simulation_mode);
+            v_gameloop_simulate(logic_world, logic_world->simulating, logic_world->simulation_mode);
 
             logic_world->previous_logictime = kinc_time();
         }
@@ -326,11 +328,13 @@ void v_gameloop_entrypoint(void * data)
             memcpy(visual_world, logic_world, sizeof(*logic_world));
 
             visual_world->simulation_mode = E_Simulation_Mode::Extrapolate;
-            v_gameloop_simulate(visual_world, visual_world->simulation_mode); 
+            v_gameloop_simulate(visual_world, visual_world->simulating, visual_world->simulation_mode); 
             Graphics_Intermediate_Representation * ir_out = address_of(context->ir_storage);
             v_gameloop_build_graphics_intermediate_representation(ir_out, visual_world);
             v_gameloop_render(address_of(context->gfx), ir_out);
 
+            //TODO(<zshoals> 07-30-2023): Gameclocks should be updated inside simulating because
+            //  we might pause the simulation lul
             logic_world->render_cumulative_gameclock += kinc_time() - logic_world->previous_rendertime;
             logic_world->previous_rendertime = kinc_time();
 
