@@ -1,11 +1,24 @@
 #pragma once
 
-#include <utility>
+#include <type_traits>
 
 //Includes types and capabilities that are basically used everywhere
 
 
 #include "varia/ds/VDS-Types.hpp"
+struct Enum_Index
+{
+	Integer_64 i;
+};
+
+template <typename E>
+Enum_Index enum_as_index(E enumeration)
+{
+	static_assert(std::is_enum<E>::value, "Provided value was not an enum.");
+
+	Enum_Index idx = { static_cast<Integer_64>(enumeration) };
+	return idx;
+};
 
 #include <assert.h>
 #define VARIA_ASSERT(COND, MSG)\
@@ -62,12 +75,6 @@ T const & dereference(T const * const element)
 static inline void varia_toggle(Boolean * b)
 {
 	*b = *b ? false : true;
-}
-
-//https://stackoverflow.com/a/8357462
-template <typename E>
-constexpr typename std::underlying_type<E>::type to_underlying(E e) noexcept {
-    return static_cast<typename std::underlying_type<E>::type>(e);
 }
 
 //||_____________________________________________________________________||
