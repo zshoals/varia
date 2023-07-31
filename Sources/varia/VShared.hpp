@@ -77,6 +77,11 @@ static inline void varia_toggle(Boolean * b)
 	*b = *b ? false : true;
 }
 
+
+#define VARIA_BYTES(N) (N)
+#define VARIA_KILOBYTES(N) ((N) * 1000)
+#define VARIA_MEGABYTES(N) ((N) * 1000 * 1000)
+
 //||_____________________________________________________________________||
 //||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
 //||                   For range loops for convenience                   ||
