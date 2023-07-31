@@ -1,6 +1,9 @@
 #pragma once
 
 #include "VDS-Types.hpp"
+//Memcpy
+#include <string.h>
+#include "kinc/io/filereader.h"
 
 template <Integer_64 SIZE>
 struct VDS_Buffer_Storage
@@ -51,6 +54,30 @@ static inline Boolean vds_buffer_write(VDS_Buffer * buffer, char const * data, I
     {
         return false;
     }
+}
+
+static inline Boolean vds_buffer_read_asset_from_file(VDS_Buffer * buffer, char const * path)
+{
+    kinc_file_reader_t reader;
+
+    if ( !kinc_file_reader_open(&(reader), path, KINC_FILE_TYPE_ASSET) )
+    {
+        return false;
+    }
+
+    size_t incoming_size = kinc_file_reader_size(&(reader));
+    if ((Integer_64)(incoming_size) > buffer->capacity)
+    {
+        kinc_file_reader_close(&reader);
+        return false;
+    }
+
+    Integer_64 written_bytes = kinc_file_reader_read(&reader, &(buffer->data[0]), incoming_size);
+    *(buffer->data_written) = written_bytes;
+
+    kinc_file_reader_close(&reader);
+
+    return true;
 }
 
 template<typename T>
