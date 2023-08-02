@@ -22,7 +22,10 @@ struct Assets
     String_Buffer<VARIA_MEGABYTES(16)> permanent_strings;
     String_Buffer<VARIA_MEGABYTES(8)> temporary_strings;
 
-    VDS_Arena_Storage<VARIA_MEGABYTES(64)> permanent_storage;
+    VDS_Arena_Storage<VARIA_MEGABYTES(32)> permanent_storage;
+    VDS_Arena_Storage<VARIA_MEGABYTES(68)> loading_buffer;
+    //TODO(<zshoals> 08-02-2023): The above arenas currently stick around forever
+    //  We might want to change this?
 };
 
 // void v_assets_initialize(Assets * assets);
