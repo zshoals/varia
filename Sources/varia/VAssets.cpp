@@ -134,7 +134,7 @@ Boolean v_assets_load_atlas(Assets * assets, char const * image_path, char const
                 Integer_64 height = v_string_utility_string_as_int(address_of(as_string[head - string_length]), string_length);
 
                 //Advance to next line, skipping \r\n
-                head += 2;
+                head += 1;
 
                 String_Buffer_Reference sub_image_name = v_string_buffer_emplace_string(address_of(assets->permanent_strings), line_start, perma_string_length);
 
