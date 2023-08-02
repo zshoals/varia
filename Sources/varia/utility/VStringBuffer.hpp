@@ -16,10 +16,9 @@ struct String_Buffer_Reference
 };
 
 template <Integer_64 SIZE>
-String_Buffer_Reference v_string_buffer_emplace_string(String_Buffer<SIZE> * sb, char const * string)
+String_Buffer_Reference v_string_buffer_emplace_string(String_Buffer<SIZE> * sb, char const * string, Integer_64 string_length)
 {
     Integer_64 const limit = 100000;
-    Integer_64 string_length = strnlen(string, limit);
 
     Integer_64 safety_check = (string_length > limit) ? limit : string_length;
     safety_check += 1; //Null terminator
