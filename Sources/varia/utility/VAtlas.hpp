@@ -3,6 +3,7 @@
 #include "varia/VShared.hpp"
 #include "varia/utility/VStringBuffer.hpp"
 #include "varia/ds/VDS-Array.hpp"
+#include "kinc/graphics4/texture.h"
 
 struct Atlas_Sub_Image
 {
@@ -12,17 +13,16 @@ struct Atlas_Sub_Image
     Integer_16 origin_y;
     Integer_16 width;
     Integer_16 height;
+    Integer_8 atlas_index;
 };
 
 struct Atlas
 {
+    kinc_g4_texture_t texture;
+
     Integer_16 width;
     Integer_16 height;
 
-    VDS_Array_Storage<Atlas_Sub_Image, 2048> sub_images;
-
-    //TODO(<zshoals> 08-02-2023): We don't really need to consume image memory
-    //  after we've loaded it as a texture...
-    void * raw_image_data;
-    void * raw_metadata;
+    //NOTE(<zshoals> 08-02-2023): Sub images are cheap, 4096 of them is only 131kb
+    VDS_Array_Storage<Atlas_Sub_Image, 4096> sub_images;
 };
