@@ -1,44 +1,29 @@
-#pragma once
+// #pragma once
 
 #include "varia/VShared.hpp"
-#include "varia/ds/VDS-Array.hpp"
-#include "varia/ds/VDS-Buffer.hpp"
+#include "varia/utility/VAtlas.hpp"
 #include "kinc/graphics4/shader.h"
-
-enum class E_Asset_Type
-{
-    Blob,
-    Texture,
-    Vertex_Shader,
-    Fragment_Shader,
-    Sound_Effect,
-    Music,
-};
-
-struct Vertex_Shader
-{
-    char const * name;
-    char const * path;
-    kinc_g4_shader_type_t shader_type;
-    VDS_Buffer_Storage<VARIA_KILOBYTES(32)> data;
-};
-
-struct Fragment_Shader
-{
-    char const * name;
-    char const * path;
-    kinc_g4_shader_type_t shader_type;
-    VDS_Buffer_Storage<VARIA_KILOBYTES(32)> data;
-};
+#include "varia/ds/VDS-Arena.hpp"
 
 struct Assets
 {
-    VDS_Array_Storage<Vertex_Shader, 8> vertex_shaders;
-    VDS_Array_Storage<Fragment_Shader, 8> fragment_shaders;
 
-    VDS_Buffer_Storage<68 * 1000 * 1000> image_loading_buffer; //68mb
-    VDS_Buffer_Storage<20 * 1000 * 1000> file_loading_buffer; //20mb
+    // Vertex_Shader textured_vert;
+    // Fragment_Shader textured_frag;
+
+    // Vertex_Shader random_vert;
+    // Fragment_Shader random_frag;
+
+    // Pipeline blend_normal_textured;
+    // Pipeline blend_normal_random;
+
+    Atlas images;
+
+    String_Buffer<VARIA_MEGABYTES(16)> permanent_strings;
+    String_Buffer<VARIA_MEGABYTES(8)> temporary_strings;
+
+    VDS_Arena_Storage<VARIA_MEGABYTES(64)> permanent_storage;
 };
 
-void v_assets_initialize(Assets * assets);
-Boolean v_assets_load_asset(Assets * assets, char const * asset_path, E_Asset_Type asset_type);
+// void v_assets_initialize(Assets * assets);
+Boolean v_assets_load_atlas(Assets * assets, char const * image_path, char const * image_metadata_path);
