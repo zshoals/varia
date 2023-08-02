@@ -4,6 +4,21 @@
 
 #include <string.h>
 
+static inline Integer_64 v_string_utility_string_as_int(char const * string, Integer_64 length)
+{
+    Integer_64 accumulator = 0;
+    Integer_64 exponent = 1;
+    for (Integer_64 i = 0; i < length; i += 1)
+    {
+        Integer_64 as_number = string[length - i - 1] - '0';
+        as_number *= exponent;
+        accumulator += as_number;
+        exponent *= 10;
+    }
+
+    return accumulator;
+}
+
 static inline Integer_64 v_string_utility_char_match(char const * left, char const * right)
 {
     return ( (*left) == (*right) );
