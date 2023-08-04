@@ -90,6 +90,12 @@ T vds_array_pop(VDS_Array<T> * array)
     return *(array->data[ *(array->push_head) ]);
 }
 
+template <typename T>
+void vds_array_clear(VDS_Array<T> * array)
+{
+    *(array->push_head) = 0;
+}
+
 template <typename T, typename FUNC>
 Integer_64 vds_array_index_of(VDS_Array<T> * array, FUNC search_function)
 {
@@ -97,7 +103,8 @@ Integer_64 vds_array_index_of(VDS_Array<T> * array, FUNC search_function)
     //  good or bad call?
     for (Integer_64 i = 0, end = *(array->push_head); i < end; i += 1)
     {
-        if ( search_function( &(array->data[i]) ) )
+        T const * element = &(array->data[i]);
+        if ( search_function(element) )
         {
             return i;
         }
