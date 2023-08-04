@@ -46,6 +46,17 @@ VDS_Stringmap<T> vds_stringmap_make_interface(VDS_Stringmap_Storage<T, SIZE> * m
 }
 
 template <typename T>
+VDS_Stringmap_Key vds_internal_stringmap_search(VDS_Array<T> * storage, char const * string)
+{
+    VDS_Stringmap_Key key = vds_array_index_of(storage, [&string](T const * element)
+    {
+        return strncmp(element->name, string, 10000);
+    });
+
+    return key;
+}
+
+template <typename T>
 void vds_stringmap_assign(VDS_Stringmap<T> * map, T element)
 {
     VDS_Array<T> * storage = &(map->data);
