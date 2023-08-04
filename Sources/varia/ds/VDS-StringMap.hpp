@@ -16,6 +16,7 @@ struct VDS_Stringmap_Key
 template <typename T, Integer_64 SIZE>
 struct VDS_Stringmap_Storage
 {
+    VDS_Array_Storage<char const *, SIZE> keys;
     VDS_Array_Storage<T, SIZE> data;
     T stub;
 };
@@ -23,6 +24,7 @@ struct VDS_Stringmap_Storage
 template <typename T>
 struct VDS_Stringmap
 {
+    VDS_Array<char const *> keys;
     VDS_Array<T> data;
     T * stub;
 };
@@ -32,6 +34,7 @@ VDS_Stringmap<T> vds_stringmap_make_interface(VDS_Stringmap_Storage<T, SIZE> * s
 {
     VDS_Stringmap<T> interface;
     {
+        interface.keys = vds_array_make_interface(&(storage->keys));
         interface.data = vds_array_make_interface(&(storage->data));
         interface.stub = &(storage->stub);
     }
@@ -39,34 +42,35 @@ VDS_Stringmap<T> vds_stringmap_make_interface(VDS_Stringmap_Storage<T, SIZE> * s
     return interface;
 }
 
-template <typename T>
-VDS_Stringmap_Key vds_internal_stringmap_search(VDS_Array<T> * storage, char const * string)
+static inline VDS_Stringmap_Key vds_internal_stringmap_search(VDS_Array<char const *> * storage, char const * search_key)
 {
     VDS_Stringmap_Key key;
-    key.key = vds_array_index_of(storage, [&string](T const * element)
+    key.key = vds_array_index_of(storage, [&search_key](char const * const * stored_key)
     {
-        return ( strncmp(element->name, string, 10000) == 0 );
+        return ( strncmp(*(stored_key), search_key, 10000) == 0 );
     });
 
     return key;
 }
 
 template <typename T>
-void vds_stringmap_assign(VDS_Stringmap<T> * map, T element)
+void vds_stringmap_assign(VDS_Stringmap<T> * map, char const * name, T element)
 {
-    VDS_Array<T> * storage = &(map->data);
-    VDS_Stringmap_Key key = vds_internal_stringmap_search(storage, element.name);
+    VDS_Array<T> * data_storage = &(map->data);
+    VDS_Array<char const *> * key_storage = &(map->keys);
+    VDS_Stringmap_Key key = vds_internal_stringmap_search(key_storage, name);
 
     if (key.key == -1)
     {
-        if (vds_array_can_push(storage))
+        if (vds_array_can_push(key_storage))
         {
-            vds_array_push(storage, element);
+            vds_array_push(key_storage, name);
+            vds_array_push(data_storage, element);
         }
     }
     else
     {
-        T * found_item = vds_array_location_of(storage, key.key);
+        T * found_item = vds_array_location_of(data_storage, key.key);
         *(found_item) = element;
     }
 }
@@ -74,8 +78,9 @@ void vds_stringmap_assign(VDS_Stringmap<T> * map, T element)
 template <typename T>
 T * vds_stringmap_retrieve(VDS_Stringmap<T> * map, char const * string)
 {
-    VDS_Array<T> * storage = &(map->data);
-    VDS_Stringmap_Key key = vds_internal_stringmap_search(storage, string);
+    VDS_Array<T> * data_storage = &(map->data);
+    VDS_Array<char const *> * key_storage = &(map->keys);
+    VDS_Stringmap_Key key = vds_internal_stringmap_search(key_storage, string);
 
     if (key.key == -1)
     {
@@ -83,13 +88,15 @@ T * vds_stringmap_retrieve(VDS_Stringmap<T> * map, char const * string)
     }
     else
     {
-        return vds_array_location_of(storage, key.key);
+        return vds_array_location_of(data_storage, key.key);
     }
 }
 
 template <typename T>
 void vds_stringmap_clear(VDS_Stringmap<T> * map)
 {
-    VDS_Array<T> * storage = &(map->data);
-    vds_array_clear(storage);
+    VDS_Array<char const *> * key_storage = &(map->keys);
+    VDS_Array<T> * data_storage = &(map->data);
+    vds_array_clear(key_storage);
+    vds_array_clear(data_storage);
 }
