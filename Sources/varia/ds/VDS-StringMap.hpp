@@ -18,28 +18,22 @@ struct VDS_Stringmap_Storage
 {
     VDS_Array_Storage<T, SIZE> data;
     T stub;
-
-    VDS_Stringmap_Storage()
-    {
-        memset(&(this->stub), 0, sizeof(this->stub));
-        stub.name = "STRINGMAP_ERROR: NON-EXISTENT ENTRY; THIS IS A STUB.";
-    }
 };
 
 template <typename T>
 struct VDS_Stringmap
 {
-    VDS_Array data;
+    VDS_Array<T> data;
     T * stub;
 };
 
 template <typename T, Integer_64 SIZE>
-VDS_Stringmap<T> vds_stringmap_make_interface(VDS_Stringmap_Storage<T, SIZE> * map)
+VDS_Stringmap<T> vds_stringmap_make_interface(VDS_Stringmap_Storage<T, SIZE> * storage)
 {
     VDS_Stringmap<T> interface;
     {
-        interface.data = vds_array_make_interface(&(map->data));
-        interface.stub = &(map->stub);
+        interface.data = vds_array_make_interface(&(storage->data));
+        interface.stub = &(storage->stub);
     }
 
     return interface;
@@ -48,9 +42,10 @@ VDS_Stringmap<T> vds_stringmap_make_interface(VDS_Stringmap_Storage<T, SIZE> * m
 template <typename T>
 VDS_Stringmap_Key vds_internal_stringmap_search(VDS_Array<T> * storage, char const * string)
 {
-    VDS_Stringmap_Key key = vds_array_index_of(storage, [&string](T const * element)
+    VDS_Stringmap_Key key;
+    key.key = vds_array_index_of(storage, [&string](T const * element)
     {
-        return strncmp(element->name, string, 10000);
+        return ( strncmp(element->name, string, 10000) == 0 );
     });
 
     return key;
@@ -60,7 +55,7 @@ template <typename T>
 void vds_stringmap_assign(VDS_Stringmap<T> * map, T element)
 {
     VDS_Array<T> * storage = &(map->data);
-    VDS_Stringmap_Key key = vds_internal_stringmap_search(storage, element->name);
+    VDS_Stringmap_Key key = vds_internal_stringmap_search(storage, element.name);
 
     if (key.key == -1)
     {
@@ -72,7 +67,7 @@ void vds_stringmap_assign(VDS_Stringmap<T> * map, T element)
     else
     {
         T * found_item = vds_array_location_of(storage, key.key);
-        found_item = element;
+        *(found_item) = element;
     }
 }
 
