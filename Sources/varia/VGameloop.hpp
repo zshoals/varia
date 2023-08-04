@@ -3,6 +3,7 @@
 #include "varia/VShared.hpp"
 #include "varia/input/VInput.hpp"
 #include "kinc/window.h"
+#include "kinc/display.h"
 
 enum class E_Simulating
 {
@@ -25,6 +26,7 @@ struct Gamestate
 
     //Kinc configuration options
     Boolean window_requires_reapplication;
+
     int kinc_primary_display_index;
 
     kinc_window_options_t window;
