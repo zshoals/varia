@@ -1,0 +1,1 @@
+.\kraffiti.exe from="C:\HaxeLibraries\Kinc\Tools\windows_x64\atlas_dump.png" to="C:\HaxeLibraries\Kinc\Tools\windows_x64\output_atlas.k" prealpha transparent=true format="hdr"
