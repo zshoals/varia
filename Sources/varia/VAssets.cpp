@@ -2,9 +2,34 @@
 
 #include "varia/VShared.hpp"
 #include "varia/utility/VStringUtil.hpp"
+#include "varia/graphics/VShader.hpp"
 #include "kinc/io/filereader.h"
 #include "kinc/image.h"
 #include "kinc/graphics4/texture.h"
+
+struct Assets_Reader_Data
+{
+    Integer_64 requested_size;
+    void * raw_memory;
+    Boolean loaded;
+};
+
+static Assets_Reader_Data v_assets_try_load(kinc_file_reader_t * reader, char const * path, VDS_Arena * storage)
+{
+    Assets_Reader_Data data = ZERO_INIT();
+
+    data.loaded = kinc_file_reader_open(reader, path, KINC_FILE_TYPE_ASSET);
+    data.requested_size = kinc_file_reader_size(reader);
+
+    if (data.loaded)
+    {
+        void * raw_memory = vds_arena_allocate(storage, data.requested_size);
+        kinc_file_reader_read(reader, raw_memory, data.requested_size);
+        kinc_file_reader_close(reader);
+    }
+
+    return data;
+}
 
 
 static void * v_assets_allocate(Assets * assets, Integer_64 requested_size)
@@ -191,3 +216,70 @@ Boolean v_assets_load_atlas(Assets * assets, char const * image_path, char const
         return false;
     }
 }
+
+Boolean v_assets_load_fragment_shader(Assets * assets, char const * name, char const * fragment_path)
+{
+    VDS_Arena arena = vds_arena_make_interface(address_of(assets->permanent_storage));
+
+    kinc_file_reader_t reader;
+    Assets_Reader_Data data = v_assets_try_load(address_of(reader), fragment_path, address_of(arena));
+
+    if (data.loaded)
+    {
+        VDS_Stringmap<kinc_g4_shader_t> fragment_shader_interface = vds_stringmap_make_interface(address_of(assets->fragment_shaders));
+        VDS_Stringmap<kinc_g4_shader_t> * fragment_shaders = address_of(fragment_shader_interface);
+
+        kinc_g4_shader_t * shader = vds_stringmap_construct_assign(fragment_shaders, name);
+        kinc_g4_shader_init(shader, data.raw_memory, data.requested_size, KINC_G4_SHADER_TYPE_FRAGMENT);
+        
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+Boolean v_assets_load_vertex_shader(Assets * assets, char const * name, char const * vertex_path)
+{
+    VDS_Arena arena = vds_arena_make_interface(address_of(assets->permanent_storage));
+
+    kinc_file_reader_t reader;
+    Assets_Reader_Data data = v_assets_try_load(address_of(reader), vertex_path, address_of(arena));
+
+    if (data.loaded)
+    {
+        VDS_Stringmap<kinc_g4_shader_t> vertex_shader_interface = vds_stringmap_make_interface(address_of(assets->vertex_shaders));
+        VDS_Stringmap<kinc_g4_shader_t> * vertex_shaders = address_of(vertex_shader_interface);
+
+        kinc_g4_shader_t * shader = vds_stringmap_construct_assign(vertex_shaders, name);
+        kinc_g4_shader_init(shader, data.raw_memory, data.requested_size, KINC_G4_SHADER_TYPE_VERTEX);
+        
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+// Boolean v_assets_load_shader(Assets * assets, char const * name, char const * vertex_path, char const * fragment_path)
+// {
+//     Graphics_Shader shader = ZERO_INIT();
+//     VDS_Arena arena = vds_arena_make_interface(address_of(assets->permanent_storage));
+
+//     Boolean shaders_initialized = v_shader_initialize(address_of(shader), vertex_path, fragment_path, address_of(arena));
+//     if (shaders_initialized)
+//     {
+//         VDS_Stringmap<Graphics_Shader> map_interface = vds_stringmap_make_interface(address_of(assets->shaders));
+//         VDS_Stringmap<Graphics_Shader> * shader_map = address_of(map_interface);
+
+//         vds_stringmap_assign(shader_map, name, shader);
+
+//         return true;
+//     }
+//     else
+//     {
+//         return false;
+//     }
+// }
