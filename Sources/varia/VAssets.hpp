@@ -13,12 +13,10 @@ struct Assets
 {
     Atlas images;
 
-    // VDS_Array_Storage<Shader, 8> shaders;
-    // VDS_Array_Storage<kinc_g4_pipeline_t, 8> pipelines;
+    Textured_Pipeline texture_painter;
 
     VDS_Stringmap_Storage<kinc_g4_shader_t, 8> vertex_shaders;
     VDS_Stringmap_Storage<kinc_g4_shader_t, 8> fragment_shaders;
-    VDS_Stringmap_Storage<Graphics_Pipeline, 8> pipelines;
 
     String_Buffer<VARIA_MEGABYTES(16)> permanent_strings;
     String_Buffer<VARIA_MEGABYTES(8)> temporary_strings;
@@ -30,4 +28,4 @@ struct Assets
 Boolean v_assets_load_atlas(Assets * assets, char const * image_path, char const * image_metadata_path);
 Boolean v_assets_load_vertex_shader(Assets * assets, char const * name, char const * vertex_path);
 Boolean v_assets_load_fragment_shader(Assets * assets, char const * name, char const * fragment_path);
-Boolean v_assets_load_pipeline_normal_textured(Assets * assets, char const * vertex_shader, char const * fragment_shader);
+Boolean v_assets_load_texture_painter(Assets * assets, char const * vertex_shader, char const * fragment_shader);

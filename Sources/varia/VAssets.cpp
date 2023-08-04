@@ -2,7 +2,7 @@
 
 #include "varia/VShared.hpp"
 #include "varia/utility/VStringUtil.hpp"
-#include "varia/graphics/VShader.hpp"
+#include "varia/graphics/VPipeline.hpp"
 #include "kinc/io/filereader.h"
 #include "kinc/image.h"
 #include "kinc/graphics4/texture.h"
@@ -263,23 +263,6 @@ Boolean v_assets_load_vertex_shader(Assets * assets, char const * name, char con
     }
 }
 
-// Boolean v_assets_load_shader(Assets * assets, char const * name, char const * vertex_path, char const * fragment_path)
-// {
-//     Graphics_Shader shader = ZERO_INIT();
-//     VDS_Arena arena = vds_arena_make_interface(address_of(assets->permanent_storage));
-
-//     Boolean shaders_initialized = v_shader_initialize(address_of(shader), vertex_path, fragment_path, address_of(arena));
-//     if (shaders_initialized)
-//     {
-//         VDS_Stringmap<Graphics_Shader> map_interface = vds_stringmap_make_interface(address_of(assets->shaders));
-//         VDS_Stringmap<Graphics_Shader> * shader_map = address_of(map_interface);
-
-//         vds_stringmap_assign(shader_map, name, shader);
-
-//         return true;
-//     }
-//     else
-//     {
-//         return false;
-//     }
-// }
+Boolean v_assets_load_texture_painter(Assets * assets, char const * vertex_shader, char const * fragment_shader)
+{
+}
