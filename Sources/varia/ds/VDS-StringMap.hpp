@@ -67,11 +67,35 @@ void vds_stringmap_assign(VDS_Stringmap<T> * map, char const * name, T element)
             vds_array_push(key_storage, name);
             vds_array_push(data_storage, element);
         }
+        else
+        {
+            VDS_ASSERT(0, "Stringmap depleted available slots.");
+        }
     }
     else
     {
         T * found_item = vds_array_location_of(data_storage, key.key);
         *(found_item) = element;
+    }
+}
+
+template <typename T>
+T * vds_stringmap_construct_assign(VDS_Stringmap<T> * map, char const * name)
+{
+    VDS_Array<T> * data_storage = &(map->data);
+    VDS_Array<char const *> * key_storage = &(map->keys);
+
+    if (vds_array_can_push(key_storage))
+    {
+        vds_array_push(key_storage, name);
+        T * out = vds_array_construct_push(data_storage);
+
+        return out;
+    }
+    else
+    {
+        VDS_ASSERT(0, "Stringmap depleted available slots.");
+        return map->stub;
     }
 }
 
