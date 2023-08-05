@@ -1,5 +1,3 @@
-//TODO(<zshoals> 07-18-2023): This pragma once might cause problems since assert is meant to be included
-//  multiple times; be careful?
 #pragma once
 
 #include <assert.h>
