@@ -2,6 +2,7 @@
 
 #include "varia/VShared.hpp"
 #include "varia/utility/VMemcpy.hpp"
+#include "kinc/log.h"
 
 template <Integer_64 SIZE>
 struct VDS_String_Buffer_Storage
@@ -72,7 +73,7 @@ static inline void vds_string_buffer_clear(VDS_String_Buffer * sb)
     *(sb->write_head) = 0;
 }
 
-// static inline void v_string_buffer_print_reference(String_Buffer_Reference const & ref)
-// {
-//     kinc_log(KINC_LOG_LEVEL_INFO, "SBR: %s Length: %ld", ref.string, ref.length);
-// }
+static inline void v_string_buffer_print_reference(VDS_String_Buffer_Reference const & ref)
+{
+    kinc_log(KINC_LOG_LEVEL_INFO, "SBR: %s Length: %ld", ref.string, ref.length);
+}
