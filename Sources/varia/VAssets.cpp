@@ -183,7 +183,8 @@ Boolean v_assets_load_atlas(Assets * assets, char const * image_path, char const
                 //Advance to next line, skipping \r\n
                 head += 1;
 
-                String_Buffer_Reference sub_image_name = v_string_buffer_emplace_string(address_of(assets->permanent_strings), line_start, perma_string_length);
+                //NOTE(<zshoals> 08-05-2023): yikes
+                VDS_String_Buffer_Reference sub_image_name = v_string_buffer_emplace_string(address_of(v_string_buffer_make_interface(address_of(assets->permanent_strings))), line_start, perma_string_length);
 
                 VDS_Array<Atlas_Sub_Image> array_interface = vds_array_make_interface(address_of(assets->images.sub_images));
                 VDS_Array<Atlas_Sub_Image> * array = address_of(array_interface);
@@ -261,8 +262,4 @@ Boolean v_assets_load_vertex_shader(Assets * assets, char const * name, char con
     {
         return false;
     }
-}
-
-Boolean v_assets_load_texture_painter(Assets * assets, char const * vertex_shader, char const * fragment_shader)
-{
 }
