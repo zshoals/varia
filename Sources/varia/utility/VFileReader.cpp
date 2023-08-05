@@ -27,6 +27,7 @@ File_Data v_filereader_try_load(VDS_Arena * arena, char const * path)
     {
         file_data.requested_size = kinc_file_reader_size(address_of(reader));
         file_data.raw_memory = vds_arena_allocate(arena, file_data.requested_size);
+        kinc_file_reader_read(address_of(reader), file_data.raw_memory, file_data.requested_size);
     }
     else
     {
