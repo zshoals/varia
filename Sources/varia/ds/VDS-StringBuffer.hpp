@@ -24,7 +24,7 @@ struct VDS_String_Buffer_Reference
 };
 
 template <Integer_64 SIZE>
-VDS_String_Buffer v_string_buffer_make_interface(VDS_String_Buffer_Storage<SIZE> * sb)
+VDS_String_Buffer vds_string_buffer_make_interface(VDS_String_Buffer_Storage<SIZE> * sb)
 {
     VDS_String_Buffer interface;
     {
@@ -36,7 +36,7 @@ VDS_String_Buffer v_string_buffer_make_interface(VDS_String_Buffer_Storage<SIZE>
     return interface;
 }
 
-static inline VDS_String_Buffer_Reference v_string_buffer_emplace_string(VDS_String_Buffer * sb, char const * string, Integer_64 string_length)
+static inline VDS_String_Buffer_Reference vds_string_buffer_emplace_string(VDS_String_Buffer * sb, char const * string, Integer_64 string_length)
 {
     Integer_64 const limit = 100000;
 
@@ -67,7 +67,7 @@ static inline VDS_String_Buffer_Reference v_string_buffer_emplace_string(VDS_Str
     return sbr;
 }
 
-static inline void v_string_buffer_clear(VDS_String_Buffer * sb)
+static inline void vds_string_buffer_clear(VDS_String_Buffer * sb)
 {
     *(sb->write_head) = 0;
 }
