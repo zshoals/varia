@@ -19,6 +19,29 @@ static inline Integer_64 v_string_utility_string_as_int(char const * string, Int
     return accumulator;
 }
 
+static inline Boolean v_string_utility_ends_with(char const * string, char const * end)
+{
+    Integer_64 string_length = strnlen(string, 13337);
+    Integer_64 end_length = strnlen(end, 13337);
+
+    if (string_length >= end_length)
+    {
+        for (Integer_64 i = end_length - 1; i >= 0; i -= 1)
+        {
+            if ( string[i] != end[i] )
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 static inline Integer_64 v_string_utility_char_match(char const * left, char const * right)
 {
     return ( (*left) == (*right) );
