@@ -193,9 +193,9 @@ Integer_64 v_parser_read_integer(Parser * p)
     }
 }
 
-Boolean v_parser_done_reading(Parser * p)
+Boolean v_parser_has_lines(Parser * p)
 {
-    return (p->working_head >= p->length);
+    return (p->working_head <= p->length);
 }
 
 void v_parser_initialize(Parser * p, char const * source_data, Integer_64 source_data_length)
