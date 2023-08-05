@@ -53,6 +53,7 @@ Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * im
 
     //Skip past the atlas name (we don't need it)
     v_parser_move_to_next_line(parser);
+
     //Skip past the atlas sizing info (always 4096x4096)
     v_parser_move_to_next_line(parser);
 
@@ -65,22 +66,28 @@ Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * im
         //Get the sub_image name
         Atlas_Sub_Image * sub_image = vds_array_construct_push(sub_images);
         sub_image->image_name = v_parser_read_line(parser, sb);
+
         //Move to "bounds:"
         v_parser_move_to_next_line(parser);
+
         //Skip "bounds:" and get the x origin
         v_parser_move_to_next_integer(parser);
         sub_image->origin_x = (Integer_16)v_parser_read_integer(parser);
+
         //y origin
         v_parser_move_to_next_integer(parser);
         sub_image->origin_y = (Integer_16)v_parser_read_integer(parser);
+
         //width
         v_parser_move_to_next_integer(parser);
         sub_image->width = (Integer_16)v_parser_read_integer(parser);
+
         //height
         v_parser_move_to_next_integer(parser);
         sub_image->height = (Integer_16)v_parser_read_integer(parser);
+
         //TODO(<zshoals> 08-05-2023): We default to a zero index but we may want to change this
-        //  if we star using texture arrays
+        //  if we start using texture arrays
         sub_image->atlas_index = 0;
 
         v_parser_move_to_next_line(parser);
