@@ -1,6 +1,7 @@
 #pragma once
 
 #include "varia/VShared.hpp"
+#include "kinc/log.h"
 
 template <Integer_64 SIZE>
 struct String_Buffer
@@ -51,4 +52,9 @@ template <Integer_64 SIZE>
 void v_string_buffer_clear(String_Buffer<SIZE> * sb)
 {
     sb->write_head = 0;
+}
+
+static inline void v_string_buffer_print_reference(String_Buffer_Reference const & ref)
+{
+    kinc_log(KINC_LOG_LEVEL_INFO, "SBR: %s Length: %ld", ref.string, ref.length);
 }
