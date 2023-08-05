@@ -2,7 +2,7 @@
 
 #include "varia/VShared.hpp"
 
-#include "varia/utility/VStringBuffer.hpp"
+#include "varia/ds/VDS-StringBuffer.hpp"
 
 struct Parser
 {
@@ -27,4 +27,4 @@ Boolean v_parser_has_lines(Parser * p);
 void v_parser_initialize(Parser * p, char const * source_data, Integer_64 source_data_length);
 Integer_64 v_parser_remaining_line_bytes(Parser const * p, Integer_64 head);
 
-String_Buffer_Reference v_parser_read_line(Parser * p, String_Buffer * sb);
+VDS_String_Buffer_Reference v_parser_read_line(Parser * p, VDS_String_Buffer * sb);

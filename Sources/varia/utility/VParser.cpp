@@ -128,7 +128,7 @@ Boolean v_parser_line_starts_with(Parser * p, char const * search)
     }
 }
 
-String_Buffer_Reference v_parser_read_line(Parser * p, String_Buffer * sb)
+VDS_String_Buffer_Reference v_parser_read_line(Parser * p, VDS_String_Buffer * sb)
 {
     char const * line = address_of(p->source_data[p->line_begin_head]);
     Integer_64 line_length = v_parser_remaining_line_bytes(p, p->line_begin_head);
