@@ -26,9 +26,12 @@ static inline Boolean v_parser_is_in_line(Parser const * p, Integer_64 head)
     return (in_bounds & in_line);
 }
 
-static inline Integer_64 v_parser_remaining_line_bytes(Parser const * p, Integer_64 head)
+//NOTE(<zshoals> 08-04-2023): Has to be exposed for a template I guess
+Integer_64 v_parser_remaining_line_bytes(Parser const * p, Integer_64 head)
 {
-    return (head >= p->line_begin_head && head < p->line_end_head);
+    //TODO(<zshoals> 08-04-2023): Verify if we should do a value clamp here
+    //  to make sure that we don't underflow or overflow the total line length?
+    return (p->line_end_head - head);
 }
 
 static inline Integer_64 v_parser_sub_region_length(Parser const * p)
@@ -149,7 +152,7 @@ void v_parser_move_to_next_integer(Parser * p)
 {
     Integer_64 remaining_line_bytes = v_parser_remaining_line_bytes(p, p->working_head);
 
-    //We're already on a number, move past it
+    //We're already on a number but we didn't just move to a newline via a jump, move past it
     while ( (remaining_line_bytes > 0) && v_parser_is_number(p, p->working_head) )
     {
         p->working_head += 1;
