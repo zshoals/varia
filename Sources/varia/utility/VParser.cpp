@@ -128,6 +128,14 @@ Boolean v_parser_line_starts_with(Parser * p, char const * search)
     }
 }
 
+String_Buffer_Reference v_parser_read_line(Parser * p, String_Buffer * sb)
+{
+    char const * line = address_of(p->source_data[p->line_begin_head]);
+    Integer_64 line_length = v_parser_remaining_line_bytes(p, p->line_begin_head);
+
+    return v_string_buffer_emplace_string(sb, line, line_length);
+}
+
 void v_parser_advance_past(Parser * p, char const * string)
 {
     if (string == nullptr)

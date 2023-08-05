@@ -27,11 +27,4 @@ Boolean v_parser_has_lines(Parser * p);
 void v_parser_initialize(Parser * p, char const * source_data, Integer_64 source_data_length);
 Integer_64 v_parser_remaining_line_bytes(Parser const * p, Integer_64 head);
 
-template <Integer_64 SIZE>
-String_Buffer_Reference v_parser_read_line(Parser * p, String_Buffer<SIZE> * sb)
-{
-    char const * line = address_of(p->source_data[p->line_begin_head]);
-    Integer_64 line_length = v_parser_remaining_line_bytes(p, p->line_begin_head);
-
-    return v_string_buffer_emplace_string(sb, line, line_length);
-}
+String_Buffer_Reference v_parser_read_line(Parser * p, String_Buffer * sb);
