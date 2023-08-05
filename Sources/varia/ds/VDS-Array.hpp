@@ -82,12 +82,11 @@ Boolean vds_array_can_pop(VDS_Array<T> const * array)
 }
 
 template <typename T>
-T vds_array_pop(VDS_Array<T> * array)
+void vds_array_pop(VDS_Array<T> * array)
 {
     VDS_ASSERT( *(array->push_head) - 1 >= 0, "Pop would underrun array");
 
     *(array->push_head) -= 1;
-    return *(array->data[ *(array->push_head) ]);
 }
 
 template <typename T>
