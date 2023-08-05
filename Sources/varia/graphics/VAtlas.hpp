@@ -2,13 +2,14 @@
 
 #include "varia/VShared.hpp"
 #include "varia/ds/VDS-StringBuffer.hpp"
+#include "varia/ds/VDS-ShortString.hpp"
 #include "varia/ds/VDS-Array.hpp"
 #include "varia/ds/VDS-Arena.hpp"
 #include "kinc/graphics4/texture.h"
 
 struct Atlas_Sub_Image
 {
-    VDS_String_Buffer_Reference image_name;
+    VDS_Short_String name;
 
     Integer_16 origin_x;
     Integer_16 origin_y;

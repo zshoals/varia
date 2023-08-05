@@ -3,12 +3,21 @@
 #include "varia/utility/VFileReader.hpp"
 #include "varia/utility/VParser.hpp"
 #include "varia/utility/VMemset.hpp"
+#include "varia/utility/VStringUtil.hpp"
 #include "kinc/image.h"
 #include "kinc/graphics4/texture.h"
 #include "varia/ds/VDS-Array.hpp"
 
 Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * image_arena, VDS_Arena * metadata_arena, char const * image_path, char const * metadata_path)
 {
+    if (!v_string_utility_ends_with(image_path, ".k"))
+    {
+        //NOTE(<zshoals> 08-05-2023): Right now, we only accept k files with LZ4 compression
+        //  these files load fast and it's a good habit to use them T B Q H
+        VARIA_UNREACHABLE("Currently, only .k LZ4 image files are supported.");
+        return false;
+    }
+
     //Attempt to upload and initialize the atlas image and metadata
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     memset(atlas, 0, sizeof(*atlas));
@@ -18,8 +27,6 @@ Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * im
 
     if ( !(image_can_load & metadata_can_load) ) { return false; }
 
-    //NOTE(<zshoals> 08-04-2023): Currently, we are using the same arena for both the image and metadata
-    //  we might want to use separate arenas for each?
     File_Data image_info = v_filereader_try_load(image_arena, image_path);
     File_Data metadata_info = v_filereader_try_load(metadata_arena, metadata_path);
 
@@ -36,7 +43,7 @@ Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * im
     void * image_decoded_memory = vds_arena_allocate(image_arena, image_decoded_size);
     kinc_image_init_from_encoded_bytes(address_of(image), image_decoded_memory, image_info.raw_memory, image_decoded_size, "k");
 
-    kinc_g4_texture_init_from_image(address_of(atlas->texture), address_of(image));
+    // kinc_g4_texture_init_from_image(address_of(atlas->texture), address_of(image));
     kinc_image_destroy(address_of(image));
     //NOTE(<zshoals> 08-04-2023): Safe to reset the temporary arena now if desired
 
@@ -55,9 +62,12 @@ Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * im
     v_parser_move_to_next_line(parser);
 
     //Skip past the atlas sizing info (always 4096x4096)
+    atlas->width = 4096;
+    atlas->height = 4096;
     v_parser_move_to_next_line(parser);
 
     //Process all subimage metadata
+    //TODO(<zshoals> 08-05-2023): Replace with stringmap
     VDS_Array<Atlas_Sub_Image> sub_images_interface = vds_array_make_interface(address_of(atlas->sub_images));
     VDS_Array<Atlas_Sub_Image> * sub_images = address_of(sub_images_interface);
 
@@ -65,31 +75,43 @@ Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * im
     {
         //Get the sub_image name
         Atlas_Sub_Image * sub_image = vds_array_construct_push(sub_images);
-        sub_image->image_name = v_parser_read_line(parser, sb);
+        VDS_String_Buffer_Reference sbr = v_parser_read_line(parser, sb);
+        sub_image->name = vds_short_string_from_literal_count(sbr.string, sbr.length);
 
-        //Move to "bounds:"
+
+        //Move to the first sub_image data packet, probably "bounds:"
         v_parser_move_to_next_line(parser);
 
-        //Skip "bounds:" and get the x origin
-        v_parser_move_to_next_integer(parser);
-        sub_image->origin_x = (Integer_16)v_parser_read_integer(parser);
+        if (v_parser_line_starts_with(parser, "bounds:"))
+        {
+            //Skip "bounds:" and get the x origin
+            v_parser_move_to_next_integer(parser);
+            sub_image->origin_x = (Integer_16)v_parser_read_integer(parser);
 
-        //y origin
-        v_parser_move_to_next_integer(parser);
-        sub_image->origin_y = (Integer_16)v_parser_read_integer(parser);
+            //y origin
+            v_parser_move_to_next_integer(parser);
+            sub_image->origin_y = (Integer_16)v_parser_read_integer(parser);
 
-        //width
-        v_parser_move_to_next_integer(parser);
-        sub_image->width = (Integer_16)v_parser_read_integer(parser);
+            //width
+            v_parser_move_to_next_integer(parser);
+            sub_image->width = (Integer_16)v_parser_read_integer(parser);
 
-        //height
-        v_parser_move_to_next_integer(parser);
-        sub_image->height = (Integer_16)v_parser_read_integer(parser);
+            //height
+            v_parser_move_to_next_integer(parser);
+            sub_image->height = (Integer_16)v_parser_read_integer(parser);
 
-        //TODO(<zshoals> 08-05-2023): We default to a zero index but we may want to change this
-        //  if we start using texture arrays
-        sub_image->atlas_index = 0;
+            //TODO(<zshoals> 08-05-2023): We default to a zero index but we may want to change this
+            //  if we start using texture arrays
+            sub_image->atlas_index = 0;
+        }
+        else
+        {
+            //There was somehow no associated data with the image, so rewind the sub_image storage
+            //  that we initially retrieved
+            vds_array_pop(sub_images);
+        }
 
+        //next sub_image
         v_parser_move_to_next_line(parser);
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
