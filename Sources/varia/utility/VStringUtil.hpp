@@ -26,12 +26,18 @@ static inline Boolean v_string_utility_ends_with(char const * string, char const
 
     if (string_length >= end_length)
     {
-        for (Integer_64 i = end_length - 1; i >= 0; i -= 1)
+        Integer_64 string_iterator = string_length - 1;
+        Integer_64 end_iterator = end_length - 1;
+
+        while ( (string_iterator >= 0) && (end_iterator >= 0) )
         {
-            if ( string[i] != end[i] )
+            if (string[string_iterator] != end[end_iterator])
             {
                 return false;
             }
+
+            string_iterator -= 1;
+            end_iterator -= 1;
         }
 
         return true;
