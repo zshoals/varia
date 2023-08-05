@@ -11,4 +11,5 @@ struct File_Data
     Boolean loaded;
 };
 
+Boolean v_filereader_can_open(char const * path);
 File_Data v_filereader_try_load(VDS_Arena * arena, char const * path);

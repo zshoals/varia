@@ -1,8 +1,23 @@
 #include "varia/VFileReader.hpp"
 
 #include "varia/VShared.hpp"
+#include "kinc/io/filereader.h"
 
-Boolean v_filereader_try_load(VDS_Arena * arena, char const * path)
+Boolean v_filereader_can_open(char const * path)
+{
+    kinc_file_reader_t reader;
+
+    Boolean loaded = kinc_file_reader_open(address_of(reader), path);
+
+    if (loaded)
+    {
+        kinc_file_reader_close(address_of(reader));
+    }
+
+    return loaded;
+}
+
+File_Data v_filereader_try_load(VDS_Arena * arena, char const * path)
 {
     File_Data file_data = ZERO_INIT();
     kinc_file_reader_t reader;
