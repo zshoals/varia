@@ -28,5 +28,5 @@ struct Atlas
     VDS_Array_Storage<Atlas_Sub_Image, 4096> sub_images;
 };
 
-Boolean v_atlas_initialize(Atlas * atlas, VDS_Arena * image_arena, VDS_Arena * metadata_arena, char const * image_path, char const * metadata_path);
+Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * image_arena, VDS_Arena * metadata_arena, char const * image_path, char const * metadata_path);
 void v_atlas_destroy(Atlas * atlas);
