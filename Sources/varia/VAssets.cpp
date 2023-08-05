@@ -3,263 +3,66 @@
 #include "varia/VShared.hpp"
 #include "varia/utility/VStringUtil.hpp"
 #include "varia/graphics/VPipeline.hpp"
-#include "kinc/io/filereader.h"
+#include "varia/utility/VFileReader.hpp"
 #include "kinc/image.h"
 #include "kinc/graphics4/texture.h"
-
-struct Assets_Reader_Data
-{
-    Integer_64 requested_size;
-    void * raw_memory;
-    Boolean loaded;
-};
-
-static Assets_Reader_Data v_assets_try_load(kinc_file_reader_t * reader, char const * path, VDS_Arena * storage)
-{
-    Assets_Reader_Data data = ZERO_INIT();
-
-    data.loaded = kinc_file_reader_open(reader, path, KINC_FILE_TYPE_ASSET);
-    data.requested_size = kinc_file_reader_size(reader);
-
-    if (data.loaded)
-    {
-        void * raw_memory = vds_arena_allocate(storage, data.requested_size);
-        kinc_file_reader_read(reader, raw_memory, data.requested_size);
-        kinc_file_reader_close(reader);
-    }
-
-    return data;
-}
-
-
-static void * v_assets_allocate(Assets * assets, Integer_64 requested_size)
-{
-    VDS_Arena arena_interface = vds_arena_make_interface(address_of(assets->permanent_storage));
-    VDS_Arena * arena = address_of(arena_interface);
-
-    return vds_arena_allocate(arena, requested_size);
-}
-
-static void * v_assets_temporary_allocate(Assets * assets, Integer_64 requested_size)
-{
-    VDS_Arena arena_interface = vds_arena_make_interface(address_of(assets->loading_buffer));
-    VDS_Arena * arena = address_of(arena_interface);
-
-    return vds_arena_allocate(arena, requested_size);
-}
-
-static void v_assets_temporary_allocator_clear(Assets * assets)
-{
-    VDS_Arena arena_interface = vds_arena_make_interface(address_of(assets->loading_buffer));
-    VDS_Arena * arena = address_of(arena_interface);
-
-    vds_arena_clear(arena);
-}
-
-// void v_assets_initialize(Assets * assets)
-// {
-//     //TODO(<zshoals> 07-31-2023): Something? Maybe nothing.
-//     // VDS_Array<Vertex_Shader> vertex_shaders = vds_array_make_interface(address_of(assets->vertex_shaders));
-//     // VDS_Array<Vertex_Shader> * vertex_shaders_location = address_of(vertex_shaders);
-// }
+#include "kinc/log.h"
 
 
 Boolean v_assets_load_atlas(Assets * assets, char const * image_path, char const * image_metadata_path)
 {
-    kinc_file_reader_t image_metadata_reader;
+    VDS_Arena texture_loader_interface = vds_arena_make_interface(address_of(assets->loading_buffer));
+    VDS_Arena metadata_loader_interface = vds_arena_make_interface(address_of(assets->permanent_storage));
+    VDS_String_Buffer sub_image_name_interface = vds_string_buffer_make_interface(address_of(assets->permanent_strings));
 
-    Integer_64 image_file_size = kinc_image_size_from_file(image_path);
+    VDS_Arena * texture_loader = address_of(texture_loader_interface);
+    VDS_Arena * metadata_loader = address_of(metadata_loader_interface);
+    VDS_String_Buffer * sub_image_name = address_of(sub_image_name_interface);
 
-    Boolean image_opened = (image_file_size > 0);
-    Boolean image_metadata_opened = kinc_file_reader_open(address_of(image_metadata_reader), image_metadata_path, KINC_FILE_TYPE_ASSET);
+    Boolean loaded = v_atlas_initialize(address_of(assets->images), sub_image_name, texture_loader, metadata_loader, image_path, image_metadata_path);
 
-    if (image_opened && image_metadata_opened)
+    if (loaded)
     {
-        //Handle texture upload
-        void * raw_image_data = v_assets_temporary_allocate(assets, image_file_size);
-
-        kinc_image_t kinc_image;
-        kinc_image_init_from_file(address_of(kinc_image), raw_image_data, image_path);
-
-        kinc_g4_texture_init_from_image(address_of(assets->images.texture), address_of(kinc_image));
-        kinc_image_destroy(address_of(kinc_image));
-
-        v_assets_temporary_allocator_clear(assets);
-
-        //Handle metadata
-        Integer_64 image_metadata_file_size = 0;
-        image_metadata_file_size = kinc_file_reader_size(address_of(image_metadata_reader));
-
-        void * raw_metadata = v_assets_allocate(assets, image_metadata_file_size);
-
-        kinc_file_reader_read(address_of(image_metadata_reader), raw_metadata, image_metadata_file_size);
-        kinc_file_reader_close(address_of(image_metadata_reader));
-
-        assets->images.width = 4096;
-        assets->images.height = 4096;
-
-        //Process subimages
-        {
-            char const * as_string = static_cast<char const *>(raw_metadata);
-            Integer_64 head = 0;
-            //Read and ignore atlas name (unused);
-            while ( (as_string[head] != '\n') && (head < image_metadata_file_size))
-            {
-                head += 1;
-            }
-            head += 1;
-            //Read and ignore atlas size (always 4096 x 4096)
-            while (as_string[head] != '\n' && (head < image_metadata_file_size))
-            {
-                head += 1;
-            }
-            head += 1;
-
-            //Begin reading subimages
-            while (head < image_metadata_file_size)
-            {
-                //Read the image name
-                Integer_64 perma_string_length = 0;
-                while (as_string[head] != '\n' && (head < image_metadata_file_size))
-                {
-                    perma_string_length += 1;
-                    head += 1;
-                }
-
-                char const * line_start = address_of(as_string[head - perma_string_length]);
-                head += 1;
-
-                //Skip "bounds:" text
-                while (!v_string_utility_is_numeric(as_string[head]) && (head < image_metadata_file_size))
-                {
-                    head += 1;
-                }
-                
-                //Read 1 of 4 values
-                Integer_64 string_length = 0;
-                while (v_string_utility_is_numeric(as_string[head]) && (head < image_metadata_file_size))
-                {
-                    string_length += 1;
-                    head += 1;
-                }
-                Integer_64 origin_x = v_string_utility_string_as_int(address_of(as_string[head - string_length]), string_length);
-
-                //Skip a comma, read value 2
-                head += 1;
-
-                //Read 2 of 4 values
-                string_length = 0;
-                while (v_string_utility_is_numeric(as_string[head]) && (head < image_metadata_file_size))
-                {
-                    string_length += 1;
-                    head += 1;
-                }
-                Integer_64 origin_y = v_string_utility_string_as_int(address_of(as_string[head - string_length]), string_length);
-
-                //Skip a comma, read value 3
-                head += 1;
-
-                //Read 3 of 4 values
-                string_length = 0;
-                while (v_string_utility_is_numeric(as_string[head]) && (head < image_metadata_file_size))
-                {
-                    string_length += 1;
-                    head += 1;
-                }
-                Integer_64 width = v_string_utility_string_as_int(address_of(as_string[head - string_length]), string_length);
-
-                //Skip a comma, read value 4
-                head += 1;
-
-                //Read 4 of 4 values
-                string_length = 0;
-                while (v_string_utility_is_numeric(as_string[head]) && (head < image_metadata_file_size))
-                {
-                    string_length += 1;
-                    head += 1;
-                }
-                Integer_64 height = v_string_utility_string_as_int(address_of(as_string[head - string_length]), string_length);
-
-                //Advance to next line, skipping \r\n
-                head += 1;
-
-                //NOTE(<zshoals> 08-05-2023): yikes
-                VDS_String_Buffer_Reference sub_image_name = v_string_buffer_emplace_string(address_of(v_string_buffer_make_interface(address_of(assets->permanent_strings))), line_start, perma_string_length);
-
-                VDS_Array<Atlas_Sub_Image> array_interface = vds_array_make_interface(address_of(assets->images.sub_images));
-                VDS_Array<Atlas_Sub_Image> * array = address_of(array_interface);
-
-                Atlas_Sub_Image * sub_image = vds_array_construct_push(array);
-                {
-                    sub_image->image_name = sub_image_name;
-                    sub_image->origin_x = (Integer_16)origin_x;
-                    sub_image->origin_y = (Integer_16)origin_y;
-                    sub_image->width    = (Integer_16)width;
-                    sub_image->height   = (Integer_16)height;
-                    sub_image->atlas_index = (Integer_8)0;
-                }
-
-            }
-
-        }
-
-        return true;
+        kinc_log(KINC_LOG_LEVEL_INFO, "Atlas loaded successfully.");
     }
     else
     {
-        //NOTE(<zshoals> 08-02-2023): The actual image data does not have an associated reader,
-        //  as Kinc has an explicit image loading function that has been handled earlier.
-        if (image_metadata_opened)
-        {
-            kinc_file_reader_close(address_of(image_metadata_reader));
-        }
-
-        return false;
+        kinc_log(KINC_LOG_LEVEL_ERROR, "ERROR: Atlas wasn't loaded.");
     }
+
+    return loaded;
 }
 
-Boolean v_assets_load_fragment_shader(Assets * assets, char const * name, char const * fragment_path)
+static inline void v_assets_init_shader(kinc_g4_shader_t * shader, File_Data shader_data, kinc_g4_shader_type_t type)
 {
-    VDS_Arena arena = vds_arena_make_interface(address_of(assets->permanent_storage));
-
-    kinc_file_reader_t reader;
-    Assets_Reader_Data data = v_assets_try_load(address_of(reader), fragment_path, address_of(arena));
-
-    if (data.loaded)
-    {
-        VDS_Stringmap<kinc_g4_shader_t> fragment_shader_interface = vds_stringmap_make_interface(address_of(assets->fragment_shaders));
-        VDS_Stringmap<kinc_g4_shader_t> * fragment_shaders = address_of(fragment_shader_interface);
-
-        kinc_g4_shader_t * shader = vds_stringmap_construct_assign(fragment_shaders, name);
-        kinc_g4_shader_init(shader, data.raw_memory, data.requested_size, KINC_G4_SHADER_TYPE_FRAGMENT);
-        
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    kinc_g4_shader_init(shader, shader_data.raw_memory, shader_data.requested_size, type);
 }
 
-Boolean v_assets_load_vertex_shader(Assets * assets, char const * name, char const * vertex_path)
+Boolean v_assets_load_default_shaders(Assets * assets)
 {
-    VDS_Arena arena = vds_arena_make_interface(address_of(assets->permanent_storage));
+    VDS_Arena perma_storage_interface = vds_arena_make_interface(address_of(assets->permanent_storage));
+    VDS_Arena * perma_storage = address_of(perma_storage_interface);
 
-    kinc_file_reader_t reader;
-    Assets_Reader_Data data = v_assets_try_load(address_of(reader), vertex_path, address_of(arena));
+    //NOTE(<zshoals> 08-05-2023): We waste some memory here if one loaded but the other didn't
+    //  not much though so who cares
+    File_Data tex_vert_info = v_filereader_try_load(perma_storage, "textured-standard.vert");
+    File_Data tex_frag_info = v_filereader_try_load(perma_storage, "textured-standard.frag");
 
-    if (data.loaded)
+    if (tex_vert_info.loaded & tex_frag_info.loaded)
     {
-        VDS_Stringmap<kinc_g4_shader_t> vertex_shader_interface = vds_stringmap_make_interface(address_of(assets->vertex_shaders));
-        VDS_Stringmap<kinc_g4_shader_t> * vertex_shaders = address_of(vertex_shader_interface);
+        //Vertex
+        v_assets_init_shader(address_of(assets->textured_vert), tex_vert_info, KINC_G4_SHADER_TYPE_VERTEX);
+        //Fragment
+        v_assets_init_shader(address_of(assets->textured_frag), tex_frag_info, KINC_G4_SHADER_TYPE_FRAGMENT);
 
-        kinc_g4_shader_t * shader = vds_stringmap_construct_assign(vertex_shaders, name);
-        kinc_g4_shader_init(shader, data.raw_memory, data.requested_size, KINC_G4_SHADER_TYPE_VERTEX);
-        
+        kinc_log(KINC_LOG_LEVEL_INFO, "Default Shaders loaded succesfully.");
+
         return true;
     }
     else
     {
+        kinc_log(KINC_LOG_LEVEL_ERROR, "ERROR: Default Shaders weren't loaded.");
+
         return false;
     }
 }
