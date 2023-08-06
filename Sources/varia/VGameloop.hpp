@@ -5,6 +5,12 @@
 #include "kinc/window.h"
 #include "kinc/display.h"
 
+struct Maptest
+{
+    char const * name;
+    int value;
+};
+
 enum class E_Simulating
 {
     Simulate,

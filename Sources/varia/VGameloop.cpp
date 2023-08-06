@@ -7,6 +7,8 @@
 #include "varia/input/VInput.hpp"
 #include "varia/VSystemCallbacks.hpp"
 
+#include "varia/ds/VDS-ShortString.hpp"
+
 #include "kinc/display.h"
 #include "kinc/system.h"
 #include "kinc/log.h"
@@ -70,6 +72,7 @@ void v_gameloop_entrypoint(void * data)
 {
     Game_Context * context = static_cast<Game_Context *>(data);
     Gamestate * logic_world = address_of(context->logic_world);
+    System_Events * system_events = address_of(context->system_events);
 
     //Process the Input Event Loop
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -79,7 +82,7 @@ void v_gameloop_entrypoint(void * data)
         //  how do we handle this? do we resolve collisions with some sort of prioritization or just allow things
         //  through?
 
-        v_input_process_events(address_of(context->input), [&logic_world](E_Gameplay_Event e)
+        v_input_process_events(address_of(context->input), [&logic_world, &system_events](E_Gameplay_Event e)
         {
             switch (e)
             {
@@ -100,6 +103,10 @@ void v_gameloop_entrypoint(void * data)
                 }
                 case E_Gameplay_Event::Move_Right_Released:
                 {
+                    // v_system_events_push(system_events, E_System_Event_Type::System_Window_Attempting_Changes);
+                    // v_system_events_push(system_events, E_System_Event_Type::System_Window_Request_Windowed);
+                    // v_system_events_push(system_events, E_System_Event_Type::System_Window_Apply_Changes);
+
                     Float_64 data = kinc_time();
                     kinc_log(KINC_LOG_LEVEL_INFO, "RIGHT RELEASE FUCK YOU detected! %f!", data);
                     break;
@@ -112,6 +119,10 @@ void v_gameloop_entrypoint(void * data)
                 }
                 case E_Gameplay_Event::Move_Left_Released:
                 {
+                    // v_system_events_push(system_events, E_System_Event_Type::System_Window_Attempting_Changes);
+                    // v_system_events_push(system_events, E_System_Event_Type::System_Window_Request_Fullscreen);
+                    // v_system_events_push(system_events, E_System_Event_Type::System_Window_Apply_Changes);
+
                     Float_64 data = kinc_time();
                     kinc_log(KINC_LOG_LEVEL_INFO, "LEFT RELEASE FUCK YOU detected! %f!", data);
                     break;
@@ -168,6 +179,9 @@ void v_gameloop_entrypoint(void * data)
                 }
                 case E_System_Event_Type::System_Window_Request_Fullscreen:
                 {
+                    kinc_display_mode_t primary = kinc_display_current_mode(0);
+                    logic_world->pending_window_changes.width = primary.width;
+                    logic_world->pending_window_changes.height = primary.height;
                     logic_world->pending_window_changes.mode = KINC_WINDOW_MODE_FULLSCREEN;
                     break;
                 }
@@ -200,9 +214,16 @@ void v_gameloop_entrypoint(void * data)
                 {
                     //TODO(<zshoals> 07-27-2023): There might be other useful settings, such as
                     //  changing the window title...but they're kind of optional
-                    kinc_window_change_mode(logic_world->kinc_primary_display_index, logic_world->pending_window_changes.mode);
-                    kinc_window_change_features(logic_world->kinc_primary_display_index, logic_world->pending_window_changes.window_features);
+
+                    //TODO(<zshoals> 07-30-2023): Exiting from fullscreen to window mode means the size of the window
+                    //  is kind of big...maybe fix and store the previous window size?
+
+                    //NOTE(<zshoals> 07-30-2023): Changing the framebuffer resizes the window, for whatever reason
+                    //  so this must be done first if we're doing some exclusive fullscreen stuff
                     kinc_window_change_framebuffer(logic_world->kinc_primary_display_index, address_of(logic_world->pending_framebuffer_changes));
+                    kinc_window_change_features(logic_world->kinc_primary_display_index, logic_world->pending_window_changes.window_features);
+                    kinc_window_change_mode(logic_world->kinc_primary_display_index, logic_world->pending_window_changes.mode);
+                    kinc_window_resize(logic_world->kinc_primary_display_index, logic_world->pending_window_changes.width, logic_world->pending_window_changes.height);
 
                     logic_world->window = logic_world->pending_window_changes;
                     logic_world->framebuffer = logic_world->pending_framebuffer_changes;
@@ -414,6 +435,10 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
         v_system_events_initialize(events);
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    // v_assets_load_atlas(address_of(game.assets), "atlas_dump.png", "atlas_dump.atlas");
+    v_assets_load_atlas(address_of(game.assets), "output_atlas.k", "atlas_dump.atlas");
+    // v_assets_load_default_shaders(address_of(game.assets));
 
 	kinc_set_update_callback(&v_gameloop_entrypoint, &game);
 	kinc_start();

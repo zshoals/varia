@@ -1,0 +1,5 @@
+// #include "varia/VAssets.cpp.hpp"
+// #include "varia/VGameContext.cpp.hpp"
+// #include "varia/VGameloop.cpp.hpp"
+// #include "varia/VSimulation.cpp.hpp"
+// #include "varia/VSystemEvents.cpp.hpp"
