@@ -5,6 +5,7 @@
 #include "varia/graphics/VRenderer.hpp"
 #include "varia/VSystemEvents.hpp"
 #include "varia/VAssets.hpp"
+#include "varia/VUID.hpp"
 
 enum class E_Game_Context_Save_Slot
 {
@@ -28,6 +29,8 @@ struct Game_Context
 
     Graphics_Renderer gfx;
     Graphics_Intermediate_Representation ir_storage;
+
+    UID_State UID_generator;
 };
 
 void v_gamecontext_save_logic_world(Game_Context * context, E_Game_Context_Save_Slot slot);
