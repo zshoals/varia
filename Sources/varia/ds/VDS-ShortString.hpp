@@ -5,23 +5,25 @@
 
 #include <string.h>
 
+#define VDS_SHORT_STRING_CAPACITY 63
 struct VDS_Short_String
 {
-    char string[63];
     char length;
+    char string[VDS_SHORT_STRING_CAPACITY];
 };
 
 static inline VDS_Short_String vds_short_string_from_literal_count(char const * literal, Integer_64 length)
 {
-
-    if (length > 62) { length = 62; }
+    constexpr char capacity = VDS_SHORT_STRING_CAPACITY - 1;
+    if (length > capacity) { length = capacity; }
     if (length < 0) { length = 0; }
 
     VDS_Short_String ss = {};
     {
         memcpy(&(ss.string[0]), literal, length);
         ss.length = (char)length;
-        ss.string[62] = '\0';
+        ss.string[length] = '\0';
+        ss.string[capacity] = '\0';
     }
 
     return ss;
