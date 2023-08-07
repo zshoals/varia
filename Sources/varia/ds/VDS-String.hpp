@@ -18,6 +18,15 @@ struct VDS_String
         memset(this, 0, sizeof(*this));
     }
 
+    VDS_String(char const * string, Integer_32 length)
+    {
+        memset(this, 0, sizeof(*this));
+        this->length = length;
+        memcpy(&(this->string[0]), string, this->length);
+        this->string[this->length] = '\0';
+        this->string[this->capacity] = '\0';
+    }
+
     VDS_String(char const * string)
     {
         memset(this, 0, sizeof(*this));
@@ -27,6 +36,18 @@ struct VDS_String
         this->string[this->capacity] = '\0';
     }
 };
+
+template <typename T>
+T vds_string_create(char const * s)
+{
+    return T{s};
+}
+
+template <typename T>
+T vds_string_create_with_length(char const * s, Integer_32 length)
+{
+    return T{s, length};
+}
 
 template <Integer_32 SIZE_A, Integer_32 SIZE_B>
 Boolean vds_string_matches(VDS_String<SIZE_A> const & left, VDS_String<SIZE_B> const & right)
@@ -77,3 +98,6 @@ Integer_32 vds_string_length(VDS_String<SIZE> const & s)
 {
     return s.length;
 }
+
+using VDS_Short_String = VDS_String<64>;
+using VDS_Long_String = VDS_String<256>;
