@@ -7,7 +7,7 @@
 #include "varia/input/VInput.hpp"
 #include "varia/VSystemCallbacks.hpp"
 
-#include "varia/ds/VDS-ShortString.hpp"
+#include "varia/ds/VDS-String.hpp"
 
 #include "kinc/display.h"
 #include "kinc/system.h"
@@ -439,6 +439,32 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     // v_assets_load_atlas(address_of(game.assets), "atlas_dump.png", "atlas_dump.atlas");
     v_assets_load_atlas(address_of(game.assets), "output_atlas.k", "atlas_dump.atlas");
     // v_assets_load_default_shaders(address_of(game.assets));
+
+    using Short_String = VDS_String<64>;
+    using Long_String = VDS_String<128>;
+
+    Short_String a = "This is a new era for everyone; it's going to be a completely awesome and exciting time.";
+    kinc_log(KINC_LOG_LEVEL_INFO, "%s", vds_string_cstr(a));
+
+    Short_String b = "Shortish string...";
+    Short_String c = "and an appendage...";
+    Long_String d = "And a much longer string...";
+
+    using Very_Long_String = VDS_String<4096>;
+    Very_Long_String vls = "This is the beginning of some sort of string...";
+    Short_String append = "...and another one";
+
+    float start = kinc_time();
+    for_range(4064)
+    {
+        vds_string_append_in_place(vls, append);
+        // vls = vds_string_append(vls, append);
+    }
+    kinc_log(KINC_LOG_LEVEL_INFO, "%s", vds_string_cstr(vls));
+    kinc_log(KINC_LOG_LEVEL_INFO, "%d", vds_string_length(vls));
+    float end = kinc_time() - start;
+    kinc_log(KINC_LOG_LEVEL_INFO, "%f", end);
+
 
 	kinc_set_update_callback(&v_gameloop_entrypoint, &game);
 	kinc_start();
