@@ -2,7 +2,7 @@
 
 #include "varia/VShared.hpp"
 #include "varia/ds/VDS-StringBuffer.hpp"
-#include "varia/ds/VDS-ShortString.hpp"
+#include "varia/ds/VDS-String.hpp"
 #include "varia/ds/VDS-Array.hpp"
 #include "varia/ds/VDS-Arena.hpp"
 #include "kinc/graphics4/texture.h"
