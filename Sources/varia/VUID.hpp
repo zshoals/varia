@@ -12,7 +12,7 @@ struct UID_State
 
 static inline UID v_UID_next(UID_State * state)
 {
-    if (UID_Generator >= 0xFFFFFFFFFFFFFFF0)
+    if (state->UID_Generator >= 0xFFFFFFFFFFFFFFF0)
     {
         state->maxed = true;
     }
