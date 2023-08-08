@@ -4,6 +4,22 @@
 #include "varia/graphics/VPipeline.hpp"
 #include "varia/VAssets.hpp"
 
+static inline void v_graphics_push_vert(float * vbo_base, float x, float y, float z, float u, float v, float r, float g, float b, float a)
+{
+    //Position
+    vbo_base[0] = x;
+    vbo_base[1] = y;
+    vbo_base[2] = z;
+    //UV
+    vbo_base[3] = u;
+    vbo_base[4] = v;
+    //Color
+    vbo_base[5] = r;
+    vbo_base[6] = g;
+    vbo_base[7] = b;
+    vbo_base[8] = a;
+}
+
 void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
 {
     //Initialize Vertex structure
@@ -74,10 +90,35 @@ void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
 
 void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate_Representation const * ir)
 {
-    graphics->tex_pipe.update_callback(address_of(graphics->tex_pipe), graphics->active_texture);
+    kinc_g4_vertex_buffer_t * vbo = address_of(graphics->vbo);
 
-    //TODO(<zshoals> 08-03-2023): Do rendering
+    float * vbo_data = kinc_g4_vertex_buffer_lock_all(vbo);
+    {
+        v_graphics_push_vert(vbo_data, .25, .25, .5, 0, 0, 1.0, 1.0, 1.0, 1.0);
+        vbo_data += 9;
+        v_graphics_push_vert(vbo_data, .75, .25, .5, 1, 0, 1.0, 1.0, 1.0, 1.0);
+        vbo_data += 9;
+        v_graphics_push_vert(vbo_data, .25, .75, .5, 0, 1, 1.0, 1.0, 1.0, 1.0);
+        vbo_data += 9;
+        v_graphics_push_vert(vbo_data, .75, .75, .5, 1, 1, 1.0, 1.0, 1.0, 1.0);
+    }
+    kinc_g4_vertex_buffer_unlock_all(vbo);
+
+
+
+    //Actually Render
+    //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     kinc_g4_begin(0);
+    {
+        graphics->tex_pipe.update_callback(address_of(graphics->tex_pipe), graphics->active_texture);
+        kinc_g4_set_vertex_buffer(vbo);
+        kinc_g4_set_index_buffer(address_of(graphics->ibo));
+
+        //TODO(<zshoals> 08-08-2023): Hardcoded experiment
+        kinc_g4_draw_indexed_vertices_from_to(0, 4);
+    }
     kinc_g4_end(0);
+    //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
     kinc_g4_swap_buffers();
 }

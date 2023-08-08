@@ -8,7 +8,8 @@ out vec2 texCoord;
 out vec4 color;
 
 void main() {
-	gl_Position = projectionMatrix * vec4(vertexPosition, 1.0);
+	//gl_Position = projectionMatrix * vec4(vertexPosition, 1.0);
+	gl_Position = vec4(vertexPosition, 1.0);
 	texCoord = vertexUV;
 	color = vertexColor;
 }
