@@ -65,7 +65,7 @@ static void v_gameloop_build_graphics_intermediate_representation
     ir_out->renderables[0] = 68306; //Dummy test stuff ignore me remove me asap
 }
 
-static void v_gameloop_render(Graphics_Renderer * gfx, Graphics_Intermediate_Representation const * ir)
+static void v_gameloop_render(Graphics_State * gfx, Graphics_Intermediate_Representation const * ir)
 {
     v_graphics_renderer_render(gfx, ir);
 }
@@ -354,7 +354,7 @@ void v_gameloop_entrypoint(void * data)
             v_gameloop_simulate(visual_world, visual_world->simulating, visual_world->simulation_mode); 
             Graphics_Intermediate_Representation * ir_out = address_of(context->ir_storage);
             v_gameloop_build_graphics_intermediate_representation(ir_out, visual_world);
-            v_gameloop_render(address_of(context->gfx), ir_out);
+            v_gameloop_render(address_of(context->graphics_state), ir_out);
 
             //TODO(<zshoals> 07-30-2023): Gameclocks should be updated inside simulating because
             //  we might pause the simulation lul
@@ -442,10 +442,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     v_assets_load_atlas(address_of(game.assets), "output_atlas.k", "atlas_dump.atlas");
     v_assets_load_default_shaders(address_of(game.assets));
 
-    vds_array_iterate(address_of(game.assets.atlas.sub_images), [](Atlas_Sub_Image * img, Integer_64 i)
-    {
-        kinc_log(KINC_LOG_LEVEL_INFO, "Image Name: %s", vds_string_cstr(img->name));
-    });
+    v_graphics_initialize(address_of(game.graphics_state), address_of(game.assets));
 
 	kinc_set_update_callback(&v_gameloop_entrypoint, &game);
 	kinc_start();

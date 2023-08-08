@@ -27,7 +27,7 @@ struct Game_Context
 
     Assets assets;
 
-    Graphics_Renderer gfx;
+    Graphics_State graphics_state;
     Graphics_Intermediate_Representation ir_storage;
 
     UID_State UID_generator;
