@@ -4,19 +4,41 @@
 
 #include "kinc/graphics4/vertexstructure.h"
 #include "kinc/graphics4/pipeline.h"
+#include "kinc/graphics4/graphics.h"
+#include "kinc/system.h"
 
-void v_pipeline_initialize_textured(Textured_Pipeline * pipe, kinc_g4_shader_t * vertex_shader, kinc_g4_shader_t * fragment_shader)
+static inline void v_internal_pipeline_textured_update_callback(Textured_Pipeline * pipe, kinc_g4_texture_t * texture)
+{
+    //Replace the old pipeline with our new one yay
+    kinc_g4_set_pipeline(address_of(pipe->pipe));
+
+    //Update onboard uniforms
+    //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    {
+        pipe->time = (float)kinc_time();
+    }
+    //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+    //Update constant locations and texture locations
+    //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    {
+        // kinc_g4_set_float(pipe->time_location, pipe->time);
+
+        //NOTE(<zshoals> 08-07-2023): We only have one single texture/texturearray because
+        //  we are GIGABRAINED and loading everything at startup.
+        //  So, just set the texture on pipeline change since there's only one anyway and forget about it
+        kinc_g4_set_texture(pipe->texture_unit, texture);
+    }
+    //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+}
+
+void v_pipeline_initialize_textured(Textured_Pipeline * pipe, kinc_g4_vertex_structure_t * vs, kinc_g4_shader_t * vertex_shader, kinc_g4_shader_t * fragment_shader)
 {
     kinc_g4_pipeline_init(address_of(pipe->pipe));
 
-    kinc_g4_vertex_structure_t * vs = address_of(pipe->structure);
-    kinc_g4_vertex_structure_init(vs);
-    kinc_g4_vertex_structure_add(vs, "pos", KINC_G4_VERTEX_DATA_F32_2X);
-    kinc_g4_vertex_structure_add(vs, "uv", KINC_G4_VERTEX_DATA_F32_2X);
-    kinc_g4_vertex_structure_add(vs, "layer", KINC_G4_VERTEX_DATA_F32_1X);
-    kinc_g4_vertex_structure_add(vs, "color", KINC_G4_VERTEX_DATA_I32_1X);
-
     pipe->pipe.input_layout[0] = vs;
+    pipe->pipe.input_layout[1] = NULL;
     pipe->pipe.vertex_shader = vertex_shader;
     pipe->pipe.fragment_shader = fragment_shader;
 
@@ -25,6 +47,8 @@ void v_pipeline_initialize_textured(Textured_Pipeline * pipe, kinc_g4_shader_t *
 
     kinc_g4_pipeline_compile(address_of(pipe->pipe));
 
-    pipe->tex = kinc_g4_pipeline_get_texture_unit(address_of(pipe->pipe), "tex");
-    pipe->time_location = kinc_g4_pipeline_get_constant_location(address_of(pipe->pipe), "time");
+    // pipe->time_location = kinc_g4_pipeline_get_constant_location(address_of(pipe->pipe), "time");
+    pipe->texture_unit = kinc_g4_pipeline_get_texture_unit(address_of(pipe->pipe), "tex");
+
+    pipe->update_callback = &v_internal_pipeline_textured_update_callback;
 }
