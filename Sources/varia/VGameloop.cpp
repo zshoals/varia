@@ -442,6 +442,11 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     v_assets_load_atlas(address_of(game.assets), "output_atlas.k", "atlas_dump.atlas");
     v_assets_load_default_shaders(address_of(game.assets));
 
+    vds_array_iterate(address_of(game.assets.atlas.sub_images), [](Atlas_Sub_Image * img, Integer_64 i)
+    {
+        kinc_log(KINC_LOG_LEVEL_INFO, "Image Name: %s", vds_string_cstr(img->name));
+    });
+
 	kinc_set_update_callback(&v_gameloop_entrypoint, &game);
 	kinc_start();
 }

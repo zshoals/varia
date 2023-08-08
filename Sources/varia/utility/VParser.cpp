@@ -1,6 +1,5 @@
 #include "varia/utility/VParser.hpp"
 
-#include "varia/VAssetStorage.hpp"
 #include "varia/utility/VStringUtil.hpp"
 #include <string.h>
 
@@ -27,7 +26,6 @@ static inline Boolean v_parser_is_in_line(Parser const * p, Integer_64 head)
     return (in_bounds & in_line);
 }
 
-//NOTE(<zshoals> 08-04-2023): Has to be exposed for a template I guess
 Integer_64 v_parser_remaining_line_bytes(Parser const * p, Integer_64 head)
 {
     //TODO(<zshoals> 08-04-2023): Verify if we should do a value clamp here
@@ -129,12 +127,15 @@ Boolean v_parser_line_starts_with(Parser * p, char const * search)
     }
 }
 
-VDS_String_Buffer_Reference v_parser_read_line(Parser * p, Temporary_String_Buffer * sb)
+Integer_64 v_parser_get_line_length(Parser const * p)
+{
+    return v_parser_remaining_line_bytes(p, p->line_begin_head);
+}
+
+char const * v_parser_read_line(Parser * p)
 {
     char const * line = address_of(p->source_data[p->line_begin_head]);
-    Integer_64 line_length = v_parser_remaining_line_bytes(p, p->line_begin_head);
-
-    return vds_string_buffer_emplace_string(sb, line, line_length);
+    return line;
 }
 
 void v_parser_advance_past(Parser * p, char const * string)
