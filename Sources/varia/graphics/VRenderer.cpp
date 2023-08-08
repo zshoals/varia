@@ -94,13 +94,27 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
 
     float * vbo_data = kinc_g4_vertex_buffer_lock_all(vbo);
     {
-        v_graphics_push_vert(vbo_data, .25, .25, .5, 0, 0, 1.0, 1.0, 1.0, 1.0);
+        /*
+        
+            0-----------2
+            |           |
+            |           |
+            |           |
+            1-----------3
+        
+        */
+        float u_min = 0.14746;
+        float v_min = 0.170166;
+        float u_max = 0.24536;
+        float v_max = 0.183349;
+
+        v_graphics_push_vert(vbo_data,    -1.0, -1.0, 0.5,      u_min, v_min,       1.0, 1.0, 1.0, 1.0);
         vbo_data += 9;
-        v_graphics_push_vert(vbo_data, .75, .25, .5, 1, 0, 1.0, 1.0, 1.0, 1.0);
+        v_graphics_push_vert(vbo_data,    -1.0, 1.0, 0.5,      u_min, v_max,       1.0, 1.0, 1.0, 1.0);
         vbo_data += 9;
-        v_graphics_push_vert(vbo_data, .25, .75, .5, 0, 1, 1.0, 1.0, 1.0, 1.0);
+        v_graphics_push_vert(vbo_data,    1.0, -1.0, 0.5,      u_max, v_min,       1.0, 1.0, 1.0, 1.0);
         vbo_data += 9;
-        v_graphics_push_vert(vbo_data, .75, .75, .5, 1, 1, 1.0, 1.0, 1.0, 1.0);
+        v_graphics_push_vert(vbo_data,    1.0, 1.0, 0.5,      u_max, v_max,       1.0, 1.0, 1.0, 1.0);
     }
     kinc_g4_vertex_buffer_unlock_all(vbo);
 
@@ -115,7 +129,7 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
         kinc_g4_set_index_buffer(address_of(graphics->ibo));
 
         //TODO(<zshoals> 08-08-2023): Hardcoded experiment
-        kinc_g4_draw_indexed_vertices_from_to(0, 4);
+        kinc_g4_draw_indexed_vertices_from_to(0, 6);
     }
     kinc_g4_end(0);
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

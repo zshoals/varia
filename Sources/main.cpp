@@ -29,7 +29,7 @@ int kickstart(int argc, char** argv)
 
 	char const * config_title = "Varia Project";
 	int config_window_width = 800;
-	int config_window_height = 600;
+	int config_window_height = 800;
 	bool config_vsync = false;
 
 	//Initialize window and framebuffer options here with struct inits
