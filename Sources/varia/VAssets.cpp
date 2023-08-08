@@ -22,7 +22,7 @@ Boolean v_assets_load_atlas(Assets * assets, char const * image_path, char const
     Permanent_Storage_Arena * metadata_loader = address_of(assets->permanent_storage);
     Temporary_String_Buffer * sub_image_name = address_of(assets->temporary_strings);
 
-    Boolean loaded = v_atlas_initialize(address_of(assets->images), sub_image_name, texture_loader, metadata_loader, image_path, image_metadata_path);
+    Boolean loaded = v_atlas_initialize(address_of(assets->atlas), sub_image_name, texture_loader, metadata_loader, image_path, image_metadata_path);
 
     if (loaded)
     {

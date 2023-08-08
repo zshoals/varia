@@ -9,7 +9,7 @@
 
 struct Assets
 {
-    Atlas images;
+    Atlas atlas;
 
     kinc_g4_shader_t textured_vert;
     kinc_g4_shader_t textured_frag;
