@@ -2,6 +2,12 @@
 
 #include "varia/VShared.hpp"
 
+struct Parser_Line_Info
+{
+    Integer_64 length;
+    char const * line_data;
+};
+
 struct Parser
 {
     char const * source_data;
@@ -25,5 +31,4 @@ Boolean v_parser_has_lines(Parser * p);
 void v_parser_initialize(Parser * p, char const * source_data, Integer_64 source_data_length);
 Integer_64 v_parser_remaining_line_bytes(Parser const * p, Integer_64 head);
 
-Integer_64 v_parser_get_line_length(Parser const * p);
-char const * v_parser_read_line(Parser * p);
+Parser_Line_Info v_parser_read_line(Parser * p);

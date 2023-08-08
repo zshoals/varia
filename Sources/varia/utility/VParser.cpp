@@ -127,15 +127,15 @@ Boolean v_parser_line_starts_with(Parser * p, char const * search)
     }
 }
 
-Integer_64 v_parser_get_line_length(Parser const * p)
+Parser_Line_Info v_parser_read_line(Parser * p)
 {
-    return v_parser_remaining_line_bytes(p, p->line_begin_head);
-}
+    Parser_Line_Info info = ZERO_INIT();
+    {
+        info.length = v_parser_remaining_line_bytes(p, p->line_begin_head);
+        info.line_data = address_of(p->source_data[p->line_begin_head]);
+    }
 
-char const * v_parser_read_line(Parser * p)
-{
-    char const * line = address_of(p->source_data[p->line_begin_head]);
-    return line;
+    return info;
 }
 
 void v_parser_advance_past(Parser * p, char const * string)

@@ -77,12 +77,9 @@ Boolean v_atlas_initialize(Atlas * atlas, Temporary_String_Buffer * sb, Temporar
     {
         //Get the sub_image name
         Atlas_Sub_Image * sub_image = vds_array_construct_push(sub_images);
-        // VDS_String_Buffer_Reference sbr = v_parser_read_line(parser, sb);
-        // sub_image->name = vds_string_create_with_length<VDS_Short_String>(sbr.string, (Integer_32)sbr.length);
-        Integer_32 line_length = (Integer_32)v_parser_get_line_length(parser);
-        char const * line_string = v_parser_read_line(parser);
-        sub_image->name = vds_string_create_with_length<VDS_Short_String>(line_string, line_length);
 
+        Parser_Line_Info info = v_parser_read_line(parser);
+        sub_image->name = vds_string_create_with_length<VDS_Short_String>(info.line_data, (Integer_32)info.length);
 
         //Move to the first sub_image data packet, probably "bounds:"
         v_parser_move_to_next_line(parser);
