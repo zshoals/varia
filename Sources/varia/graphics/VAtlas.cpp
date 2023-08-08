@@ -46,7 +46,11 @@ Boolean v_atlas_initialize(Atlas * atlas, Temporary_String_Buffer * sb, Temporar
     void * image_decoded_memory = vds_arena_allocate(image_arena, image_decoded_size);
     kinc_image_init_from_encoded_bytes(address_of(image), image_decoded_memory, image_info.raw_memory, image_decoded_size, "k");
 
-    // kinc_g4_texture_init_from_image(address_of(atlas->texture), address_of(image));
+    //NOTE(<zshoals> 08-07-2023): ACTUALLY LOAD THE TEXTURE (ugh...)
+    {
+        kinc_g4_texture_init_from_image(address_of(atlas->texture), address_of(image));
+    }
+
     kinc_image_destroy(address_of(image));
     //NOTE(<zshoals> 08-04-2023): Safe to reset the temporary arena now if desired
 
