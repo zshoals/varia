@@ -13,6 +13,8 @@ struct Textured_Pipeline
 
     //NOTE(<zshoals> 08-05-2023): Use standard types here as these will be passed into the GPU as uniforms
     //  may as well be pessimistic about the situation
+    //TODO(<zshoals> 08-07-2023): We can add a callback here that actually applies all the uniforms
+    //to G4, which we trigger whenever we switch to a new pipeline
     float time;
     kinc_g4_constant_location_t time_location;
 };

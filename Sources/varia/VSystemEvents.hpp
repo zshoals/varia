@@ -18,10 +18,10 @@ enum class E_System_Event_Type
     System_Window_Apply_Changes,
 };
 
+using System_Event_Queue = VDS_Reset_Queue<E_System_Event_Type, 128>;
 struct System_Events
 {
-    #define SYSTEM_EVENT_QUEUE_MAX_SIZE 128
-    VDS_Reset_Queue_Storage<E_System_Event_Type, SYSTEM_EVENT_QUEUE_MAX_SIZE> events;
+    System_Event_Queue events;
 };
 
 void v_system_events_initialize(System_Events * events);
@@ -30,8 +30,7 @@ void v_system_events_push(System_Events * events, E_System_Event_Type e);
 template<typename FUNC>
 void v_system_events_process(System_Events * system_events, FUNC f)
 {
-    VDS_Reset_Queue<E_System_Event_Type> events = vds_reset_queue_make_interface(address_of(system_events->events));
-    VDS_Reset_Queue<E_System_Event_Type> * events_location = address_of(events);
+    System_Event_Queue * events_location = address_of(system_events->events);
 
     while (vds_reset_queue_has_elements(events_location))
     {

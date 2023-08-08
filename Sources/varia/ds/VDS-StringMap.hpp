@@ -14,35 +14,15 @@ struct VDS_Stringmap_Key
 //NOTE(<zshoals> 08-03-2023): We assume anything using stringmap has a char const * field called
 //"name"
 template <typename T, Integer_64 SIZE>
-struct VDS_Stringmap_Storage
+struct VDS_Stringmap
 {
-    VDS_Array_Storage<char const *, SIZE> keys;
-    VDS_Array_Storage<T, SIZE> data;
+    VDS_Array<char const *, SIZE> keys;
+    VDS_Array<T, SIZE> data;
     T stub;
 };
 
-template <typename T>
-struct VDS_Stringmap
-{
-    VDS_Array<char const *> keys;
-    VDS_Array<T> data;
-    T * stub;
-};
-
-template <typename T, Integer_64 SIZE>
-VDS_Stringmap<T> vds_stringmap_make_interface(VDS_Stringmap_Storage<T, SIZE> * storage)
-{
-    VDS_Stringmap<T> interface;
-    {
-        interface.keys = vds_array_make_interface(&(storage->keys));
-        interface.data = vds_array_make_interface(&(storage->data));
-        interface.stub = &(storage->stub);
-    }
-
-    return interface;
-}
-
-static inline VDS_Stringmap_Key vds_internal_stringmap_search(VDS_Array<char const *> * storage, char const * search_key)
+template <Integer_64 SIZE>
+VDS_Stringmap_Key vds_internal_stringmap_search(VDS_Array<char const *, SIZE> * storage, char const * search_key)
 {
     VDS_Stringmap_Key key;
     key.key = vds_array_index_of(storage, [&search_key](char const * const * stored_key)
@@ -53,11 +33,11 @@ static inline VDS_Stringmap_Key vds_internal_stringmap_search(VDS_Array<char con
     return key;
 }
 
-template <typename T>
-void vds_stringmap_assign(VDS_Stringmap<T> * map, char const * name, T element)
+template <typename T, Integer_64 SIZE>
+void vds_stringmap_assign(VDS_Stringmap<T, SIZE> * map, char const * name, T element)
 {
-    VDS_Array<T> * data_storage = &(map->data);
-    VDS_Array<char const *> * key_storage = &(map->keys);
+    VDS_Array<T, SIZE> * data_storage = &(map->data);
+    VDS_Array<char const *, SIZE> * key_storage = &(map->keys);
     VDS_Stringmap_Key key = vds_internal_stringmap_search(key_storage, name);
 
     if (key.key == -1)
@@ -79,11 +59,11 @@ void vds_stringmap_assign(VDS_Stringmap<T> * map, char const * name, T element)
     }
 }
 
-template <typename T>
-T * vds_stringmap_construct_assign(VDS_Stringmap<T> * map, char const * name)
+template <typename T, Integer_64 SIZE>
+T * vds_stringmap_construct_assign(VDS_Stringmap<T, SIZE> * map, char const * name)
 {
-    VDS_Array<T> * data_storage = &(map->data);
-    VDS_Array<char const *> * key_storage = &(map->keys);
+    VDS_Array<T, SIZE> * data_storage = &(map->data);
+    VDS_Array<char const *, SIZE> * key_storage = &(map->keys);
 
     if (vds_array_can_push(key_storage))
     {
@@ -95,20 +75,20 @@ T * vds_stringmap_construct_assign(VDS_Stringmap<T> * map, char const * name)
     else
     {
         VDS_ASSERT(0, "Stringmap depleted available slots.");
-        return map->stub;
+        return &(map->stub);
     }
 }
 
-template <typename T>
-T * vds_stringmap_retrieve(VDS_Stringmap<T> * map, char const * string)
+template <typename T, Integer_64 SIZE>
+T * vds_stringmap_retrieve(VDS_Stringmap<T, SIZE> * map, char const * string)
 {
-    VDS_Array<T> * data_storage = &(map->data);
-    VDS_Array<char const *> * key_storage = &(map->keys);
+    VDS_Array<T, SIZE> * data_storage = &(map->data);
+    VDS_Array<char const *, SIZE> * key_storage = &(map->keys);
     VDS_Stringmap_Key key = vds_internal_stringmap_search(key_storage, string);
 
     if (key.key == -1)
     {
-        return map->stub;
+        return &(map->stub);
     }
     else
     {
@@ -116,11 +96,11 @@ T * vds_stringmap_retrieve(VDS_Stringmap<T> * map, char const * string)
     }
 }
 
-template <typename T>
-void vds_stringmap_clear(VDS_Stringmap<T> * map)
+template <typename T, Integer_64 SIZE>
+void vds_stringmap_clear(VDS_Stringmap<T, SIZE> * map)
 {
-    VDS_Array<char const *> * key_storage = &(map->keys);
-    VDS_Array<T> * data_storage = &(map->data);
+    VDS_Array<char const *, SIZE> * key_storage = &(map->keys);
+    VDS_Array<T, SIZE> * data_storage = &(map->data);
     vds_array_clear(key_storage);
     vds_array_clear(data_storage);
 }

@@ -1,14 +1,17 @@
 #include "varia/graphics/VAtlas.hpp"
 
+#include "varia/VShared.hpp"
+
+#include "varia/VAssetStorage.hpp"
 #include "varia/utility/VFileReader.hpp"
 #include "varia/utility/VParser.hpp"
 #include "varia/utility/VMemset.hpp"
 #include "varia/utility/VStringUtil.hpp"
+
 #include "kinc/image.h"
 #include "kinc/graphics4/texture.h"
-#include "varia/ds/VDS-Array.hpp"
 
-Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * image_arena, VDS_Arena * metadata_arena, char const * image_path, char const * metadata_path)
+Boolean v_atlas_initialize(Atlas * atlas, Temporary_String_Buffer * sb, Temporary_Storage_Arena * image_arena, Permanent_Storage_Arena * metadata_arena, char const * image_path, char const * metadata_path)
 {
     if (!v_string_utility_ends_with(image_path, ".k"))
     {
@@ -68,8 +71,7 @@ Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * im
 
     //Process all subimage metadata
     //TODO(<zshoals> 08-05-2023): Replace with stringmap
-    VDS_Array<Atlas_Sub_Image> sub_images_interface = vds_array_make_interface(address_of(atlas->sub_images));
-    VDS_Array<Atlas_Sub_Image> * sub_images = address_of(sub_images_interface);
+    Atlas_Sub_Image_Array * sub_images = address_of(atlas->sub_images);
 
     while (v_parser_has_lines(parser))
     {

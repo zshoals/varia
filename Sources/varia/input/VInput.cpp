@@ -55,8 +55,7 @@ void v_input_configure_move_left_action(Input_Virtual_Action_State * state, Kinc
 void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/)
 {
     Input_Virtual_Action_State * state = static_cast<Input_Virtual_Action_State *>(data);
-    VDS_Reset_Queue<E_Gameplay_Event> events = vds_reset_queue_make_interface(address_of(state->events));
-    VDS_Reset_Queue<E_Gameplay_Event> * events_location = address_of(events);
+    Input_Event_Queue * events_location = address_of(state->events);
 
     //NOTE(<zshoals> 07-27-2023): Special casing modifier keys because it's way easier this way...
     if (key == KINC_KEY_SHIFT) { state->_modifiers.shift_down = true; }
@@ -76,8 +75,7 @@ void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Virtual_Acti
 void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/)
 {
     Input_Virtual_Action_State * state = static_cast<Input_Virtual_Action_State *>(data);
-    VDS_Reset_Queue<E_Gameplay_Event> events = vds_reset_queue_make_interface(address_of(state->events));
-    VDS_Reset_Queue<E_Gameplay_Event> * events_location = address_of(events);
+    Input_Event_Queue * events_location = address_of(state->events);
 
     //NOTE(<zshoals> 07-27-2023): Special casing modifier keys because it's way easier this way...
     if (key == KINC_KEY_SHIFT) { state->_modifiers.shift_down = false; }
@@ -96,8 +94,7 @@ void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action
 
 void v_input_trigger_all_keyup_actions(Input_Virtual_Action_State * state)
 {
-    VDS_Reset_Queue<E_Gameplay_Event> events = vds_reset_queue_make_interface(address_of(state->events));
-    VDS_Reset_Queue<E_Gameplay_Event> * events_location = address_of(events);
+    Input_Event_Queue * events_location = address_of(state->events);
 
     for_range_var(i, (Integer_64)(E_Gameplay_Action::MAX_COUNT))
     {

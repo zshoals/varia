@@ -1,4 +1,5 @@
 #include "varia/VSystemEvents.hpp"
+#include "varia/VShared.hpp"
 
 #include "kinc/system.h"
 
@@ -14,8 +15,6 @@ static void v_system_callback_focus_gained(void * data)
     v_system_events_push(system_events, E_System_Event_Type::System_Window_Gained_Focus);
 }
 
-
-
 void v_system_events_initialize(System_Events * events)
 {
     //TODO(<zshoals> 07-30-2023): This is bad; we're setting global state
@@ -29,6 +28,6 @@ void v_system_events_initialize(System_Events * events)
 
 void v_system_events_push(System_Events * system_events, E_System_Event_Type e)
 {
-    VDS_Reset_Queue<E_System_Event_Type> events = vds_reset_queue_make_interface(address_of(system_events->events));
-    vds_reset_queue_push(address_of(events), e);
+    System_Event_Queue * events = address_of(system_events->events);
+    vds_reset_queue_push(events, e);
 }

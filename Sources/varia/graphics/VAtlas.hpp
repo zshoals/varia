@@ -6,6 +6,7 @@
 #include "varia/ds/VDS-Array.hpp"
 #include "varia/ds/VDS-Arena.hpp"
 #include "kinc/graphics4/texture.h"
+#include "varia/VAssetStorage.hpp"
 
 struct Atlas_Sub_Image
 {
@@ -18,6 +19,8 @@ struct Atlas_Sub_Image
     Integer_8 atlas_index;
 };
 
+using Atlas_Sub_Image_Array = VDS_Array<Atlas_Sub_Image, 4096>;
+
 struct Atlas
 {
     kinc_g4_texture_t texture;
@@ -26,8 +29,8 @@ struct Atlas
     Integer_16 height;
 
     //NOTE(<zshoals> 08-02-2023): Sub images are cheap, 4096 of them is only 131kb
-    VDS_Array_Storage<Atlas_Sub_Image, 4096> sub_images;
+    Atlas_Sub_Image_Array sub_images;
 };
 
-Boolean v_atlas_initialize(Atlas * atlas, VDS_String_Buffer * sb, VDS_Arena * image_arena, VDS_Arena * metadata_arena, char const * image_path, char const * metadata_path);
+Boolean v_atlas_initialize(Atlas * atlas, Temporary_String_Buffer * sb, Temporary_Storage_Arena * image_arena, Permanent_Storage_Arena * metadata_arena, char const * image_path, char const * metadata_path);
 void v_atlas_destroy(Atlas * atlas);

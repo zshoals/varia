@@ -46,12 +46,12 @@ struct Input_Modifier_State
     Boolean alt_down;
 };
 
-#define GAMEPLAY_EVENT_QUEUE_MAX_SIZE 128
+using Input_Event_Queue = VDS_Reset_Queue<E_Gameplay_Event, 128>;
 struct Input_Virtual_Action_State
 {
     Input_Virtual_Key virtual_keys[E_Gameplay_Action::MAX_COUNT];
 
-    VDS_Reset_Queue_Storage<E_Gameplay_Event, GAMEPLAY_EVENT_QUEUE_MAX_SIZE> events;
+    Input_Event_Queue events;
 
     Input_Modifier_State _modifiers;
 };
@@ -70,8 +70,7 @@ void v_input_keyup_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action
 template <typename FUNC>
 void v_input_process_events(Input_Virtual_Action_State * state, FUNC f)
 {
-    VDS_Reset_Queue<E_Gameplay_Event> events = vds_reset_queue_make_interface(address_of(state->events));
-    VDS_Reset_Queue<E_Gameplay_Event> * events_location = address_of(events);
+    Input_Event_Queue * events_location = address_of(state->events);
 
     while (vds_reset_queue_has_elements(events_location))
     {
