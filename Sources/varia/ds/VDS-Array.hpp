@@ -3,6 +3,9 @@
 #include "VDS-Types.hpp"
 #include "VDS-Util.hpp"
 
+//Ugh
+#include <stdlib.h>
+
 template <typename T, Integer_64 SIZE>
 struct VDS_Array
 {
@@ -78,7 +81,7 @@ void vds_array_clear(VDS_Array<T, SIZE> * array)
 }
 
 template <typename T, Integer_64 SIZE, typename FUNC>
-Integer_64 vds_array_index_of(VDS_Array<T, SIZE> * array, FUNC search_function)
+Integer_64 vds_array_index_of(VDS_Array<T, SIZE> const * array, FUNC search_function)
 {
     //NOTE(<zshoals> 07-31-2023): Push head is max, NOT capacity
     //  good or bad call?
@@ -104,4 +107,14 @@ void vds_array_iterate(VDS_Array<T, SIZE> * array, FUNC f)
         T * element = vds_array_location_of(array, i);
         f(element, i);
     }
+}
+
+template <typename T, Integer_64 SIZE>
+void vds_array_sort(VDS_Array<T, SIZE> * array, int(*compare)(const void * a, const void * b))
+{
+    T * base = vds_array_location_of(array, 0);
+    Integer_64 item_count = array->push_head;
+    Integer_64 size = sizeof(T);
+
+    qsort(base, item_count, size, compare);
 }
