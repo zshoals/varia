@@ -5,20 +5,50 @@
 #include "varia/graphics/VPipeline.hpp"
 #include "varia/VAssets.hpp"
 
-static inline void v_graphics_push_vert(float * vbo_base, float x, float y, float z, float u, float v, float r, float g, float b, float a)
+// static inline void v_graphics_push_vert(float * vbo_base, float x, float y, float z, float u, float v, float r, float g, float b, float a)
+// {
+//     //Position
+//     vbo_base[0] = x;
+//     vbo_base[1] = y;
+//     vbo_base[2] = z;
+//     //UV
+//     vbo_base[3] = u;
+//     vbo_base[4] = v;
+//     //Color
+//     vbo_base[5] = r;
+//     vbo_base[6] = g;
+//     vbo_base[7] = b;
+//     vbo_base[8] = a;
+// }
+
+static inline float * v_graphics_push_pos(float * vbo_base, float x, float y, float layer)
 {
     //Position
     vbo_base[0] = x;
     vbo_base[1] = y;
-    vbo_base[2] = z;
+    vbo_base[2] = layer;
+
+    return vbo_base + 3;
+}
+
+static inline float * v_graphics_push_uv(float * vbo_base, float u, float v)
+{
     //UV
-    vbo_base[3] = u;
-    vbo_base[4] = v;
+    vbo_base[0] = u;
+    vbo_base[1] = v;
+
+    return vbo_base + 2;
+}
+
+static inline float * v_graphics_push_color(float * vbo_base, float r, float g, float b, float a)
+{
     //Color
-    vbo_base[5] = r;
-    vbo_base[6] = g;
-    vbo_base[7] = b;
-    vbo_base[8] = a;
+    vbo_base[0] = r;
+    vbo_base[1] = g;
+    vbo_base[2] = b;
+    vbo_base[3] = a;
+
+    return vbo_base + 4;
 }
 
 void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
@@ -97,29 +127,84 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
 {
     kinc_g4_vertex_buffer_t * vbo = address_of(graphics->vbo);
 
-    float * vbo_data = kinc_g4_vertex_buffer_lock_all(vbo);
+    float * vbo_base = kinc_g4_vertex_buffer_lock_all(vbo);
     {
-        /*
+        // /*
         
-            0-----------2
-            |           |
-            |           |
-            |           |
-            1-----------3
+        //     0-----------2
+        //     |           |
+        //     |           |
+        //     |           |
+        //     1-----------3
         
-        */
-        float u_min = 0.14746f;
-        float v_min = 0.170166f;
-        float u_max = 0.24536f;
-        float v_max = 0.183349f;
+        // */
+        // float u_min = 0.14746f;
+        // float v_min = 0.170166f;
+        // float u_max = 0.24536f;
+        // float v_max = 0.183349f;
 
-        v_graphics_push_vert(vbo_data,    -1.0, -1.0, 0.5,      u_min, v_min,       1.0, 1.0, 1.0, 1.0);
-        vbo_data += 9;
-        v_graphics_push_vert(vbo_data,    -1.0, 1.0, 0.5,      u_min, v_max,       1.0, 1.0, 1.0, 1.0);
-        vbo_data += 9;
-        v_graphics_push_vert(vbo_data,    1.0, -1.0, 0.5,      u_max, v_min,       1.0, 1.0, 1.0, 1.0);
-        vbo_data += 9;
-        v_graphics_push_vert(vbo_data,    1.0, 1.0, 0.5,      u_max, v_max,       1.0, 1.0, 1.0, 1.0);
+        // v_graphics_push_vert(vbo_data,    -1.0, -1.0, 0.5,      u_min, v_min,       1.0, 1.0, 1.0, 1.0);
+        // vbo_data += 9;
+        // v_graphics_push_vert(vbo_data,    -1.0, 1.0, 0.5,      u_min, v_max,       1.0, 1.0, 1.0, 1.0);
+        // vbo_data += 9;
+        // v_graphics_push_vert(vbo_data,    1.0, -1.0, 0.5,      u_max, v_min,       1.0, 1.0, 1.0, 1.0);
+        // vbo_data += 9;
+        // v_graphics_push_vert(vbo_data,    1.0, 1.0, 0.5,      u_max, v_max,       1.0, 1.0, 1.0, 1.0);
+
+
+
+
+        // vds_array_const_iterate(const_address_of(ir->sortables), [&vbo_data](Graphics_Item_Sortable const * const sortable, Integer_64 i)
+        // {
+        //     Graphics_Item const * item = sortable->item;
+
+        //     //Vert 0
+        //     vbo_data = v_graphics_push_pos(vbo_data, item->x, item->y, item->layer);
+        //     vbo_data = v_graphics_push_uv(vbo_data, item->u_min, item->v_min);
+        //     vbo_data = v_graphics_push_color(vbo_data, item->r, item->g, item->b, item->a);
+
+        //     //Vert 1
+        //     vbo_data = v_graphics_push_pos(vbo_data, item->x, item->y + item->h, item->layer);
+        //     vbo_data = v_graphics_push_uv(vbo_data, item->u_min, item->v_max);
+        //     vbo_data = v_graphics_push_color(vbo_data, item->r, item->g, item->b, item->a);
+
+        //     //Vert 2
+        //     vbo_data = v_graphics_push_pos(vbo_data, item->x + item->w, item->y, item->layer);
+        //     vbo_data = v_graphics_push_uv(vbo_data, item->u_max, item->v_min);
+        //     vbo_data = v_graphics_push_color(vbo_data, item->r, item->g, item->b, item->a);
+
+        //     //Vert 3
+        //     vbo_data = v_graphics_push_pos(vbo_data, item->x + item->w, item->y + item->h, item->layer);
+        //     vbo_data = v_graphics_push_uv(vbo_data, item->u_max, item->v_max);
+        //     vbo_data = v_graphics_push_color(vbo_data, item->r, item->g, item->b, item->a);
+        // });
+
+        float * vbo_data = vbo_base;
+        for_range_var(i, 8)
+        {
+            Graphics_Item_Sortable const * sortable = vds_array_const_location_of(const_address_of(ir->sortables), i);
+            Graphics_Item const * item = sortable->item;
+
+            //Vert 0
+            vbo_data = v_graphics_push_pos(vbo_data, item->x, item->y, item->layer);
+            vbo_data = v_graphics_push_uv(vbo_data, item->u_min, item->v_min);
+            vbo_data = v_graphics_push_color(vbo_data, item->r, item->g, item->b, item->a);
+
+            //Vert 1
+            vbo_data = v_graphics_push_pos(vbo_data, item->x, item->y + item->h, item->layer);
+            vbo_data = v_graphics_push_uv(vbo_data, item->u_min, item->v_max);
+            vbo_data = v_graphics_push_color(vbo_data, item->r, item->g, item->b, item->a);
+
+            //Vert 2
+            vbo_data = v_graphics_push_pos(vbo_data, item->x + item->w, item->y, item->layer);
+            vbo_data = v_graphics_push_uv(vbo_data, item->u_max, item->v_min);
+            vbo_data = v_graphics_push_color(vbo_data, item->r, item->g, item->b, item->a);
+
+            //Vert 3
+            vbo_data = v_graphics_push_pos(vbo_data, item->x + item->w, item->y + item->h, item->layer);
+            vbo_data = v_graphics_push_uv(vbo_data, item->u_max, item->v_max);
+            vbo_data = v_graphics_push_color(vbo_data, item->r, item->g, item->b, item->a);
+        }
     }
     kinc_g4_vertex_buffer_unlock_all(vbo);
 
@@ -132,7 +217,7 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
         kinc_g4_set_index_buffer(address_of(graphics->ibo));
 
         //TODO(<zshoals> 08-08-2023): Hardcoded experiment
-        kinc_g4_draw_indexed_vertices_from_to(0, 6);
+        kinc_g4_draw_indexed_vertices_from_to(0, 128);
     }
     kinc_g4_end(0);
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

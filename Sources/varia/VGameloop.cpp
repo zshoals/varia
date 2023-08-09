@@ -343,6 +343,8 @@ void v_gameloop_entrypoint(void * data)
             visual_world->simulation_mode = E_Simulation_Mode::Extrapolate;
             v_simulation_simulate(visual_world, visual_world->simulating, visual_world->simulation_mode);
 
+            //TODO(<zshoals> 08-09-2023): Building the IR outside of the graphics layer is...bad? overcomplicated?
+            //  we need the atlas anyway....
             Graphics_Intermediate_Representation * ir_out = address_of(context->ir_storage);
             v_graphics_ir_clear(ir_out);
             v_graphics_ir_build(ir_out, visual_world, address_of(context->graphics_state.active_atlas));
@@ -444,6 +446,32 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
         v_assets_load_atlas_metadata(ass_loc, address_of(game.assets.atlas_metadata_01), "atlas_dump.atlas");
         v_assets_load_shader(ass_loc, address_of(game.assets.textured_vert), "textured-standard.vert");
         v_assets_load_shader(ass_loc, address_of(game.assets.textured_frag), "textured-standard.frag");
+    }
+    //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+    //Test Game Data
+    //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    {
+        float splitter = -0.5f;
+        for_range_var(i, 8)
+        {
+            vds_array_push(address_of(game.logic_world.gamedata.x_pos), splitter);
+            vds_array_push(address_of(game.logic_world.gamedata.y_pos), splitter);
+            vds_array_push(address_of(game.logic_world.gamedata.width), splitter);
+            vds_array_push(address_of(game.logic_world.gamedata.height), splitter);
+            vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
+
+            splitter += 0.10f;
+        }
+
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die1"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die1"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die2"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die3"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die4"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die5"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die6"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die7"));
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

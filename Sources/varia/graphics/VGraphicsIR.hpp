@@ -8,6 +8,9 @@ struct Graphics_Item
 {
     float x;
     float y;
+    //NOTE(<zshoals> 08-09-2023): Layer is duplicated to avoid having to somehow get 
+    //  this value from Graphics_Item_Sortable later
+    float layer;
     float w;
     float h;
     //Note: before submitting the graphics item, we must resolve the uv coordinates
@@ -24,7 +27,7 @@ struct Graphics_Item
 struct Graphics_Item_Sortable
 {
     float layer;
-    Graphics_Item * item;
+    Graphics_Item const * item;
 };
 
 struct Graphics_Intermediate_Representation
@@ -33,7 +36,6 @@ struct Graphics_Intermediate_Representation
 
     VDS_Array<Graphics_Item,          1024> items;
     VDS_Array<Graphics_Item_Sortable, 1024> sortables;
-    VDS_Array<Graphics_Item *,        1024> render_queue;
 };
 
 void v_graphics_ir_clear(Graphics_Intermediate_Representation * ir);
