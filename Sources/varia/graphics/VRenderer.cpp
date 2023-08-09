@@ -1,5 +1,6 @@
 #include "varia/graphics/VRenderer.hpp"
 
+#include "varia/graphics/VGraphicsIR.hpp"
 #include "kinc/graphics4/graphics.h"
 #include "varia/graphics/VPipeline.hpp"
 #include "varia/VAssets.hpp"
@@ -38,24 +39,28 @@ void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
 
     //Set the atlas and configure the default pipeline
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    graphics->active_texture = address_of(assets->atlas.texture);
+    v_atlas_initialize
+    (
+        address_of(graphics->active_atlas), 
+        address_of(assets->atlas_texture_01),
+        const_address_of(assets->atlas_metadata_01)
+    );
 
     v_pipeline_initialize_textured
     (
         address_of(graphics->tex_pipe),
         address_of(graphics->vertex_layout),
-        address_of(assets->textured_vert),
-        address_of(assets->textured_frag)
+        address_of(assets->textured_vert.shader),
+        address_of(assets->textured_frag.shader)
     );
-
-    graphics->tex_pipe.update_callback(address_of(graphics->tex_pipe), address_of(assets->atlas.texture));
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
     //Initialize Vertex and Index Buffers
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    int vertex_count = 10000 * 4;
-    int index_count = 10000 * 6;
+    int quad_count = 2000;
+    int vertex_count = quad_count * 4;
+    int index_count = quad_count * 6;
 
     kinc_g4_vertex_buffer_init
     (
@@ -103,10 +108,10 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
             1-----------3
         
         */
-        float u_min = 0.14746;
-        float v_min = 0.170166;
-        float u_max = 0.24536;
-        float v_max = 0.183349;
+        float u_min = 0.14746f;
+        float v_min = 0.170166f;
+        float u_max = 0.24536f;
+        float v_max = 0.183349f;
 
         v_graphics_push_vert(vbo_data,    -1.0, -1.0, 0.5,      u_min, v_min,       1.0, 1.0, 1.0, 1.0);
         vbo_data += 9;
@@ -118,13 +123,11 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
     }
     kinc_g4_vertex_buffer_unlock_all(vbo);
 
-
-
     //Actually Render
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     kinc_g4_begin(0);
     {
-        graphics->tex_pipe.update_callback(address_of(graphics->tex_pipe), graphics->active_texture);
+        graphics->tex_pipe.update_callback(address_of(graphics->tex_pipe), v_atlas_get_texture(address_of(graphics->active_atlas)));
         kinc_g4_set_vertex_buffer(vbo);
         kinc_g4_set_index_buffer(address_of(graphics->ibo));
 

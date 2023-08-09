@@ -3,6 +3,7 @@
 #include "kinc/graphics4/vertexstructure.h"
 #include "kinc/graphics4/pipeline.h"
 #include "kinc/graphics4/texture.h"
+#include "varia/VAssets.hpp"
 
 struct Textured_Pipeline;
 
