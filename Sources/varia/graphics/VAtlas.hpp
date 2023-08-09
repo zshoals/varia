@@ -1,12 +1,13 @@
 #pragma once
 
 #include "varia/VShared.hpp"
+
+#include "varia/VAssets.hpp"
 #include "varia/ds/VDS-StringBuffer.hpp"
 #include "varia/ds/VDS-String.hpp"
 #include "varia/ds/VDS-Array.hpp"
 #include "varia/ds/VDS-Arena.hpp"
 #include "kinc/graphics4/texture.h"
-#include "varia/VAssetStorage.hpp"
 
 struct Atlas_Sub_Image
 {
@@ -23,7 +24,7 @@ using Atlas_Sub_Image_Array = VDS_Array<Atlas_Sub_Image, 4096>;
 
 struct Atlas
 {
-    kinc_g4_texture_t texture;
+    Asset_Texture * texture;
 
     Integer_16 width;
     Integer_16 height;
@@ -32,5 +33,7 @@ struct Atlas
     Atlas_Sub_Image_Array sub_images;
 };
 
-Boolean v_atlas_initialize(Atlas * atlas, Temporary_String_Buffer * sb, Temporary_Storage_Arena * image_arena, Permanent_Storage_Arena * metadata_arena, char const * image_path, char const * metadata_path);
+// Boolean v_atlas_initialize(Atlas * atlas, Temporary_String_Buffer * sb, Temporary_Storage_Arena * image_arena, Permanent_Storage_Arena * metadata_arena, char const * image_path, char const * metadata_path);
+void v_atlas_initialize(Atlas * atlas, Asset_Texture * texture, Asset_Atlas_Metadata const * metadata);
+kinc_g4_texture_t * v_atlas_get_texture(Atlas * atlas);
 void v_atlas_destroy(Atlas * atlas);
