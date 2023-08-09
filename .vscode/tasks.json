@@ -9,6 +9,8 @@
 			"command": "C:/HaxeLibraries/Kinc/make.bat",
 			"args": [
 				"windows",
+				// "--graphics",
+				// "direct3d11",
 				"--compile",
 				"--debug"
 			],
