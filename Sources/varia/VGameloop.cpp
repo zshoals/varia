@@ -345,7 +345,7 @@ void v_gameloop_entrypoint(void * data)
 
             Graphics_Intermediate_Representation * ir_out = address_of(context->ir_storage);
             v_graphics_ir_clear(ir_out);
-            v_graphics_ir_build(ir_out, visual_world);
+            v_graphics_ir_build(ir_out, visual_world, address_of(context->graphics_state.active_atlas));
 
             v_gameloop_render(address_of(context->graphics_state), ir_out);
 

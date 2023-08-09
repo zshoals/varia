@@ -8,6 +8,9 @@
 struct Gamedata
 {
     VDS_Array<VDS_Short_String, 32> enemy_texture;
-    VDS_Array<int, 32> x_pos;
-    VDS_Array<int, 32> y_pos;
+    VDS_Array<float, 32> x_pos;
+    VDS_Array<float, 32> y_pos;
+    VDS_Array<float, 32> width;
+    VDS_Array<float, 32> height;
+    VDS_Array<float, 32> layer;
 };
