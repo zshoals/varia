@@ -2,7 +2,9 @@
 
 #include "varia/VShared.hpp"
 #include "varia/VGameContext.hpp"
+#include "varia/VGamestate.hpp"
 #include "varia/VSimulation.hpp"
+#include "varia/graphics/VGraphicsIR.hpp"
 #include "varia/utility/VMemcpy.hpp"
 #include "varia/input/VInput.hpp"
 #include "varia/VSystemCallbacks.hpp"
@@ -51,18 +53,6 @@ static void v_print_timing_info(Gamestate * gamestate)
 static void v_gameloop_simulate(Gamestate * gs, E_Simulating simulating, E_Simulation_Mode mode)
 {
     v_simulation_simulate(gs, simulating, mode);
-}
-
-static void v_gameloop_build_graphics_intermediate_representation
-(
-    Graphics_Intermediate_Representation * ir_out, 
-    Gamestate const * visual_world
-)
-{
-    //TODO(<zshoals> 07-27-2023): Build IR before rendering
-    //....obviously
-
-    ir_out->renderables[0] = 68306; //Dummy test stuff ignore me remove me asap
 }
 
 static void v_gameloop_render(Graphics_State * gfx, Graphics_Intermediate_Representation const * ir)
@@ -309,7 +299,7 @@ void v_gameloop_entrypoint(void * data)
             logic_world->logic_cumulative_gameclock += logic_world->fixed_timestep_interval;
 
             logic_world->simulation_mode = E_Simulation_Mode::Fixed_Step;
-            v_gameloop_simulate(logic_world, logic_world->simulating, logic_world->simulation_mode);
+            v_simulation_simulate(logic_world, logic_world->simulating, logic_world->simulation_mode);
 
             logic_world->previous_logictime = kinc_time();
         }
@@ -351,9 +341,12 @@ void v_gameloop_entrypoint(void * data)
             memcpy(visual_world, logic_world, sizeof(*logic_world));
 
             visual_world->simulation_mode = E_Simulation_Mode::Extrapolate;
-            v_gameloop_simulate(visual_world, visual_world->simulating, visual_world->simulation_mode); 
+            v_simulation_simulate(visual_world, visual_world->simulating, visual_world->simulation_mode);
+
             Graphics_Intermediate_Representation * ir_out = address_of(context->ir_storage);
-            v_gameloop_build_graphics_intermediate_representation(ir_out, visual_world);
+            v_graphics_ir_clear(ir_out);
+            v_graphics_ir_build(ir_out, visual_world);
+
             v_gameloop_render(address_of(context->graphics_state), ir_out);
 
             //TODO(<zshoals> 07-30-2023): Gameclocks should be updated inside simulating because
@@ -394,7 +387,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
 		//[Gameloop Configuration]
 		game.logic_world.enable_excessive_frametime_exit = true;
 		game.logic_world.enable_framerate_limit = true;
-		game.logic_world.fps_limit = 1.0 / 144.0;
+		game.logic_world.fps_limit = 1.0 / 30.0;
 
 		//[Kinc Settings]
 		game.logic_world.window = wo;
@@ -414,6 +407,8 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     );
     kinc_threads_init();
 
+
+
     //Initialize Input
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
@@ -430,6 +425,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
+
     //Set Kinc's Environment Callbacks
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
@@ -439,8 +435,17 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
-    v_assets_load_atlas(address_of(game.assets), "output_atlas.k", "atlas_dump.atlas");
-    v_assets_load_default_shaders(address_of(game.assets));
+
+    //Load All Assets (hopefully)
+    //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    {
+        Assets * ass_loc = address_of(game.assets);
+        v_assets_load_texture(ass_loc, address_of(game.assets.atlas_texture_01), "output_atlas.k");
+        v_assets_load_atlas_metadata(ass_loc, address_of(game.assets.atlas_metadata_01), "atlas_dump.atlas");
+        v_assets_load_shader(ass_loc, address_of(game.assets.textured_vert), "textured-standard.vert");
+        v_assets_load_shader(ass_loc, address_of(game.assets.textured_frag), "textured-standard.frag");
+    }
+    //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     v_graphics_initialize(address_of(game.graphics_state), address_of(game.assets));
 
