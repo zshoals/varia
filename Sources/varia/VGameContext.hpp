@@ -1,7 +1,8 @@
 #pragma once
 
 #include "varia/VShared.hpp"
-#include "varia/VGameloop.hpp"
+#include "varia/VGamestate.hpp"
+#include "varia/graphics/VGraphicsIR.hpp"
 #include "varia/graphics/VRenderer.hpp"
 #include "varia/VSystemEvents.hpp"
 #include "varia/VAssets.hpp"
