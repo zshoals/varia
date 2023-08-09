@@ -18,7 +18,7 @@ void v_graphics_ir_build(Graphics_Intermediate_Representation * ir, Gamestate co
     Atlas_Sub_Image_Array const * subs = const_address_of(atlas->sub_images);
 
     //TODO(<zshoals> 08-09-2023): We need to do like, not a fixed sized value :)))))
-    for_range_var(i, 8)
+    for_range_var(i, 4)
     {
         VDS_Short_String const * sub_image_name = vds_array_const_location_of(address_of(game->enemy_texture), i);
 
@@ -60,17 +60,17 @@ void v_graphics_ir_build(Graphics_Intermediate_Representation * ir, Gamestate co
         {
             kinc_log(KINC_LOG_LEVEL_WARNING, "Graphics IR tried to push an item, but a texture was not found. This item was skipped.");
         }
-
-        //Sort quads based on their "layer", a value that we probably didn't even have to provide at all because we could just use a z value ://////
-        //  and the shader would just take care of it ://////
-        //TODO(<zshoals> 08-09-2023): It's qsort, this is going to be very slow
-        vds_array_sort(address_of(ir->sortables), [](const void * a, const void * b)
-        {
-            
-            Graphics_Item_Sortable const * left = (Graphics_Item_Sortable const *)a;
-            Graphics_Item_Sortable const * right = (Graphics_Item_Sortable const *)b;
-
-            return (left->layer < right->layer) ? -1 : 1;
-        });
     }
+
+    //Sort quads based on their "layer", a value that we probably didn't even have to provide at all because we could just use a z value ://////
+    //  and the shader would just take care of it ://////
+    //TODO(<zshoals> 08-09-2023): It's qsort, this is going to be very slow
+    vds_array_sort(address_of(ir->sortables), [](const void * a, const void * b)
+    {
+        
+        Graphics_Item_Sortable const * left = (Graphics_Item_Sortable const *)a;
+        Graphics_Item_Sortable const * right = (Graphics_Item_Sortable const *)b;
+
+        return (left->layer < right->layer) ? -1 : 1;
+    });
 }

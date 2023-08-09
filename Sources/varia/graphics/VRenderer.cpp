@@ -112,12 +112,12 @@ void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
     Signless_16 * ibo_data = static_cast<Signless_16 *>( kinc_g4_index_buffer_lock_all(address_of(graphics->ibo)) );
     for (Integer_64 i = 0; i < index_count; i += 6)
     {
-        ibo_data[i + 0] = 0;
-        ibo_data[i + 1] = 1;
-        ibo_data[i + 2] = 2;
-        ibo_data[i + 3] = 2;
-        ibo_data[i + 4] = 1;
-        ibo_data[i + 5] = 3;
+        ibo_data[i + 0] = i + 0;
+        ibo_data[i + 1] = i + 1;
+        ibo_data[i + 2] = i + 2;
+        ibo_data[i + 3] = i + 2;
+        ibo_data[i + 4] = i + 1;
+        ibo_data[i + 5] = i + 3;
     }
     kinc_g4_index_buffer_unlock_all(address_of(graphics->ibo));
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -180,7 +180,7 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
         // });
 
         float * vbo_data = vbo_base;
-        for_range_var(i, 8)
+        for_range_var(i, 4)
         {
             Graphics_Item_Sortable const * sortable = vds_array_const_location_of(const_address_of(ir->sortables), i);
             Graphics_Item const * item = sortable->item;
@@ -217,7 +217,7 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
         kinc_g4_set_index_buffer(address_of(graphics->ibo));
 
         //TODO(<zshoals> 08-08-2023): Hardcoded experiment
-        kinc_g4_draw_indexed_vertices_from_to(0, 128);
+        kinc_g4_draw_indexed_vertices_from_to(0, 48);
     }
     kinc_g4_end(0);
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

@@ -452,26 +452,34 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //Test Game Data
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        float splitter = -0.5f;
-        for_range_var(i, 8)
-        {
-            vds_array_push(address_of(game.logic_world.gamedata.x_pos), splitter);
-            vds_array_push(address_of(game.logic_world.gamedata.y_pos), splitter);
-            vds_array_push(address_of(game.logic_world.gamedata.width), splitter);
-            vds_array_push(address_of(game.logic_world.gamedata.height), splitter);
-            vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
+        vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.5f);
+        vds_array_push(address_of(game.logic_world.gamedata.y_pos), 0.5f);
+        vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
 
-            splitter += 0.10f;
-        }
+        vds_array_push(address_of(game.logic_world.gamedata.x_pos), -0.5f);
+        vds_array_push(address_of(game.logic_world.gamedata.y_pos), -0.5f);
+        vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
+
+        vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.1f);
+        vds_array_push(address_of(game.logic_world.gamedata.y_pos), 0.1f);
+        vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
+
+        vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.9f);
+        vds_array_push(address_of(game.logic_world.gamedata.y_pos), 0.9f);
+        vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
 
         vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die1"));
         vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die1"));
         vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die2"));
         vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die3"));
-        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die4"));
-        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die5"));
-        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die6"));
-        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die7"));
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
