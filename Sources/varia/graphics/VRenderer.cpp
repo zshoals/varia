@@ -110,14 +110,14 @@ void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
     );
 
     Signless_16 * ibo_data = static_cast<Signless_16 *>( kinc_g4_index_buffer_lock_all(address_of(graphics->ibo)) );
-    for (Integer_64 i = 0; i < index_count; i += 6)
+    for (Integer_64 i = 0; i < index_count / 6; i += 1)
     {
-        ibo_data[i + 0] = i + 0;
-        ibo_data[i + 1] = i + 1;
-        ibo_data[i + 2] = i + 2;
-        ibo_data[i + 3] = i + 2;
-        ibo_data[i + 4] = i + 1;
-        ibo_data[i + 5] = i + 3;
+        ibo_data[(i * 6) + 0] = (i * 4) + 0;
+        ibo_data[(i * 6) + 1] = (i * 4) + 1;
+        ibo_data[(i * 6) + 2] = (i * 4) + 2;
+        ibo_data[(i * 6) + 3] = (i * 4) + 2;
+        ibo_data[(i * 6) + 4] = (i * 4) + 1;
+        ibo_data[(i * 6) + 5] = (i * 4) + 3;
     }
     kinc_g4_index_buffer_unlock_all(address_of(graphics->ibo));
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
