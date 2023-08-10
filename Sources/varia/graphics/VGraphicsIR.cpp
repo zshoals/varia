@@ -33,7 +33,8 @@ void v_graphics_ir_build(Graphics_Intermediate_Representation * ir, Gamestate co
         if (result >= 0)
         {
             Atlas_Sub_Image const * sub_image_data = vds_array_const_location_of(subs, result);
-            float inverse_size = 1.0f / 4096.0f;
+            float inverse_width = 1.0f / atlas->width;
+            float inverse_height = 1.0f / atlas->height;
 
             Graphics_Item * item = vds_array_construct_push(address_of(ir->items));
             item->x     = vds_array_copy_of(address_of(game->x_pos), i);
@@ -41,10 +42,10 @@ void v_graphics_ir_build(Graphics_Intermediate_Representation * ir, Gamestate co
             item->layer = vds_array_copy_of(address_of(game->layer), i);
             item->w     = vds_array_copy_of(address_of(game->width), i);
             item->h     = vds_array_copy_of(address_of(game->height), i);
-            item->u_min = (sub_image_data->origin_x * inverse_size);
-            item->v_min = (sub_image_data->origin_y * inverse_size);
-            item->u_max = ( (sub_image_data->origin_x + sub_image_data->width) * inverse_size);
-            item->v_max = ( (sub_image_data->origin_y + sub_image_data->height) * inverse_size);
+            item->u_min = (sub_image_data->origin_x * inverse_width);
+            item->v_min = (sub_image_data->origin_y * inverse_height);
+            item->u_max = ( (sub_image_data->origin_x + sub_image_data->width) * inverse_width);
+            item->v_max = ( (sub_image_data->origin_y + sub_image_data->height) * inverse_height);
             item->r     = 1.0;
             item->g     = 1.0;
             item->b     = 1.0;
