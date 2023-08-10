@@ -182,7 +182,7 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
         float * vbo_data = vbo_base;
         for_range_var(i, 4)
         {
-            Graphics_Item_Sortable const * sortable = vds_array_const_location_of(const_address_of(ir->sortables), i);
+            Graphics_Item_Sortable const * sortable = vds_array_location_of(const_address_of(ir->sortables), i);
             Graphics_Item const * item = sortable->item;
 
             //Vert 0

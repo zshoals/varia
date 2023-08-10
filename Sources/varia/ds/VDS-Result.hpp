@@ -7,6 +7,7 @@ struct VDS_Result
     T element;
 };
 
+template <typename T>
 void vds_result_initialize(VDS_Result<T> * result, T element, Boolean valid)
 {
     result->valid = valid;

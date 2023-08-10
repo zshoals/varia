@@ -97,3 +97,15 @@ kinc_g4_texture_t * v_atlas_get_texture(Atlas * atlas)
         return nullptr;
     }
 }
+
+VDS_Result<Atlas_Sub_Image const *> v_atlas_find_sub_image(Atlas const * atlas, VDS_Short_String const * image)
+{
+    Atlas_Sub_Image_Array const * subs = address_of(atlas->sub_images);
+
+    VDS_Result<Atlas_Sub_Image const *> res = vds_array_try_find(subs, [&image](Atlas_Sub_Image const * candidate)
+    {
+        return vds_string_matches(dereference(image), candidate->name);
+    });
+
+    return res;
+}

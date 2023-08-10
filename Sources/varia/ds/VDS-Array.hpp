@@ -30,8 +30,7 @@ T * vds_array_location_of(VDS_Array<T, SIZE> * array, Integer_64 index)
 }
 
 template <typename T, Integer_64 SIZE>
-T const * vds_array_const_location_of(VDS_Array<T, SIZE> const * array, Integer_64 index)
-
+T const * vds_array_location_of(VDS_Array<T, SIZE> const * array, Integer_64 index)
 {
     //TODO(<zshoals> 08-06-2023): Where's the bounds checking?
     return &(array->data[index]);
@@ -101,7 +100,7 @@ Integer_64 vds_array_index_of(VDS_Array<T, SIZE> const * array, FUNC search_func
 }
 
 template <typename T, Integer_64 SIZE, typename FUNC>
-VDS_Result<T> vds_array_try_find(VDS_Array<T, SIZE> * array, FUNC search_function)
+VDS_Result<T *> vds_array_try_find(VDS_Array<T, SIZE> * array, FUNC search_function)
 {
     Integer_64 item_index = vds_array_index_of(array, search_function);
 
@@ -120,6 +119,26 @@ VDS_Result<T> vds_array_try_find(VDS_Array<T, SIZE> * array, FUNC search_functio
 }
 
 template <typename T, Integer_64 SIZE, typename FUNC>
+VDS_Result<T const *> vds_array_try_find(VDS_Array<T, SIZE> const * array, FUNC search_function)
+{
+    Integer_64 item_index = vds_array_index_of(array, search_function);
+
+    VDS_Result<T const *> res = {};
+    if (item_index >= 0)
+    {
+        res.element = vds_array_location_of(array, item_index);
+        res.valid = true;
+    }
+    else
+    {
+        res.valid = false;
+    }
+
+    return res;
+}
+
+
+template <typename T, Integer_64 SIZE, typename FUNC>
 void vds_array_iterate(VDS_Array<T, SIZE> * array, FUNC f)
 {
     //NOTE(<zshoals> 07-31-2023): Push head is max, NOT capacity
@@ -127,18 +146,6 @@ void vds_array_iterate(VDS_Array<T, SIZE> * array, FUNC f)
     for (Integer_64 i = 0; i < array->push_head; i += 1)
     {
         T * element = vds_array_location_of(array, i);
-        f(element, i);
-    }
-}
-
-template <typename T, Integer_64 SIZE, typename FUNC>
-void vds_array_const_iterate(VDS_Array<T, SIZE> const * array, FUNC f)
-{
-    //NOTE(<zshoals> 07-31-2023): Push head is max, NOT capacity
-    //  good or bad call?
-    for (Integer_64 i = 0; i < array->push_head; i += 1)
-    {
-        T const * element = vds_array_const_location_of(array, i);
         f(element, i);
     }
 }

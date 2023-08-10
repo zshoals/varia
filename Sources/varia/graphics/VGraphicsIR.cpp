@@ -20,19 +20,24 @@ void v_graphics_ir_build(Graphics_Intermediate_Representation * ir, Gamestate co
     //TODO(<zshoals> 08-09-2023): We need to do like, not a fixed sized value :)))))
     for_range_var(i, 4)
     {
-        VDS_Short_String const * sub_image_name = vds_array_const_location_of(address_of(game->enemy_texture), i);
+        VDS_Short_String const * sub_image_name = vds_array_location_of(address_of(game->enemy_texture), i);
 
-        //TODO(<zshoals> 08-09-2023): This sucks, this should really be a hash map
-        //TODO(<zshoals> 08-09-2023): This could be minimized by not figuring this out on demand, but rather setting the UV
-        //  coordinates when we assign a texture instead
-        Integer_64 result = vds_array_index_of(subs, [&sub_image_name](Atlas_Sub_Image const * img)
+        // //TODO(<zshoals> 08-09-2023): This sucks, this should really be a hash map
+        // //TODO(<zshoals> 08-09-2023): This could be minimized by not figuring this out on demand, but rather setting the UV
+        // //  coordinates when we assign a texture instead
+        // Integer_64 result = vds_array_index_of(subs, [&sub_image_name](Atlas_Sub_Image const * img)
+        // {
+        //     return vds_string_matches( dereference(sub_image_name), img->name );
+        // });
+
+        VDS_Result<Atlas_Sub_Image const *> res = vds_array_try_find(subs, [&sub_image_name](Atlas_Sub_Image const * image)
         {
-            return vds_string_matches( dereference(sub_image_name), img->name );
+            return vds_string_matches( dereference(sub_image_name), image->name );
         });
 
-        if (result >= 0)
+        if (res.valid)
         {
-            Atlas_Sub_Image const * sub_image_data = vds_array_const_location_of(subs, result);
+            Atlas_Sub_Image const * sub_image_data = res.element;
             float inverse_width = 1.0f / atlas->width;
             float inverse_height = 1.0f / atlas->height;
 
@@ -68,7 +73,6 @@ void v_graphics_ir_build(Graphics_Intermediate_Representation * ir, Gamestate co
     //TODO(<zshoals> 08-09-2023): It's qsort, this is going to be very slow
     vds_array_sort(address_of(ir->sortables), [](const void * a, const void * b)
     {
-        
         Graphics_Item_Sortable const * left = (Graphics_Item_Sortable const *)a;
         Graphics_Item_Sortable const * right = (Graphics_Item_Sortable const *)b;
 
