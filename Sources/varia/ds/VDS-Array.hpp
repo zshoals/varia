@@ -104,7 +104,7 @@ VDS_Result<T *> vds_array_try_find(VDS_Array<T, SIZE> * array, FUNC search_funct
 {
     Integer_64 item_index = vds_array_index_of(array, search_function);
 
-    VDS_Result<T> res = {};
+    VDS_Result<T *> res = {};
     if (item_index >= 0)
     {
         res.element = vds_array_location_of(array, item_index);
