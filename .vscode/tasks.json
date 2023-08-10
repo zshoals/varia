@@ -68,6 +68,24 @@
 		{
 			"label": "Varia: Debug Compile",
 			"type": "shell",
+			"command": "C:/Users/ZPC/Desktop/Programming_Projects/Varia/build_debug_noshaders.bat",
+			"group": {
+				"kind": "build",
+			},
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				// "revealProblems": "onProblem",
+				"focus": true,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "Varia: Debug Compile (File Rebuild)",
+			"type": "shell",
 			"command": "C:/Users/ZPC/Desktop/Programming_Projects/Varia/build_debug.bat",
 			"group": {
 				"kind": "build",
