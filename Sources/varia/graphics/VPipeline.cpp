@@ -23,7 +23,7 @@ static inline void v_internal_pipeline_textured_update_callback(Textured_Pipelin
     //Update constant locations and texture locations
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        // kinc_g4_set_float(pipe->time_location, pipe->time);
+        kinc_g4_set_float(pipe->time_location, pipe->time);
 
         //NOTE(<zshoals> 08-07-2023): We only have one single texture/texturearray because
         //  we are GIGABRAINED and loading everything at startup.
@@ -42,12 +42,12 @@ void v_pipeline_initialize_textured(Textured_Pipeline * pipe, kinc_g4_vertex_str
     pipe->pipe.vertex_shader = vertex_shader;
     pipe->pipe.fragment_shader = fragment_shader;
 
-    pipe->pipe.blend_source = KINC_G4_BLEND_SOURCE_COLOR;
-    pipe->pipe.blend_destination = KINC_G4_BLEND_INV_SOURCE_COLOR;
+    pipe->pipe.blend_source = KINC_G4_BLEND_ONE;
+    pipe->pipe.blend_destination = KINC_G4_BLEND_ZERO;
 
     kinc_g4_pipeline_compile(address_of(pipe->pipe));
 
-    // pipe->time_location = kinc_g4_pipeline_get_constant_location(address_of(pipe->pipe), "time");
+    pipe->time_location = kinc_g4_pipeline_get_constant_location(address_of(pipe->pipe), "vTime");
     pipe->texture_unit = kinc_g4_pipeline_get_texture_unit(address_of(pipe->pipe), "tex");
 
     pipe->update_callback = &v_internal_pipeline_textured_update_callback;

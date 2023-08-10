@@ -389,7 +389,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
 		//[Gameloop Configuration]
 		game.logic_world.enable_excessive_frametime_exit = true;
 		game.logic_world.enable_framerate_limit = true;
-		game.logic_world.fps_limit = 1.0 / 30.0;
+		game.logic_world.fps_limit = 1.0 / 500.0;
 
 		//[Kinc Settings]
 		game.logic_world.window = wo;
@@ -452,20 +452,20 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //Test Game Data
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.5f);
-        vds_array_push(address_of(game.logic_world.gamedata.y_pos), 0.5f);
-        vds_array_push(address_of(game.logic_world.gamedata.width), 0.15f);
-        vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
-        vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
-
         vds_array_push(address_of(game.logic_world.gamedata.x_pos), -0.5f);
         vds_array_push(address_of(game.logic_world.gamedata.y_pos), -0.5f);
-        vds_array_push(address_of(game.logic_world.gamedata.width), 0.15f);
+        vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
         vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
         vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
 
         vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.1f);
         vds_array_push(address_of(game.logic_world.gamedata.y_pos), 0.1f);
+        vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
+
+        vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.5f);
+        vds_array_push(address_of(game.logic_world.gamedata.y_pos), 0.5f);
         vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
         vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
         vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
@@ -477,9 +477,9 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
         vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
 
         vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die1"));
-        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die1"));
         vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die2"));
         vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die3"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die4"));
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

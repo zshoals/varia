@@ -112,12 +112,12 @@ void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
     Signless_16 * ibo_data = static_cast<Signless_16 *>( kinc_g4_index_buffer_lock_all(address_of(graphics->ibo)) );
     for (Integer_64 i = 0; i < index_count / 6; i += 1)
     {
-        ibo_data[(i * 6) + 0] = (i * 4) + 0;
-        ibo_data[(i * 6) + 1] = (i * 4) + 1;
-        ibo_data[(i * 6) + 2] = (i * 4) + 2;
-        ibo_data[(i * 6) + 3] = (i * 4) + 2;
-        ibo_data[(i * 6) + 4] = (i * 4) + 1;
-        ibo_data[(i * 6) + 5] = (i * 4) + 3;
+        ibo_data[(i * 6) + 0] = (Signless_16)( (i * 4) + 0 );
+        ibo_data[(i * 6) + 1] = (Signless_16)( (i * 4) + 1 );
+        ibo_data[(i * 6) + 2] = (Signless_16)( (i * 4) + 2 );
+        ibo_data[(i * 6) + 3] = (Signless_16)( (i * 4) + 2 );
+        ibo_data[(i * 6) + 4] = (Signless_16)( (i * 4) + 1 );
+        ibo_data[(i * 6) + 5] = (Signless_16)( (i * 4) + 3 );
     }
     kinc_g4_index_buffer_unlock_all(address_of(graphics->ibo));
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -212,6 +212,15 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     kinc_g4_begin(0);
     {
+        unsigned clear_flags = KINC_G4_CLEAR_COLOR;
+        unsigned color = 0;
+        {
+            color |= (255U <<  0); //R
+            color |= (  0U <<  8); //G
+            color |= (  0U << 16); //B
+            color |= ( 65U << 24); //Alpha
+        }
+        kinc_g4_clear(clear_flags, color, 0.0f, 0);
         graphics->tex_pipe.update_callback(address_of(graphics->tex_pipe), v_atlas_get_texture(address_of(graphics->active_atlas)));
         kinc_g4_set_vertex_buffer(vbo);
         kinc_g4_set_index_buffer(address_of(graphics->ibo));
