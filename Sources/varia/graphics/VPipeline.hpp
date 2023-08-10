@@ -8,7 +8,7 @@
 struct Textured_Pipeline;
 
 //TODO(<zshoals> 08-07-2023): Should support any pipeline?
-using Pipeline_Update_Callback = void(*)(Textured_Pipeline * pipe, kinc_g4_texture_t * texture);
+using Pipeline_Update_Callback = void(*)(Textured_Pipeline * pipe, kinc_g4_texture_t * texture, float time);
 
 struct Textured_Pipeline
 {

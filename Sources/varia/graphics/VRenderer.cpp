@@ -5,22 +5,6 @@
 #include "varia/graphics/VPipeline.hpp"
 #include "varia/VAssets.hpp"
 
-// static inline void v_graphics_push_vert(float * vbo_base, float x, float y, float z, float u, float v, float r, float g, float b, float a)
-// {
-//     //Position
-//     vbo_base[0] = x;
-//     vbo_base[1] = y;
-//     vbo_base[2] = z;
-//     //UV
-//     vbo_base[3] = u;
-//     vbo_base[4] = v;
-//     //Color
-//     vbo_base[5] = r;
-//     vbo_base[6] = g;
-//     vbo_base[7] = b;
-//     vbo_base[8] = a;
-// }
-
 static inline float * v_graphics_push_pos(float * vbo_base, float x, float y, float layer)
 {
     //Position
@@ -88,9 +72,9 @@ void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
 
     //Initialize Vertex and Index Buffers
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    int quad_count = 2000;
-    int vertex_count = quad_count * 4;
-    int index_count = quad_count * 6;
+    int const quad_count = 2000;
+    int const vertex_count = quad_count * 4;
+    int const index_count = quad_count * 6;
 
     kinc_g4_vertex_buffer_init
     (
@@ -123,7 +107,9 @@ void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 }
 
-void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate_Representation const * ir)
+static bool resized_test = false;
+
+void v_graphics_renderer_render(Graphics_State * graphics, Gamestate * visual_world, Graphics_Intermediate_Representation const * ir)
 {
     kinc_g4_vertex_buffer_t * vbo = address_of(graphics->vbo);
 
@@ -221,7 +207,7 @@ void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate
             color |= ( 65U << 24); //Alpha
         }
         kinc_g4_clear(clear_flags, color, 0.0f, 0);
-        graphics->tex_pipe.update_callback(address_of(graphics->tex_pipe), v_atlas_get_texture(address_of(graphics->active_atlas)));
+        graphics->tex_pipe.update_callback(address_of(graphics->tex_pipe), v_atlas_get_texture(address_of(graphics->active_atlas)), (float)visual_world->render_cumulative_gameclock);
         kinc_g4_set_vertex_buffer(vbo);
         kinc_g4_set_index_buffer(address_of(graphics->ibo));
 

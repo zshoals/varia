@@ -7,7 +7,7 @@
 #include "kinc/graphics4/graphics.h"
 #include "kinc/system.h"
 
-static inline void v_internal_pipeline_textured_update_callback(Textured_Pipeline * pipe, kinc_g4_texture_t * texture)
+static inline void v_internal_pipeline_textured_update_callback(Textured_Pipeline * pipe, kinc_g4_texture_t * texture, float time)
 {
     //Replace the old pipeline with our new one yay
     kinc_g4_set_pipeline(address_of(pipe->pipe));
@@ -15,7 +15,7 @@ static inline void v_internal_pipeline_textured_update_callback(Textured_Pipelin
     //Update onboard uniforms
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
-        pipe->time = (float)kinc_time();
+        pipe->time = time;
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

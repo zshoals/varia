@@ -14,6 +14,7 @@
 #include "kinc/graphics4/textureunit.h"
 #include "kinc/graphics4/constantlocation.h"
 #include "kinc/graphics4/graphics.h"
+#include "varia/VGamestate.hpp"
 
 
 struct Graphics_State
@@ -30,6 +31,7 @@ struct Graphics_State
 
 void v_graphics_initialize(Graphics_State * graphics, Assets * assets);
 
-void v_graphics_renderer_render(Graphics_State * graphics, Graphics_Intermediate_Representation const * ir);
-
+void v_graphics_renderer_render(Graphics_State * graphics, Gamestate * visual_world, Graphics_Intermediate_Representation const * ir);
+void v_graphics_ir_build();
+void v_graphics_ir_clear();
 

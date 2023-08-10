@@ -55,9 +55,9 @@ static void v_gameloop_simulate(Gamestate * gs, E_Simulating simulating, E_Simul
     v_simulation_simulate(gs, simulating, mode);
 }
 
-static void v_gameloop_render(Graphics_State * gfx, Graphics_Intermediate_Representation const * ir)
+static void v_gameloop_render(Graphics_State * gfx, Gamestate * visual_world, Graphics_Intermediate_Representation const * ir)
 {
-    v_graphics_renderer_render(gfx, ir);
+    v_graphics_renderer_render(gfx, visual_world, ir);
 }
 
 void v_gameloop_entrypoint(void * data)
@@ -349,7 +349,7 @@ void v_gameloop_entrypoint(void * data)
             v_graphics_ir_clear(ir_out);
             v_graphics_ir_build(ir_out, visual_world, address_of(context->graphics_state.active_atlas));
 
-            v_gameloop_render(address_of(context->graphics_state), ir_out);
+            v_gameloop_render(address_of(context->graphics_state), visual_world, ir_out);
 
             //TODO(<zshoals> 07-30-2023): Gameclocks should be updated inside simulating because
             //  we might pause the simulation lul
@@ -389,7 +389,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
 		//[Gameloop Configuration]
 		game.logic_world.enable_excessive_frametime_exit = true;
 		game.logic_world.enable_framerate_limit = true;
-		game.logic_world.fps_limit = 1.0 / 500.0;
+		game.logic_world.fps_limit = 1.0 / 300.0;
 
 		//[Kinc Settings]
 		game.logic_world.window = wo;
