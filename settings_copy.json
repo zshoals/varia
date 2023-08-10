@@ -4,7 +4,7 @@
 
     "workbench.colorTheme": "Verdandi Alter",
     "editor.fontFamily": "'Iosevka SS06', 'Terminus (TTF) for Windows', 'Iosevka SS06',  'Liga Liberation Mono', 'Liberation Mono', 'IntelOne Mono',  Consolas, 'Courier New', monospace",
-    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
     "terminal.integrated.profiles.windows": {
         "PowerShell": {
             "source": "PowerShell",
@@ -83,9 +83,10 @@
                         "support.variable",
                         "meta.cast",
                         "meta.preprocessor",
-                        // "meta.preprocessor string",
+                        "entity.name.label.cpp",
                         "entity.name.scope-resolution.cpp",
                         "constant.language",
+                        // "meta.preprocessor string",
                     ],
                     "settings": {
                         "foreground": "#949ca3",
@@ -118,6 +119,8 @@
                     "scope": [
                         "keyword.other.unit",
                         "meta.encoding.cpp",
+                        "constant.language.nullptr.cpp",
+                        "constant.language.NULL.cpp",
                     ],
                     "settings": {
                         "foreground": "#cfcc8a",
@@ -128,6 +131,7 @@
                     "scope": [
                         "storage.type.struct.cpp",
                         "storage.type.class.cpp",
+                        "storage.type.union.cpp",
                         "storage.type.enum.enum-key.class.cpp",
                         "storage.type.enum",
                     ],
@@ -248,7 +252,6 @@
     "editor.foldingHighlight": false,
     "editor.occurrencesHighlight": false,
     "editor.matchBrackets": "never",
-    "editor.fontSize": 16,
     "editor.cursorBlinking": "solid",
     "editor.renderLineHighlight": "none",
     "editor.scrollbar.horizontal": "hidden",
@@ -275,5 +278,32 @@
     "C_Cpp.intelliSenseEngine": "Tag Parser",
     "C_Cpp.autocomplete": "disabled",
     "editor.folding": false,
-    "workbench.activityBar.visible": false
+    "workbench.activityBar.visible": false,
+    "window.commandCenter": false,
+    "editor.cursorSmoothCaretAnimation": "on",
+    "headerSourceSwitch.mappings": [
+
+        {
+            "header": [
+                ".h",
+                ".hpp",
+                ".hh",
+                ".hxx"
+            ],
+            "source": [
+                ".source",
+                ".cpp",
+                ".c",
+                ".cc",
+                ".cxx",
+                ".m",
+                ".mm"
+            ],
+            "name": "C++"
+        }
+    ],
+
+    "files.associations": {
+        "*.source": "cpp",
+    }
 }
