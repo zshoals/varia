@@ -6,6 +6,8 @@
 //Ugh
 #include <stdlib.h>
 
+#include "VDS-Result.hpp"
+
 template <typename T, Integer_64 SIZE>
 struct VDS_Array
 {
@@ -96,6 +98,25 @@ Integer_64 vds_array_index_of(VDS_Array<T, SIZE> const * array, FUNC search_func
     }
 
     return -1;
+}
+
+template <typename T, Integer_64 SIZE, typename FUNC>
+VDS_Result<T> vds_array_try_find(VDS_Array<T, SIZE> * array, FUNC search_function)
+{
+    Integer_64 item_index = vds_array_index_of(array, search_function);
+
+    VDS_Result<T> res = {};
+    if (item_index >= 0)
+    {
+        res.element = vds_array_location_of(array, item_index);
+        res.valid = true;
+    }
+    else
+    {
+        res.valid = false;
+    }
+
+    return res;
 }
 
 template <typename T, Integer_64 SIZE, typename FUNC>
