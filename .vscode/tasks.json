@@ -11,7 +11,7 @@
 				"windows",
 				// "--graphics",
 				// "direct3d11",
-				"--compile",
+				// "--compile",
 				"--debug"
 			],
 			"group": "build",
