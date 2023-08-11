@@ -17,7 +17,6 @@ struct Textured_Pipeline
 
     //NOTE(<zshoals> 08-05-2023): Use standard types here as these will be passed into the GPU as uniforms
     //  may as well be pessimistic about the situation
-    //"time"
     kinc_g4_constant_location_t time_location;
     float time;
 
