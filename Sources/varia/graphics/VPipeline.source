@@ -47,8 +47,8 @@ void v_pipeline_initialize_textured(Textured_Pipeline * pipe, kinc_g4_vertex_str
 
     kinc_g4_pipeline_compile(address_of(pipe->pipe));
 
-    pipe->time_location = kinc_g4_pipeline_get_constant_location(address_of(pipe->pipe), "vTime");
-    pipe->texture_unit = kinc_g4_pipeline_get_texture_unit(address_of(pipe->pipe), "tex");
+    pipe->time_location = kinc_g4_pipeline_get_constant_location(address_of(pipe->pipe), "u_time");
+    pipe->texture_unit = kinc_g4_pipeline_get_texture_unit(address_of(pipe->pipe), "u_tex");
 
     pipe->update_callback = &v_internal_pipeline_textured_update_callback;
 }

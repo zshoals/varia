@@ -11,8 +11,9 @@ enum class E_Gameplay_Action
 {
     Move_Right,
     Move_Left,
+    Reload_Shader,
 
-    MAX_COUNT //The way we use this means it acts like 
+    MAX_COUNT 
 };
 
 enum class E_Gameplay_Event
@@ -26,6 +27,9 @@ enum class E_Gameplay_Event
 
     Move_Left_Pressed,
     Move_Left_Released,
+
+    Reload_Shader_Pressed,
+    Reload_Shader_Released,
 
 };
 
@@ -62,6 +66,7 @@ void v_input_initialize(Input_Virtual_Action_State * input);
 
 void v_input_configure_move_right_action(Input_Virtual_Action_State * state, Kinc_Keycode key, Boolean use_shift, Boolean use_control, Boolean use_alt);
 void v_input_configure_move_left_action(Input_Virtual_Action_State * state, Kinc_Keycode key, Boolean use_shift, Boolean use_control, Boolean use_alt);
+void v_input_configure_reload_shader_action(Input_Virtual_Action_State * state, Kinc_Keycode key, Boolean use_shift, Boolean use_control, Boolean use_alt);
 
 void v_input_trigger_all_keyup_actions(Input_Virtual_Action_State * state);
 void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/);

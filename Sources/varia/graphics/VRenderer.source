@@ -47,14 +47,13 @@ static void v_internal_graphics_ir_build(Graphics_IR * ir, Gamestate const * vis
     {
         VDS_Short_String const * sub_image_name = vds_array_location_of(address_of(game->enemy_texture), i);
 
-        // //TODO(<zshoals> 08-09-2023): This sucks, this should really be a hash map
-        // //TODO(<zshoals> 08-09-2023): This could be minimized by not figuring this out on demand, but rather setting the UV
-        // //  coordinates when we assign a texture instead
+        VDS_Result<Atlas_Sub_Image const *> res = v_atlas_find_sub_image(atlas, sub_image_name);
 
-        VDS_Result<Atlas_Sub_Image const *> res = vds_array_try_find(subs, [&sub_image_name](Atlas_Sub_Image const * image)
+        if (!res.valid)
         {
-            return vds_string_matches( dereference(sub_image_name), image->name );
-        });
+            VDS_Short_String fallback = vds_string_create<VDS_Short_String>("dev_missing_64x64");
+            res = v_atlas_find_sub_image(atlas, address_of(fallback));
+        }
 
         if (res.valid)
         {
@@ -62,7 +61,7 @@ static void v_internal_graphics_ir_build(Graphics_IR * ir, Gamestate const * vis
             float inverse_width = 1.0f / atlas->width;
             float inverse_height = 1.0f / atlas->height;
 
-            Graphics_Item * item = vds_array_construct_push(address_of(ir->items));
+            Graphics_Renderable * item = vds_array_construct_push(address_of(ir->items));
             item->x     = vds_array_copy_of(address_of(game->x_pos), i);
             item->y     = vds_array_copy_of(address_of(game->y_pos), i);
             item->layer = vds_array_copy_of(address_of(game->layer), i);
@@ -77,7 +76,7 @@ static void v_internal_graphics_ir_build(Graphics_IR * ir, Gamestate const * vis
             item->b     = 1.0;
             item->a     = 1.0;
 
-            Graphics_Item_Sortable * sortable = vds_array_construct_push(address_of(ir->sortables));
+            Graphics_Renderable_Sortable * sortable = vds_array_construct_push(address_of(ir->sortables));
             sortable->layer = item->layer;
             sortable->item = item;
 
@@ -94,8 +93,8 @@ static void v_internal_graphics_ir_build(Graphics_IR * ir, Gamestate const * vis
     //TODO(<zshoals> 08-09-2023): It's qsort, this is going to be very slow
     vds_array_sort(address_of(ir->sortables), [](const void * a, const void * b)
     {
-        Graphics_Item_Sortable const * left = (Graphics_Item_Sortable const *)a;
-        Graphics_Item_Sortable const * right = (Graphics_Item_Sortable const *)b;
+        Graphics_Renderable_Sortable const * left = (Graphics_Renderable_Sortable const *)a;
+        Graphics_Renderable_Sortable const * right = (Graphics_Renderable_Sortable const *)b;
 
         return (left->layer < right->layer) ? -1 : 1;
     });
@@ -118,9 +117,10 @@ void v_graphics_initialize(Graphics_State * graphics, Assets * assets)
     // kinc_g4_vertex_structure_add(address_of(graphics->vertex_layout), "color", KINC_G4_VERTEX_DATA_U32_1X);
     // kinc_g4_vertex_structure_add(address_of(graphics->vertex_layout), "uv", KINC_G4_VERTEX_DATA_F32_2X);
 
-    kinc_g4_vertex_structure_add(address_of(graphics->vertex_layout), "vertexPosition", KINC_G4_VERTEX_DATA_F32_3X);
-    kinc_g4_vertex_structure_add(address_of(graphics->vertex_layout), "vertexUV", KINC_G4_VERTEX_DATA_F32_2X);
-    kinc_g4_vertex_structure_add(address_of(graphics->vertex_layout), "vertexColor", KINC_G4_VERTEX_DATA_F32_4X);
+    kinc_g4_vertex_structure_add(address_of(graphics->vertex_layout), "v_pos", KINC_G4_VERTEX_DATA_F32_2X);
+    kinc_g4_vertex_structure_add(address_of(graphics->vertex_layout), "v_layer", KINC_G4_VERTEX_DATA_F32_1X);
+    kinc_g4_vertex_structure_add(address_of(graphics->vertex_layout), "v_uv", KINC_G4_VERTEX_DATA_F32_2X);
+    kinc_g4_vertex_structure_add(address_of(graphics->vertex_layout), "v_color", KINC_G4_VERTEX_DATA_F32_4X);
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -205,8 +205,8 @@ void v_graphics_render(Graphics_State * graphics, Gamestate * visual_world)
         float * vbo_data = vbo_base;
         for_range_var(i, 4)
         {
-            Graphics_Item_Sortable const * sortable = vds_array_location_of(const_address_of(graphics->ir.sortables), i);
-            Graphics_Item const * item = sortable->item;
+            Graphics_Renderable_Sortable const * sortable = vds_array_location_of(const_address_of(graphics->ir.sortables), i);
+            Graphics_Renderable const * item = sortable->item;
 
             //Vert 0
             vbo_data = v_graphics_push_pos(vbo_data, item->x, item->y, item->layer);
@@ -235,6 +235,7 @@ void v_graphics_render(Graphics_State * graphics, Gamestate * visual_world)
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     kinc_g4_begin(0);
     {
+        kinc_g4_set_texture_minification_filter(graphics->active_texture_unit, KINC_G4_TEXTURE_FILTER_LINEAR);
         unsigned clear_flags = KINC_G4_CLEAR_COLOR;
         unsigned color = 0;
         {
@@ -252,6 +253,8 @@ void v_graphics_render(Graphics_State * graphics, Gamestate * visual_world)
         kinc_g4_draw_indexed_vertices_from_to(0, 48);
     }
     kinc_g4_end(0);
+
+
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     kinc_g4_swap_buffers();

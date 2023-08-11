@@ -48,7 +48,7 @@
 			"command": "C:/HaxeLibraries/Kinc/make.bat",
 			"args": [
 				"windows",
-				"--noshaders",
+				// "--noshaders",
 				"--debug"
 			],
 			"group": "build",

@@ -14,39 +14,14 @@
 #include "kinc/graphics4/constantlocation.h"
 #include "kinc/graphics4/graphics.h"
 #include "varia/VGamestate.hpp"
-
-struct Graphics_Item
-{
-    float x;
-    float y;
-    //NOTE(<zshoals> 08-09-2023): Layer is duplicated to avoid having to somehow get 
-    //  this value from Graphics_Item_Sortable later
-    float layer;
-    float w;
-    float h;
-    //Note: before submitting the graphics item, we must resolve the uv coordinates
-    float u_min;
-    float v_min;
-    float u_max;
-    float v_max;
-    float r;
-    float g;
-    float b;
-    float a;
-};
-
-struct Graphics_Item_Sortable
-{
-    float layer;
-    Graphics_Item const * item;
-};
+#include "varia/graphics/VGraphicsItem.hpp"
 
 struct Graphics_IR
 {
     Integer_64 count;
 
-    VDS_Array<Graphics_Item,          1024> items;
-    VDS_Array<Graphics_Item_Sortable, 1024> sortables;
+    VDS_Array<Graphics_Renderable,          1024> items;
+    VDS_Array<Graphics_Renderable_Sortable, 1024> sortables;
 };
 
 struct Graphics_State

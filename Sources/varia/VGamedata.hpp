@@ -2,9 +2,11 @@
 
 #include "varia/ds/VDS-Array.hpp"
 #include "varia/ds/VDS-String.hpp"
+#include "varia/graphics/VGraphicsItem.hpp"
 
 //NOTE(<zshoals> 08-09-2023): This struct houses the ACTUAL gameplay stuff, things like
 //  player and enemy behaviors, not info that's more meta than that. Meta info is in "Gamestate"
+
 struct Gamedata
 {
     VDS_Array<VDS_Short_String, 32> enemy_texture;
@@ -13,4 +15,9 @@ struct Gamedata
     VDS_Array<float, 32> width;
     VDS_Array<float, 32> height;
     VDS_Array<float, 32> layer;
+
+
+
+
+    VDS_Array<Graphics_Renderable, 131072> renderables;
 };

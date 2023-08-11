@@ -52,6 +52,14 @@ void v_input_configure_move_left_action(Input_Virtual_Action_State * state, Kinc
     virtual_key->event_released = E_Gameplay_Event::Move_Left_Released;
 }
 
+void v_input_configure_reload_shader_action(Input_Virtual_Action_State * state, Kinc_Keycode key, Boolean use_shift, Boolean use_control, Boolean use_alt)
+{
+    Input_Virtual_Key * virtual_key = address_of(state->virtual_keys[(Integer_64)(E_Gameplay_Action::Reload_Shader)]);
+    v_input_configure_virtual_key(virtual_key, key, use_shift, use_control, use_alt);
+    virtual_key->event_pressed = E_Gameplay_Event::Reload_Shader_Pressed;
+    virtual_key->event_released = E_Gameplay_Event::Reload_Shader_Released;
+}
+
 void v_input_keydown_callback(Kinc_Keycode key, void * data /*Input_Virtual_Action_State * state*/)
 {
     Input_Virtual_Action_State * state = static_cast<Input_Virtual_Action_State *>(data);
