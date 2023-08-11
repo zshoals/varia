@@ -73,7 +73,7 @@ void v_gameloop_entrypoint(void * data)
         //  how do we handle this? do we resolve collisions with some sort of prioritization or just allow things
         //  through?
 
-        v_input_process_events(address_of(context->input), [&logic_world, &system_events](E_Gameplay_Event e)
+        v_input_process_events(address_of(context->input), [&context, &logic_world, &system_events](E_Gameplay_Event e)
         {
             switch (e)
             {
@@ -117,6 +117,21 @@ void v_gameloop_entrypoint(void * data)
                     Float_64 data = kinc_time();
                     kinc_log(KINC_LOG_LEVEL_INFO, "LEFT RELEASE FUCK YOU detected! %f!", data);
                     break;
+                }
+                case E_Gameplay_Event::Reload_Shader_Pressed:
+                {
+                    Assets * ass_loc = address_of(context->assets);
+                    v_assets_unload_all(ass_loc);
+                    v_assets_load_texture(ass_loc, address_of(context->assets.atlas_texture_01), "atlas.k");
+                    v_assets_load_atlas_metadata(ass_loc, address_of(context->assets.atlas_metadata_01), "atlas.atlasmeta");
+                    v_assets_load_shader(ass_loc, address_of(context->assets.textured_vert), "textured-standard.vert");
+                    v_assets_load_shader(ass_loc, address_of(context->assets.textured_frag), "textured-standard.frag");
+                    v_graphics_initialize(address_of(context->graphics_state), ass_loc);
+
+                }
+                case E_Gameplay_Event::Reload_Shader_Released:
+                {
+                    VARIA_NO_OPERATION();
                 }
             }
         });
@@ -414,6 +429,7 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
 
         v_input_configure_move_right_action(input, KINC_KEY_D, false, false, false);
         v_input_configure_move_left_action(input, KINC_KEY_A, false, false, false);
+        v_input_configure_reload_shader_action(input, KINC_KEY_R, true, false, false);
 
         //Reset all parameters to their default up state
         v_input_trigger_all_keyup_actions(input);
@@ -436,8 +452,8 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     //BEGIN:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     {
         Assets * ass_loc = address_of(game.assets);
-        v_assets_load_texture(ass_loc, address_of(game.assets.atlas_texture_01), "output_atlas.k");
-        v_assets_load_atlas_metadata(ass_loc, address_of(game.assets.atlas_metadata_01), "atlas_dump.atlas");
+        v_assets_load_texture(ass_loc, address_of(game.assets.atlas_texture_01), "atlas.k");
+        v_assets_load_atlas_metadata(ass_loc, address_of(game.assets.atlas_metadata_01), "atlas.atlasmeta");
         v_assets_load_shader(ass_loc, address_of(game.assets.textured_vert), "textured-standard.vert");
         v_assets_load_shader(ass_loc, address_of(game.assets.textured_frag), "textured-standard.frag");
     }
@@ -448,20 +464,20 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
     {
         vds_array_push(address_of(game.logic_world.gamedata.x_pos), -0.5f);
         vds_array_push(address_of(game.logic_world.gamedata.y_pos), -0.5f);
-        vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
-        vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.width), 0.30f);
+        vds_array_push(address_of(game.logic_world.gamedata.height), 0.30f);
         vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
 
         vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.1f);
         vds_array_push(address_of(game.logic_world.gamedata.y_pos), 0.1f);
-        vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
-        vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.width), 0.30f);
+        vds_array_push(address_of(game.logic_world.gamedata.height), 0.30f);
         vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
 
-        vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.5f);
-        vds_array_push(address_of(game.logic_world.gamedata.y_pos), 0.5f);
-        vds_array_push(address_of(game.logic_world.gamedata.width), 0.10f);
-        vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
+        vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.4f);
+        vds_array_push(address_of(game.logic_world.gamedata.y_pos), 0.1f);
+        vds_array_push(address_of(game.logic_world.gamedata.width), 0.30f);
+        vds_array_push(address_of(game.logic_world.gamedata.height), 0.30f);
         vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
 
         vds_array_push(address_of(game.logic_world.gamedata.x_pos), 0.9f);
@@ -470,10 +486,10 @@ void v_gameloop_initialize(kinc_window_options_t wo, kinc_framebuffer_options_t 
         vds_array_push(address_of(game.logic_world.gamedata.height), 0.10f);
         vds_array_push(address_of(game.logic_world.gamedata.layer), 0.5f);
 
-        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die1"));
-        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die2"));
-        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die3"));
-        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("die4"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("dev_missing_64x64"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("dev_texture_64x64_blue"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("dev_texture_64x64_red"));
+        vds_array_push(address_of(game.logic_world.gamedata.enemy_texture), vds_string_create<VDS_Short_String>("white_pixel_1x1"));
     }
     //END:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

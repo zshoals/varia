@@ -52,6 +52,6 @@ struct Assets
 Boolean v_assets_load_texture(Assets * assets, Asset_Texture * texture, char const * path);
 Boolean v_assets_load_shader(Assets * assets, Asset_Shader * shader, char const * path);
 Boolean v_assets_load_atlas_metadata(Assets * assets, Asset_Atlas_Metadata * metadata, char const * path);
-
+void v_assets_unload_all(Assets * assets);
 
 // Boolean v_assets_load_pipeline(Asset_Pipeline * pipe, Permanent_Storage_Arena * arena, Asset_Asset_Shader * vert, Asset_Shader * frag)

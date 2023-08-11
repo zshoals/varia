@@ -122,3 +122,18 @@ Boolean v_assets_load_atlas_metadata(Assets * assets, Asset_Atlas_Metadata * met
         return false;
     }
 }
+
+void v_assets_unload_all(Assets * assets)
+{
+    kinc_g4_texture_destroy(address_of(assets->atlas_texture_01.texture));
+    kinc_g4_shader_destroy(address_of(assets->textured_vert.shader));
+    kinc_g4_shader_destroy(address_of(assets->textured_frag.shader));
+    // memset(assets, 0, sizeof(*assets));
+    vds_arena_clear(address_of(assets->permanent_storage));
+    vds_arena_clear(address_of(assets->temporary_storage));
+
+    assets->atlas_texture_01.loaded = false;
+    assets->atlas_metadata_01.loaded = false;
+    assets->textured_vert.loaded = false;
+    assets->textured_frag.loaded = false;
+}
